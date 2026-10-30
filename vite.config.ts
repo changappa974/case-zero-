@@ -3,11 +3,6 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
-
-const allowedHosts = [
-  "case-zero-qm15.onrender.com",
-  "https://case-zero-qm15.onrender.com",
-];
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
@@ -16,8 +11,14 @@ export default defineConfig({
   ],
   base: './',
   server: {
-    port: 5173,
+    port: process.env.PORT ? parseInt(process.env.PORT) : 5173,
     host: true,
+    allowedHosts: true, // Allows Render domains (e.g. case-zero-qm15.onrender.com) and custom domains
+  },
+  preview: {
+    port: process.env.PORT ? parseInt(process.env.PORT) : 4173,
+    host: true,
+    allowedHosts: true, // Allows Render domains (e.g. case-zero-qm15.onrender.com) and custom domains
   },
   build: {
     outDir: 'dist',
