@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
@@ -8,9 +9,16 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  base: './',
   server: {
     port: 5173,
     host: true,
+  },
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: false,
+    chunkSizeWarningLimit: 1200,
   },
   test: {
     globals: true,
