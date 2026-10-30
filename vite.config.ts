@@ -3,6 +3,11 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
+
+const allowedHosts = [
+  "case-zero-qm15.onrender.com",
+  "https://case-zero-qm15.onrender.com",
+];
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
