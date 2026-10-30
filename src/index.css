@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+@theme {
+  --color-charcoal-950: #07080a;
+  --color-charcoal-900: #0c0e12;
+  --color-charcoal-850: #11141a;
+  --color-charcoal-800: #171a22;
+  --color-charcoal-700: #232834;
+  --color-charcoal-600: #32394a;
+  --color-crime-red: #dc2626;
+  --color-crime-amber: #f59e0b;
+  --color-crime-cyan: #06b6d4;
+  --color-crime-dim: #4b5563;
+}
+
+body {
+  background-color: #07080a;
+  color: #f3f4f6;
+  min-height: 100vh;
+}
+
+/* Custom forensic scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0c0e12;
+}
+::-webkit-scrollbar-thumb {
+  background: #232834;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #f59e0b;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out forwards;
+}
