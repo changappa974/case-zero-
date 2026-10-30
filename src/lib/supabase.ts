@@ -92,8 +92,8 @@ export async function registerParticipant(participantName: string): Promise<{ pa
   }
 
   // Resilient Local fallback
-  const mockParticipantId = 'p-' + Math.random().toString(36).substring(2, 9);
-  const mockSessionId = 'sess-' + Math.random().toString(36).substring(2, 9);
+  const mockParticipantId = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : 'a0000000-0000-0000-0000-000000000001';
+  const mockSessionId = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : 'b0000000-0000-0000-0000-000000000001';
 
   const participant: Participant = {
     id: mockParticipantId,

@@ -1,7 +1,7 @@
 import { MysteryCase, Suspect, Evidence, CCTVFeed, AudioLog, TimelineEntry } from '../types';
 
 export const CASE_DATA: MysteryCase = {
-  id: 'c0a80101-0000-0000-0000-000000000001',
+  id: '221814d4-3cbf-42e9-a6cc-13efc373a1ae',
   slug: 'the-74-second-vanishing',
   title: 'CASE ZERO: The 74-Second Vanishing',
   tagline: 'Every Detail Tells a Story. Can You Find the Truth?',
@@ -13,8 +13,8 @@ export const CASE_DATA: MysteryCase = {
 
 export const INITIAL_SUSPECTS: Suspect[] = [
   {
-    id: 's001-mira-sen',
-    case_id: CASE_DATA.id,
+    id: '293c8464-eadd-40c9-8144-c8baef53a57e',
+    case_id: '221814d4-3cbf-42e9-a6cc-13efc373a1ae',
     display_name: 'Mira Sen',
     role: 'Project Leader & Lead Hardware Architect',
     portrait_url: '/suspects/mira-sen.jpg',
@@ -29,8 +29,8 @@ export const INITIAL_SUSPECTS: Suspect[] = [
     }
   },
   {
-    id: 's002-kabir-rao',
-    case_id: CASE_DATA.id,
+    id: 'e67496a0-9dce-46a9-8a49-758ec188f589',
+    case_id: '221814d4-3cbf-42e9-a6cc-13efc373a1ae',
     display_name: 'Kabir Rao',
     role: 'Technical Operations Assistant',
     portrait_url: '/suspects/kabir-rao.jpg',
@@ -45,8 +45,8 @@ export const INITIAL_SUSPECTS: Suspect[] = [
     }
   },
   {
-    id: 's003-rhea-das',
-    case_id: CASE_DATA.id,
+    id: '2c79ee51-d64e-438f-ab93-60a199c84ce0',
+    case_id: '221814d4-3cbf-42e9-a6cc-13efc373a1ae',
     display_name: 'Rhea Das',
     role: 'Event Coordinator',
     portrait_url: '/suspects/rhea-das.jpg',
@@ -61,8 +61,8 @@ export const INITIAL_SUSPECTS: Suspect[] = [
     }
   },
   {
-    id: 's004-dev-malhotra',
-    case_id: CASE_DATA.id,
+    id: '84f88770-cdac-43e9-a0eb-783ef6541a90',
+    case_id: '221814d4-3cbf-42e9-a6cc-13efc373a1ae',
     display_name: 'Dev Malhotra',
     role: 'Visiting Evaluator & Tech Journalist',
     portrait_url: '/suspects/dev-malhotra.jpg',
