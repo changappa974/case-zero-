@@ -65,13 +65,14 @@ describe('CASE ZERO Investigation Workflow & Data Integrity', () => {
     expect(receipt.confirmation_code).toMatch(/^CZ-/);
     expect(receipt.submission_id).toBeDefined();
 
-    // Verify stored submission in registry
+    // Verify stored submission in Supabase registry
     const submissions = await getOrganizerSubmissions();
-    expect(submissions.length).toBe(1);
-    const saved = submissions[0];
-    expect(saved.selected_suspect).toBe('Rhea Das');
-    expect(saved.score).toBeGreaterThanOrEqual(80); // Accused Rhea, selected 4 critical clues, provided complete explanation
-    expect(saved.submission_status).toBe('verified');
+    expect(submissions.length).toBeGreaterThanOrEqual(1);
+    const saved = submissions.find((s) => s.session_id === session.id);
+    expect(saved).toBeDefined();
+    expect(saved!.selected_suspect).toBe('Rhea Das');
+    expect(saved!.score).toBeGreaterThanOrEqual(80); // Accused Rhea, selected 4 critical clues, provided complete explanation
+    expect(saved!.submission_status).toBe('verified');
   });
 
   it('rejects submissions with explanations that are too short', async () => {

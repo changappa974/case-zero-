@@ -8,7 +8,7 @@ import { Stage4EvidenceBoard } from './stages/Stage4EvidenceBoard';
 import { Stage5Submission } from './stages/Stage5Submission';
 import { OrganizerDashboard } from './components/OrganizerDashboard';
 import { InvestigationStage, Participant, InvestigationSession, SubmissionReceipt } from './types';
-import { getSavedSession, updateSessionProgress } from './lib/supabase';
+import { restoreActiveSession, updateSessionProgress } from './lib/supabase';
 import { soundFX } from './lib/audioService';
 
 export const App: React.FC = () => {
@@ -25,29 +25,30 @@ export const App: React.FC = () => {
   const [showOrganizer, setShowOrganizer] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(false);
 
-  // Restore session on mount
+  // Restore session from Supabase on mount
   useEffect(() => {
-    const saved = getSavedSession();
-    if (saved.participant && saved.session) {
-      setParticipant(saved.participant);
-      setSession(saved.session);
-      const stage = (saved.session.stage_reached as InvestigationStage) || 1;
-      setCurrentStage(stage);
-      setMaxStageReached(Math.max(stage, saved.session.stage_reached || 1));
-      if (saved.session.collected_evidence_ids) {
-        setCollectedEvidence(saved.session.collected_evidence_ids);
+    restoreActiveSession().then((saved) => {
+      if (saved.participant && saved.session) {
+        setParticipant(saved.participant);
+        setSession(saved.session);
+        const stage = (saved.session.stage_reached as InvestigationStage) || 1;
+        setCurrentStage(stage);
+        setMaxStageReached(Math.max(stage, saved.session.stage_reached || 1));
+        if (saved.session.collected_evidence_ids) {
+          setCollectedEvidence(saved.session.collected_evidence_ids);
+        }
+        if (saved.session.connected_links) {
+          setConnectedLinks(saved.session.connected_links);
+        }
+        if (saved.session.suspect_notes) {
+          setSuspectNotes(saved.session.suspect_notes);
+        }
+        if (saved.session.status === 'submitted') {
+          setCurrentStage(5);
+          setMaxStageReached(5);
+        }
       }
-      if (saved.session.connected_links) {
-        setConnectedLinks(saved.session.connected_links);
-      }
-      if (saved.session.suspect_notes) {
-        setSuspectNotes(saved.session.suspect_notes);
-      }
-      if (saved.session.status === 'submitted') {
-        setCurrentStage(5);
-        setMaxStageReached(5);
-      }
-    }
+    });
   }, []);
 
   // Update session stage helper
