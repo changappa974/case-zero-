@@ -177,9 +177,15 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
                     <p className="text-xs font-bold text-[#1c1917] mb-1">
                       {log.title}
                     </p>
-                    <p className="text-[11px] text-stone-800 font-mono italic mb-3 leading-relaxed bg-[#fbf9f5] p-2 rounded border border-[#cfc7b7]">
-                      “{log.transcript}”
-                    </p>
+                    <div className="text-xs text-stone-900 font-sans mb-3 leading-relaxed bg-[#fbf9f5] p-3 rounded-xl border border-[#cfc7b7] space-y-2">
+                      <p className="font-medium text-stone-900 leading-relaxed">{log.transcript}</p>
+                      {log.clueMeaning && (
+                        <div className="pt-2 border-t border-[#e2dbce] flex items-start space-x-1.5 text-[11px]">
+                          <span className="text-amber-900 font-bold shrink-0">💡 What it means:</span>
+                          <span className="text-stone-700 font-semibold">{log.clueMeaning}</span>
+                        </div>
+                      )}
+                    </div>
 
                     {/* Interactive Playable Button */}
                     <button

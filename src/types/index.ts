@@ -145,6 +145,8 @@ export interface AudioLog {
   speaker: string;
   transcript: string;
   synthesizedFrequency: number;
+  simpleMeaning?: string;
+  clueMeaning?: string;
 }
 
 export interface TimelineEntry {
