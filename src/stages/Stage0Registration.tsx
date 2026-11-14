@@ -40,66 +40,66 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
   };
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 sm:p-6 lg:p-8">
+    <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-slate-50">
       {/* Background Graphic Grid */}
-      <div className="absolute inset-0 bg-[radial-gradient(#1f2430_1px,transparent_1px)] [background-size:24px_24px] opacity-25 pointer-events-none"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:24px_24px] opacity-40 pointer-events-none"></div>
 
-      <div className="relative w-full max-w-2xl bg-charcoal-900/90 border border-charcoal-800 rounded-xl p-6 sm:p-10 shadow-2xl backdrop-blur-xl">
+      <div className="relative w-full max-w-2xl bg-white border border-slate-200 rounded-2xl p-6 sm:p-10 shadow-xl backdrop-blur-xl">
         
         {/* Forensic Classification Stamp */}
-        <div className="flex items-center justify-between border-b border-charcoal-800 pb-4 mb-6">
+        <div className="flex items-center justify-between border-b border-slate-200 pb-4 mb-6">
           <div className="flex items-center space-x-2">
             <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-ping"></span>
-            <span className="text-xs font-mono uppercase tracking-widest text-red-500 font-semibold">
+            <span className="text-xs font-mono uppercase tracking-widest text-red-700 font-bold bg-red-50 px-2.5 py-1 rounded-full border border-red-200">
               CLASSIFIED DOSSIER // RESTRICTED ACCESS
             </span>
           </div>
-          <span className="text-[11px] font-mono text-gray-500">
+          <span className="text-[11px] font-mono text-slate-500 font-semibold">
             REF: FROSTPEAK-2026-CASE-0
           </span>
         </div>
 
-        {/* Title & Tagline matching Prompt Specification */}
+        {/* Title & Tagline */}
         <div className="text-center space-y-3 mb-8">
-          <div className="inline-block px-3 py-1 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono text-xs tracking-widest uppercase">
+          <div className="inline-block px-3 py-1 rounded-full bg-amber-100 border border-amber-300 text-amber-800 font-mono text-xs tracking-widest uppercase font-bold">
             THE VISUAL MYSTERY CHALLENGE
           </div>
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white font-mono">
+          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 font-mono">
             CASE ZERO
           </h1>
-          <p className="text-sm sm:text-base font-medium text-amber-500/90 tracking-wide font-sans italic">
+          <p className="text-base sm:text-lg font-semibold text-amber-700 tracking-wide font-sans italic">
             “Every Detail Tells a Story. Can You Find the Truth?”
           </p>
-          <p className="text-sm text-gray-300 max-w-md mx-auto pt-2">
+          <p className="text-sm text-slate-600 max-w-md mx-auto pt-1 font-medium">
             An incident has occurred. The truth is hidden in what you see.
           </p>
         </div>
 
-        {/* Brief Incident Context */}
-        <div className="bg-charcoal-950/70 border border-charcoal-800/80 rounded-lg p-4 mb-8 text-xs font-mono text-gray-400 space-y-2">
-          <div className="flex justify-between text-gray-300 pb-1.5 border-b border-charcoal-800/80">
-            <span className="text-amber-500">CASE FILE:</span>
-            <span className="text-white font-semibold">MURDER AT FROSTPEAK CONSERVATORY</span>
+        {/* Incident Summary Card */}
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-8 text-xs font-mono text-slate-700 space-y-2.5">
+          <div className="flex justify-between pb-2 border-b border-slate-200">
+            <span className="text-amber-800 font-bold">CASE FILE:</span>
+            <span className="text-slate-900 font-bold">MURDER AT FROSTPEAK CONSERVATORY</span>
           </div>
-          <div className="flex justify-between text-gray-300 pb-1.5 border-b border-charcoal-800/80">
-            <span className="text-amber-500">LOCATION:</span>
-            <span>Frostpeak Conservatory & B-Wing Laboratory</span>
+          <div className="flex justify-between pb-2 border-b border-slate-200">
+            <span className="text-amber-800 font-bold">LOCATION:</span>
+            <span className="font-semibold text-slate-800">Frostpeak Conservatory & B-Wing Laboratory</span>
           </div>
-          <div className="flex justify-between text-gray-300 pb-1.5 border-b border-charcoal-800/80">
-            <span className="text-amber-500">INCIDENT TIME:</span>
-            <span>23:24:00 (Surveillance Window: 22:50 – 23:30)</span>
+          <div className="flex justify-between pb-2 border-b border-slate-200">
+            <span className="text-amber-800 font-bold">INCIDENT TIME:</span>
+            <span className="font-semibold text-slate-800">23:24:00 (Surveillance Window: 22:50 – 23:30)</span>
           </div>
-          <div className="flex justify-between text-gray-300">
-            <span className="text-amber-500">INCIDENT:</span>
-            <span className="text-red-400 font-semibold">Dr. Arthur Vance found deceased with poisoned tea & glowing blue orchid pollen</span>
+          <div className="flex justify-between">
+            <span className="text-amber-800 font-bold">INCIDENT:</span>
+            <span className="text-red-700 font-bold">Dr. Arthur Vance found deceased with poisoned tea & glowing blue orchid pollen</span>
           </div>
         </div>
 
         {/* Form: Full Name Only */}
         <form onSubmit={handleStart} className="space-y-5">
           <div>
-            <label htmlFor="fullName" className="block text-xs font-mono tracking-wider uppercase text-gray-300 mb-2">
-              Participant Full Name <span className="text-red-500">*</span>
+            <label htmlFor="fullName" className="block text-xs font-mono tracking-wider uppercase text-slate-800 font-bold mb-2">
+              Participant Full Name <span className="text-red-600">*</span>
             </label>
             <div className="relative">
               <input
@@ -113,17 +113,17 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
                 placeholder="e.g., Detective Alex Mercer"
                 maxLength={60}
                 disabled={loading}
-                className="w-full bg-charcoal-950 border border-charcoal-700 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 rounded-lg px-4 py-3 text-sm font-mono text-white placeholder-gray-600 transition"
+                className="w-full bg-white border-2 border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 rounded-xl px-4 py-3 text-base font-mono text-slate-900 placeholder-slate-400 font-semibold shadow-sm transition"
                 autoFocus
               />
             </div>
             {errorMessage && (
-              <p className="mt-2 text-xs font-mono text-red-400 flex items-center space-x-1">
+              <p className="mt-2 text-xs font-mono text-red-600 font-bold flex items-center space-x-1">
                 <span>⚠</span>
                 <span>{errorMessage}</span>
               </p>
             )}
-            <p className="mt-2 text-[11px] font-mono text-gray-500">
+            <p className="mt-2 text-[11px] font-mono text-slate-500">
               Your name links to your secure investigation session and final submission receipt. No email, phone, or password required.
             </p>
           </div>
@@ -131,7 +131,7 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
           <button
             type="submit"
             disabled={loading}
-            className="w-full group relative flex items-center justify-center space-x-2 bg-gradient-to-r from-red-700 via-amber-600 to-amber-500 hover:from-red-600 hover:to-amber-400 text-charcoal-950 font-mono font-bold text-sm tracking-wider uppercase py-3.5 px-6 rounded-lg shadow-lg hover:shadow-[0_0_25px_rgba(245,158,11,0.4)] transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:pointer-events-none"
+            className="w-full group relative flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white font-mono font-bold text-sm tracking-wider uppercase py-3.5 px-6 rounded-xl shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:pointer-events-none"
           >
             <span>{loading ? 'INITIALIZING INVESTIGATION...' : 'START INVESTIGATION'}</span>
             <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition" />
@@ -139,18 +139,18 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
         </form>
 
         {/* Visual Pillars */}
-        <div className="grid grid-cols-3 gap-3 pt-6 mt-6 border-t border-charcoal-800/80 text-center font-mono text-[11px] text-gray-400">
-          <div className="p-2 rounded bg-charcoal-950/40 border border-charcoal-800/50">
-            <Video className="w-4 h-4 mx-auto mb-1 text-amber-500/80" />
-            <span>Cinematic Scene</span>
+        <div className="grid grid-cols-3 gap-3 pt-6 mt-6 border-t border-slate-200 text-center font-mono text-xs text-slate-600">
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <Video className="w-4 h-4 mx-auto mb-1 text-blue-600" />
+            <span className="font-semibold text-slate-800">Cinematic Scene</span>
           </div>
-          <div className="p-2 rounded bg-charcoal-950/40 border border-charcoal-800/50">
-            <Search className="w-4 h-4 mx-auto mb-1 text-amber-500/80" />
-            <span>Forensic Evidence</span>
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <Search className="w-4 h-4 mx-auto mb-1 text-amber-600" />
+            <span className="font-semibold text-slate-800">Forensic Clues</span>
           </div>
-          <div className="p-2 rounded bg-charcoal-950/40 border border-charcoal-800/50">
-            <Users className="w-4 h-4 mx-auto mb-1 text-amber-500/80" />
-            <span>4 Real Suspects</span>
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <Users className="w-4 h-4 mx-auto mb-1 text-emerald-600" />
+            <span className="font-semibold text-slate-800">4 Real Suspects</span>
           </div>
         </div>
 

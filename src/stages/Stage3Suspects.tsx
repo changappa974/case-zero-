@@ -46,24 +46,24 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-charcoal-800 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
         <div>
-          <div className="flex items-center space-x-2 text-amber-500 font-mono text-xs tracking-wider">
+          <div className="flex items-center space-x-2 text-amber-700 font-mono text-xs tracking-wider font-bold">
             <span>STAGE 03 OF 05</span>
             <span>//</span>
             <span>PERSONS OF INTEREST</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black font-mono text-white mt-1">
+          <h2 className="text-2xl sm:text-3xl font-black font-mono text-slate-900 mt-1">
             EXAMINE THE FOUR SUSPECTS
           </h2>
-          <p className="text-xs sm:text-sm text-gray-400 mt-1 font-sans">
+          <p className="text-xs sm:text-sm text-slate-600 mt-1 font-sans">
             Analyze suspect statements, physical clothing against CCTV captures, carried equipment, verified alibis, and hidden motives.
           </p>
         </div>
 
         <div className="flex items-center space-x-2 font-mono text-xs">
-          <span className="px-3 py-1.5 rounded-lg bg-charcoal-900 border border-charcoal-700 text-gray-300">
-            DOSSIERS: <strong className="text-amber-400">4 VERIFIED</strong>
+          <span className="px-3.5 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 shadow-sm font-semibold">
+            DOSSIERS: <strong className="text-blue-700 font-bold">4 VERIFIED</strong>
           </span>
         </div>
       </div>
@@ -78,14 +78,14 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
             <div
               key={suspect.id}
               onClick={() => handleSelect(suspect)}
-              className={`group cursor-pointer rounded-2xl overflow-hidden border transition-all duration-200 relative bg-charcoal-900 shadow-xl ${
+              className={`group cursor-pointer rounded-2xl overflow-hidden border transition-all duration-200 relative bg-white shadow-sm hover:shadow-md ${
                 isSelected
-                  ? 'border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.25)] ring-1 ring-amber-500/50'
-                  : 'border-charcoal-800 hover:border-charcoal-700 hover:bg-charcoal-850'
+                  ? 'border-2 border-blue-600 ring-2 ring-blue-100 shadow-md'
+                  : 'border-slate-200 hover:border-slate-300'
               }`}
             >
-              {/* Portrait Aspect Box */}
-              <div className="relative aspect-[4/5] w-full overflow-hidden bg-charcoal-950">
+              {/* Portrait Box */}
+              <div className="relative aspect-[4/5] w-full overflow-hidden bg-slate-100">
                 <img
                   src={suspect.portrait_url}
                   alt={suspect.display_name}
@@ -94,25 +94,23 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
                 
                 {/* Note Indicator Tag */}
                 {hasNote && (
-                  <div className="absolute top-2.5 right-2.5 p-1 rounded-md bg-amber-500 text-charcoal-950 shadow-md">
+                  <div className="absolute top-2.5 right-2.5 p-1 rounded-md bg-blue-600 text-white shadow-md">
                     <Bookmark className="w-3.5 h-3.5 fill-current" />
                   </div>
                 )}
+              </div>
 
-                {/* Bottom Overlay Gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-charcoal-950 via-charcoal-950/20 to-transparent"></div>
-
-                <div className="absolute bottom-2.5 left-3 right-3">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold">
-                    SUSPECT 0{suspect.display_order}
-                  </span>
-                  <h3 className="text-base sm:text-lg font-bold font-mono text-white leading-tight">
-                    {suspect.display_name}
-                  </h3>
-                  <p className="text-[11px] text-gray-300 truncate font-sans">
-                    {suspect.role}
-                  </p>
-                </div>
+              {/* Clear Info Banner Below Image */}
+              <div className="p-3 bg-white border-t border-slate-100">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-blue-700 font-bold">
+                  SUSPECT 0{suspect.display_order}
+                </span>
+                <h3 className="text-base font-bold font-mono text-slate-900 leading-tight">
+                  {suspect.display_name}
+                </h3>
+                <p className="text-xs text-slate-500 truncate font-sans font-medium mt-0.5">
+                  {suspect.role}
+                </p>
               </div>
             </div>
           );
@@ -120,12 +118,12 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
       </div>
 
       {/* Selected Suspect Deep Dive Dossier */}
-      <div className="bg-charcoal-900 border border-charcoal-800 rounded-2xl overflow-hidden shadow-2xl">
+      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
         
         {/* Dossier Header */}
-        <div className="p-6 bg-charcoal-950/90 border-b border-charcoal-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="p-6 bg-slate-50 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center space-x-4">
-            <div className="w-16 h-16 rounded-xl overflow-hidden border border-amber-500/50 shrink-0 shadow-md">
+            <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-slate-200 shrink-0 shadow-sm bg-white">
               <img
                 src={selectedSuspect.portrait_url}
                 alt={selectedSuspect.display_name}
@@ -134,30 +132,30 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <span className="px-2.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono text-[10px] font-bold">
+                <span className="px-2.5 py-0.5 rounded-full bg-blue-100 border border-blue-200 text-blue-800 font-mono text-[10px] font-bold">
                   SUBJECT DOSSIER // 0{selectedSuspect.display_order}
                 </span>
               </div>
-              <h2 className="text-2xl font-black font-mono text-white mt-1">
+              <h2 className="text-2xl font-black font-mono text-slate-900 mt-1">
                 {selectedSuspect.display_name}
               </h2>
-              <p className="text-xs font-mono text-gray-400">
+              <p className="text-xs font-mono text-slate-600 font-medium">
                 {selectedSuspect.role}
               </p>
             </div>
           </div>
 
           {/* Quick Tab Switcher */}
-          <div className="flex items-center space-x-1.5 bg-charcoal-900 p-1.5 rounded-xl border border-charcoal-800 font-mono text-xs overflow-x-auto">
+          <div className="flex items-center space-x-1.5 bg-slate-100 p-1.5 rounded-xl border border-slate-200 font-mono text-xs overflow-x-auto">
             <button
               onClick={() => {
                 soundFX.playCameraSwitch();
                 setActiveTab('statement');
               }}
-              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition ${
+              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition font-semibold ${
                 activeTab === 'statement'
-                  ? 'bg-amber-500 text-charcoal-950 font-bold shadow'
-                  : 'text-gray-400 hover:text-white'
+                  ? 'bg-blue-600 text-white font-bold shadow-sm'
+                  : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200'
               }`}
             >
               STATEMENT & ALIBI
@@ -167,10 +165,10 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
                 soundFX.playCameraSwitch();
                 setActiveTab('clothing');
               }}
-              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition ${
+              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition font-semibold ${
                 activeTab === 'clothing'
-                  ? 'bg-amber-500 text-charcoal-950 font-bold shadow'
-                  : 'text-gray-400 hover:text-white'
+                  ? 'bg-blue-600 text-white font-bold shadow-sm'
+                  : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200'
               }`}
             >
               ATTIRE (CCTV MATCH)
@@ -180,10 +178,10 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
                 soundFX.playCameraSwitch();
                 setActiveTab('belongings');
               }}
-              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition ${
+              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition font-semibold ${
                 activeTab === 'belongings'
-                  ? 'bg-amber-500 text-charcoal-950 font-bold shadow'
-                  : 'text-gray-400 hover:text-white'
+                  ? 'bg-blue-600 text-white font-bold shadow-sm'
+                  : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200'
               }`}
             >
               BELONGINGS
@@ -193,10 +191,10 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
                 soundFX.playCameraSwitch();
                 setActiveTab('motive');
               }}
-              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition ${
+              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition font-semibold ${
                 activeTab === 'motive'
-                  ? 'bg-amber-500 text-charcoal-950 font-bold shadow'
-                  : 'text-gray-400 hover:text-white'
+                  ? 'bg-blue-600 text-white font-bold shadow-sm'
+                  : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200'
               }`}
             >
               MOTIVE AUDIT
@@ -211,11 +209,11 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
           <div className="lg:col-span-2 space-y-6">
             
             {/* Background Narrative */}
-            <div className="p-4 rounded-xl bg-charcoal-950/60 border border-charcoal-800 space-y-1.5">
-              <span className="text-[11px] font-mono text-amber-500 uppercase font-semibold">
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+              <span className="text-[11px] font-mono text-blue-900 uppercase font-bold">
                 BACKGROUND SUMMARY
               </span>
-              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
+              <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans font-medium">
                 {selectedSuspect.public_profile.background}
               </p>
             </div>
@@ -223,22 +221,22 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
             {/* Dynamic Tab Body */}
             {activeTab === 'statement' && (
               <div className="space-y-4">
-                <div className="p-4 rounded-xl bg-charcoal-950/80 border border-charcoal-800 space-y-2">
-                  <div className="flex items-center space-x-2 text-amber-400 font-mono text-xs">
-                    <MessageSquareQuote className="w-4 h-4" />
-                    <span className="font-bold">OFFICIAL VERBATIM STATEMENT</span>
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                  <div className="flex items-center space-x-2 text-blue-900 font-mono text-xs font-bold">
+                    <MessageSquareQuote className="w-4 h-4 text-blue-600" />
+                    <span>OFFICIAL VERBATIM STATEMENT</span>
                   </div>
-                  <blockquote className="text-sm font-sans italic text-gray-200 border-l-2 border-amber-500 pl-3 py-1 leading-relaxed">
+                  <blockquote className="text-sm font-sans italic text-slate-800 border-l-4 border-amber-500 pl-3 py-1 leading-relaxed bg-white p-3 rounded-r-lg border-y border-r border-slate-200">
                     “{selectedSuspect.public_profile.statement}”
                   </blockquote>
                 </div>
 
-                <div className="p-4 rounded-xl bg-charcoal-950/80 border border-charcoal-800 space-y-2">
-                  <div className="flex items-center space-x-2 text-cyan-400 font-mono text-xs">
-                    <ShieldCheck className="w-4 h-4" />
-                    <span className="font-bold">FORENSIC ALIBI VERIFICATION</span>
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                  <div className="flex items-center space-x-2 text-emerald-800 font-mono text-xs font-bold">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                    <span>FORENSIC ALIBI VERIFICATION</span>
                   </div>
-                  <p className="text-xs text-gray-300 leading-relaxed font-sans">
+                  <p className="text-xs text-slate-700 leading-relaxed font-sans font-medium bg-white p-3 rounded-lg border border-slate-200">
                     {selectedSuspect.public_profile.alibi}
                   </p>
                 </div>
@@ -246,46 +244,46 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
             )}
 
             {activeTab === 'clothing' && (
-              <div className="p-4 rounded-xl bg-charcoal-950/80 border border-charcoal-800 space-y-3">
-                <div className="flex items-center space-x-2 text-amber-400 font-mono text-xs">
-                  <FileText className="w-4 h-4" />
-                  <span className="font-bold">VERIFIED APPAREL ON INCIDENT NIGHT</span>
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                <div className="flex items-center space-x-2 text-blue-900 font-mono text-xs font-bold">
+                  <FileText className="w-4 h-4 text-blue-600" />
+                  <span>VERIFIED APPAREL ON INCIDENT NIGHT</span>
                 </div>
-                <p className="text-sm text-gray-200 font-sans leading-relaxed">
+                <p className="text-sm text-slate-800 font-sans leading-relaxed bg-white p-3 rounded-lg border border-slate-200 font-medium">
                   {selectedSuspect.public_profile.clothing}
                 </p>
-                <div className="p-3 rounded-lg bg-amber-950/20 border border-amber-800/40 text-amber-300 text-xs font-mono space-y-1">
-                  <strong className="block text-amber-400">FORENSIC CORRELATION TIP:</strong>
+                <div className="p-3 rounded-lg bg-amber-50 border border-amber-300 text-amber-900 text-xs font-mono space-y-1">
+                  <strong className="block text-amber-800 font-bold">FORENSIC CORRELATION TIP:</strong>
                   <span>Cross-check this attire against CAM 3 & CAM 4 corridor movements (11:12 PM – 11:18 PM), the green tartan snag on the side service door, and the snow-boot footprints near the heater.</span>
                 </div>
               </div>
             )}
 
             {activeTab === 'belongings' && (
-              <div className="p-4 rounded-xl bg-charcoal-950/80 border border-charcoal-800 space-y-3">
-                <div className="flex items-center space-x-2 text-amber-400 font-mono text-xs">
-                  <Briefcase className="w-4 h-4" />
-                  <span className="font-bold">GEAR & TOOLS CARRIED DURING INCIDENT</span>
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                <div className="flex items-center space-x-2 text-blue-900 font-mono text-xs font-bold">
+                  <Briefcase className="w-4 h-4 text-blue-600" />
+                  <span>GEAR & TOOLS CARRIED DURING INCIDENT</span>
                 </div>
-                <p className="text-sm text-gray-200 font-sans leading-relaxed">
+                <p className="text-sm text-slate-800 font-sans leading-relaxed bg-white p-3 rounded-lg border border-slate-200 font-medium">
                   {selectedSuspect.public_profile.belongings}
                 </p>
-                <div className="p-3 rounded-lg bg-charcoal-900 border border-charcoal-700 text-gray-400 text-xs font-mono">
+                <div className="p-3 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 text-xs font-mono font-medium">
                   <span>Pay close attention to B-Wing electronic keycards, tea service trays, sampling tweezers, and latex gloves that carry bioluminescent orchid residue.</span>
                 </div>
               </div>
             )}
 
             {activeTab === 'motive' && (
-              <div className="p-4 rounded-xl bg-charcoal-950/80 border border-charcoal-800 space-y-3">
-                <div className="flex items-center space-x-2 text-red-400 font-mono text-xs">
-                  <AlertOctagon className="w-4 h-4" />
-                  <span className="font-bold">POTENTIAL MOTIVE ASSESSMENT</span>
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                <div className="flex items-center space-x-2 text-red-700 font-mono text-xs font-bold">
+                  <AlertOctagon className="w-4 h-4 text-red-600" />
+                  <span>POTENTIAL MOTIVE ASSESSMENT</span>
                 </div>
-                <p className="text-sm text-gray-200 font-sans leading-relaxed">
+                <p className="text-sm text-slate-800 font-sans leading-relaxed bg-white p-3 rounded-lg border border-slate-200 font-medium">
                   {selectedSuspect.public_profile.possible_motive}
                 </p>
-                <div className="p-3 rounded-lg bg-red-950/20 border border-red-800/40 text-red-300 text-xs font-mono">
+                <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-800 text-xs font-mono font-medium">
                   <span>Ask yourself: Who had the motive and chemical means to synthesize the Midnight Orchid toxin and poison Dr. Vance's tea?</span>
                 </div>
               </div>
@@ -295,15 +293,15 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
 
           {/* Detective Personal Notes Sidebar (Span 1) */}
           <div className="space-y-4">
-            <div className="p-4 rounded-xl bg-charcoal-950/80 border border-charcoal-800 space-y-3">
-              <div className="flex items-center justify-between text-amber-500 font-mono text-xs">
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+              <div className="flex items-center justify-between text-blue-900 font-mono text-xs">
                 <span className="flex items-center space-x-1.5 font-bold">
-                  <Edit3 className="w-3.5 h-3.5" />
+                  <Edit3 className="w-3.5 h-3.5 text-blue-600" />
                   <span>INVESTIGATOR'S LOG</span>
                 </span>
                 {noteSaved && (
-                  <span className="text-emerald-400 flex items-center space-x-1 font-bold">
-                    <CheckCircle2 className="w-3 h-3" />
+                  <span className="text-emerald-700 flex items-center space-x-1 font-bold">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                     <span>SAVED</span>
                   </span>
                 )}
@@ -314,31 +312,31 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
                 onChange={handleNoteChange}
                 placeholder={`Type your investigative observations about ${selectedSuspect.display_name}...`}
                 rows={5}
-                className="w-full bg-charcoal-900 border border-charcoal-700 focus:border-amber-500 rounded-lg p-3 text-xs text-white placeholder-gray-600 font-mono outline-none resize-none"
+                className="w-full bg-white border-2 border-slate-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-100 rounded-xl p-3 text-xs text-slate-900 placeholder-slate-400 font-mono outline-none resize-none shadow-inner"
               />
 
               <button
                 onClick={handleSaveNote}
-                className="w-full py-2.5 rounded-lg bg-charcoal-800 hover:bg-charcoal-700 border border-charcoal-600 text-gray-200 hover:text-amber-300 font-mono text-xs font-bold transition"
+                className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-mono text-xs font-bold transition shadow-sm"
               >
                 SAVE LOG FOR {selectedSuspect.display_name.toUpperCase()}
               </button>
             </div>
 
             {/* Suspect Quick Comparison Box */}
-            <div className="p-3.5 rounded-xl bg-charcoal-950/40 border border-charcoal-800/60 text-[11px] font-mono text-gray-500 space-y-1.5">
-              <span className="text-gray-400 font-semibold block">QUICK JUMP:</span>
+            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-[11px] font-mono text-slate-600 space-y-1.5">
+              <span className="text-slate-800 font-bold block">QUICK JUMP:</span>
               <div className="space-y-1">
                 {INITIAL_SUSPECTS.map((s) => (
                   <button
                     key={s.id}
                     onClick={() => handleSelect(s)}
                     className={`w-full text-left px-2.5 py-1.5 rounded-lg transition flex items-center justify-between ${
-                      selectedSuspect.id === s.id ? 'bg-amber-500/15 text-amber-300 font-bold border border-amber-500/30' : 'hover:text-gray-300'
+                      selectedSuspect.id === s.id ? 'bg-blue-100 text-blue-900 font-bold border border-blue-200' : 'hover:bg-slate-100 text-slate-700'
                     }`}
                   >
                     <span>{s.display_name}</span>
-                    <ChevronRight className="w-3 h-3" />
+                    <ChevronRight className="w-3 h-3 text-slate-400" />
                   </button>
                 ))}
               </div>
@@ -351,8 +349,8 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
       </div>
 
       {/* Navigation footer */}
-      <div className="flex items-center justify-between pt-6 border-t border-charcoal-800">
-        <p className="text-xs font-mono text-gray-400 font-sans">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-slate-200 bg-white p-6 rounded-2xl shadow-sm">
+        <p className="text-xs font-mono text-slate-600 font-medium">
           All 4 suspects reviewed? Proceed to the Interactive Evidence Board to pin clues and map timeline events.
         </p>
         <button
@@ -360,9 +358,9 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
             soundFX.playCameraSwitch();
             onProceed();
           }}
-          className="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-charcoal-950 font-bold font-mono text-xs tracking-wider flex items-center space-x-2 transition shadow-[0_0_15px_rgba(245,158,11,0.3)] transform hover:scale-[1.02]"
+          className="px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold font-mono text-xs tracking-wider flex items-center space-x-2 transition shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
         >
-          <span>PROCEED TO STAGE 04: EVIDENCE COLLECTION</span>
+          <span>PROCEED TO STAGE 04: EVIDENCE BOARD</span>
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>

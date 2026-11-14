@@ -255,7 +255,7 @@ export const CinematicVideoPlayer: React.FC<CinematicVideoPlayerProps> = ({
   };
 
   return (
-    <div ref={containerRef} className="relative rounded-2xl overflow-hidden bg-black border border-charcoal-700/80 shadow-2xl select-none group">
+    <div ref={containerRef} className="relative rounded-2xl overflow-hidden bg-slate-950 border-2 border-slate-300 shadow-xl select-none group">
       
       {/* Top HUD Header Bar */}
       <div className="absolute top-0 left-0 right-0 z-30 px-4 py-2.5 bg-gradient-to-b from-black/90 via-black/60 to-transparent flex items-center justify-between text-xs font-mono pointer-events-none">
@@ -357,7 +357,7 @@ export const CinematicVideoPlayer: React.FC<CinematicVideoPlayerProps> = ({
       </div>
 
       {/* Control Bar */}
-      <div className="bg-charcoal-950 border-t border-charcoal-800/80 p-3 sm:p-4 space-y-2.5">
+      <div className="bg-slate-900 border-t border-slate-800 p-3 sm:p-4 space-y-2.5 text-white">
         
         {/* Scrubber Progress Slider */}
         <div className="flex items-center space-x-3 text-xs font-mono">
@@ -384,7 +384,7 @@ export const CinematicVideoPlayer: React.FC<CinematicVideoPlayerProps> = ({
           <div className="flex items-center space-x-2">
             <button
               onClick={togglePlay}
-              className="px-3.5 py-1.5 rounded-lg bg-charcoal-800 hover:bg-charcoal-700 border border-charcoal-700 text-white font-bold flex items-center space-x-1.5 transition"
+              className="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold flex items-center space-x-1.5 transition shadow-sm"
             >
               {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
               <span>{isPlaying ? 'PAUSE' : 'PLAY'}</span>

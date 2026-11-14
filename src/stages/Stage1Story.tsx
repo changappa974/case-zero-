@@ -203,37 +203,37 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-10">
       
       {/* Stage Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-charcoal-800 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
         <div>
-          <div className="flex items-center space-x-2 text-amber-500 font-mono text-xs tracking-wider">
+          <div className="flex items-center space-x-2 text-amber-700 font-mono text-xs tracking-wider font-bold">
             <span>STAGE 01 OF 05</span>
             <span>//</span>
             <span>THE CRIME SCENE</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black font-mono text-white mt-1">
+          <h2 className="text-2xl sm:text-3xl font-black font-mono text-slate-900 mt-1">
             CASE ZERO: MURDER AT FROSTPEAK CONSERVATORY
           </h2>
-          <p className="text-xs sm:text-sm text-gray-400 mt-1 max-w-3xl font-sans">
+          <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-3xl font-sans">
             Explore Frostpeak Conservatory and inspect the victim’s surroundings. Click on suspicious objects, fallen pollen, teacups, door locks, and environmental traces to uncover forensic leads.
           </p>
         </div>
 
         <div className="flex items-center space-x-2">
-          <span className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-red-950/60 border border-red-800/60 text-red-400 font-mono text-xs font-bold">
-            <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+          <span className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-red-50 border border-red-200 text-red-700 font-mono text-xs font-bold shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-red-600 animate-ping"></span>
             <span>CRIME SCENE SEALED</span>
           </span>
         </div>
       </div>
 
       {/* 1. Cinematic Video Player Container */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between text-xs font-mono text-gray-400">
-          <span className="flex items-center space-x-2 text-amber-400 font-semibold">
-            <Film className="w-4 h-4 text-amber-500" />
+      <div className="space-y-3 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div className="flex items-center justify-between text-xs font-mono text-slate-600">
+          <span className="flex items-center space-x-2 text-blue-900 font-bold">
+            <Film className="w-4 h-4 text-blue-600" />
             <span>INCIDENT OVERVIEW CINEMATIC RECORDING</span>
           </span>
-          <span className="text-[11px] text-gray-500">FORMAT: 1080P IR CINEMATIC</span>
+          <span className="text-[11px] text-slate-400 font-semibold">FORMAT: 1080P IR SURVEILLANCE</span>
         </div>
 
         <CinematicVideoPlayer
@@ -249,40 +249,40 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
       </div>
 
       {/* 2. Explorable Interactive 3D Crime Scene Canvas */}
-      <div className="space-y-4 pt-4">
+      <div className="space-y-4 pt-2 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h3 className="text-lg font-mono font-bold text-white flex items-center space-x-2">
-              <Eye className="w-5 h-5 text-amber-500" />
+            <h3 className="text-lg font-mono font-bold text-slate-900 flex items-center space-x-2">
+              <Eye className="w-5 h-5 text-blue-600" />
               <span>EXPLORE THE CRIME SCENE: INTERACTIVE INVESTIGATION</span>
             </h3>
-            <p className="text-xs text-gray-400 font-sans">
+            <p className="text-xs text-slate-500 font-sans">
               Click on the glowing forensic markers to inspect individual objects, zoom into suspicious items, and extract evidence.
             </p>
           </div>
 
           <div className="flex items-center space-x-3 text-xs font-mono">
-            <span className="text-gray-400">
-              INSPECTED: <span className="text-amber-400 font-bold">{inspectedHotspots.length}</span> / {crimeSceneHotspots.length}
+            <span className="text-slate-600 font-medium">
+              INSPECTED: <span className="text-blue-700 font-bold">{inspectedHotspots.length}</span> / {crimeSceneHotspots.length}
             </span>
             <div className="flex items-center space-x-1">
               <button
                 onClick={() => setSceneZoom((prev) => Math.min(prev + 0.25, 2.0))}
-                className="p-1.5 rounded-lg bg-charcoal-800 hover:bg-charcoal-700 text-gray-200 transition"
+                className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition"
                 title="Zoom In"
               >
                 <ZoomIn className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setSceneZoom((prev) => Math.max(prev - 0.25, 1.0))}
-                className="p-1.5 rounded-lg bg-charcoal-800 hover:bg-charcoal-700 text-gray-200 transition"
+                className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition"
                 title="Zoom Out"
               >
                 <ZoomOut className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setSceneZoom(1.0)}
-                className="px-2.5 py-1 rounded-lg bg-charcoal-800 hover:bg-charcoal-700 text-gray-200 text-[11px] transition"
+                className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-[11px] font-bold transition"
               >
                 100%
               </button>
@@ -291,7 +291,7 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
         </div>
 
         {/* Crime Scene Graphic with Interactive Pulsing Hotspots */}
-        <div className="relative rounded-2xl overflow-hidden bg-black border border-charcoal-700/80 shadow-2xl">
+        <div className="relative rounded-xl overflow-hidden bg-slate-900 border-2 border-slate-300 shadow-lg">
           
           <div 
             className="relative w-full aspect-[16/9] overflow-hidden transition-transform duration-300"
@@ -304,7 +304,7 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
             />
 
             {/* Glowing forensic scan grid overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20 pointer-events-none"></div>
 
             {/* Hotspot Markers */}
             {crimeSceneHotspots.map((spot) => {
@@ -325,17 +325,17 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
                     isSelected
                       ? 'bg-amber-400'
                       : isInspected
-                      ? 'bg-cyan-500'
+                      ? 'bg-emerald-400'
                       : 'bg-red-500'
                   }`}></span>
 
                   {/* Icon Button */}
                   <div className={`relative flex items-center justify-center w-8 h-8 rounded-full border-2 transition-transform transform group-hover:scale-125 shadow-lg ${
                     isSelected
-                      ? 'bg-amber-500 border-white text-charcoal-950 scale-110 shadow-[0_0_15px_rgba(245,158,11,0.8)]'
+                      ? 'bg-amber-500 border-white text-slate-900 scale-110 shadow-lg'
                       : isInspected
-                      ? 'bg-cyan-900/90 border-cyan-400 text-cyan-200'
-                      : 'bg-red-900/90 border-red-500 text-red-200'
+                      ? 'bg-emerald-600 border-white text-white'
+                      : 'bg-red-600 border-white text-white'
                   }`}>
                     {isInspected ? (
                       <CheckCircle2 className="w-4 h-4" />
@@ -346,10 +346,10 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
 
                   {/* Tooltip on Hover */}
                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center pointer-events-none whitespace-nowrap z-30">
-                    <div className="px-2.5 py-1 rounded bg-charcoal-950/95 border border-amber-500/40 text-amber-300 font-mono text-[11px] shadow-xl">
+                    <div className="px-2.5 py-1 rounded-lg bg-slate-900 text-white font-mono text-[11px] shadow-xl border border-slate-700">
                       {spot.name}
                     </div>
-                    <div className="w-2 h-2 bg-charcoal-950 border-r border-b border-amber-500/40 rotate-45 -mt-1"></div>
+                    <div className="w-2 h-2 bg-slate-900 rotate-45 -mt-1 border-r border-b border-slate-700"></div>
                   </div>
                 </div>
               );
@@ -357,22 +357,22 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
           </div>
 
           {/* Quick HUD Legend */}
-          <div className="bg-charcoal-950 border-t border-charcoal-800/80 px-4 py-2.5 flex flex-wrap items-center justify-between text-xs font-mono text-gray-400">
+          <div className="bg-slate-50 border-t border-slate-200 px-4 py-2.5 flex flex-wrap items-center justify-between text-xs font-mono text-slate-600">
             <div className="flex items-center space-x-4">
-              <span className="flex items-center space-x-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+              <span className="flex items-center space-x-1.5 font-semibold">
+                <span className="w-2.5 h-2.5 rounded-full bg-red-600"></span>
                 <span>Unexamined Object</span>
               </span>
-              <span className="flex items-center space-x-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+              <span className="flex items-center space-x-1.5 font-semibold">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
                 <span>Inspected Trace</span>
               </span>
-              <span className="flex items-center space-x-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+              <span className="flex items-center space-x-1.5 font-semibold">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
                 <span>Active Target</span>
               </span>
             </div>
-            <span className="text-[11px] text-gray-500">
+            <span className="text-[11px] text-slate-500 font-semibold">
               LOCATION: FROSTPEAK CONSERVATORY // 23:30:00
             </span>
           </div>
@@ -380,26 +380,26 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
 
         {/* Hotspot Inspection Modal / Detail Panel */}
         {selectedHotspot && (
-          <div className="bg-charcoal-900 border border-charcoal-700 rounded-2xl p-5 sm:p-6 shadow-2xl space-y-4 animate-fade-in">
-            <div className="flex items-start justify-between border-b border-charcoal-800 pb-3">
+          <div className="bg-white border-2 border-slate-300 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4 animate-fade-in mt-4">
+            <div className="flex items-start justify-between border-b border-slate-200 pb-3">
               <div>
-                <span className="px-2.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono text-[10px] tracking-wider uppercase font-bold">
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-100 border border-amber-300 text-amber-800 font-mono text-[10px] tracking-wider uppercase font-bold">
                   {selectedHotspot.category}
                 </span>
-                <h4 className="text-xl font-mono font-bold text-white mt-1">
+                <h4 className="text-xl font-mono font-black text-slate-900 mt-1">
                   {selectedHotspot.name}
                 </h4>
               </div>
               <button
                 onClick={() => setSelectedHotspot(null)}
-                className="p-1.5 rounded-lg bg-charcoal-800 hover:bg-charcoal-700 text-gray-400 hover:text-white transition"
+                className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              <div className="rounded-xl overflow-hidden bg-black border border-charcoal-800 aspect-video md:aspect-square flex items-center justify-center">
+              <div className="rounded-xl overflow-hidden bg-slate-100 border border-slate-200 aspect-video md:aspect-square flex items-center justify-center">
                 <img
                   src={selectedHotspot.previewImg}
                   alt={selectedHotspot.name}
@@ -408,15 +408,15 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
               </div>
 
               <div className="md:col-span-2 space-y-3 font-mono text-xs">
-                <p className="text-gray-300 text-sm leading-relaxed font-sans">
+                <p className="text-slate-800 text-sm leading-relaxed font-sans font-medium">
                   {selectedHotspot.detailedAnalysis}
                 </p>
 
-                <div className="bg-charcoal-950/80 p-3.5 rounded-xl border border-charcoal-800/80 space-y-1.5">
-                  <span className="text-amber-500 font-bold block text-[11px]">
+                <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-1.5">
+                  <span className="text-amber-800 font-bold block text-[11px]">
                     CRITICAL FORENSIC OBSERVATIONS:
                   </span>
-                  <ul className="space-y-1 text-gray-300 list-disc list-inside font-sans text-xs">
+                  <ul className="space-y-1 text-slate-700 list-disc list-inside font-sans text-xs">
                     {selectedHotspot.forensicPoints.map((pt, i) => (
                       <li key={i}>{pt}</li>
                     ))}
@@ -425,19 +425,19 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
 
                 {selectedHotspot.evidenceCode && (
                   <div className="pt-2 flex items-center justify-between">
-                    <span className="text-[11px] text-gray-400">
-                      IDENTIFIED EVIDENCE CODE: <span className="text-amber-400 font-bold">{selectedHotspot.evidenceCode}</span>
+                    <span className="text-[11px] text-slate-600 font-semibold">
+                      IDENTIFIED EVIDENCE CODE: <span className="text-blue-700 font-bold">{selectedHotspot.evidenceCode}</span>
                     </span>
 
                     {collectedEvidence.includes(selectedHotspot.evidenceCode) ? (
-                      <span className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/70 border border-emerald-800/80 text-emerald-400 font-bold">
-                        <CheckCircle2 className="w-4 h-4" />
+                      <span className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-300 text-emerald-700 font-bold">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                         <span>ADDED TO EVIDENCE DOSSIER</span>
                       </span>
                     ) : (
                       <button
                         onClick={() => handleCollectClue(selectedHotspot.evidenceCode!)}
-                        className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-charcoal-950 font-bold transition shadow-md"
+                        className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold transition shadow-md"
                       >
                         <Sparkles className="w-4 h-4" />
                         <span>ADD TO EVIDENCE INVENTORY</span>
@@ -453,12 +453,12 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
       </div>
 
       {/* Stage Completion Banner */}
-      <div className="bg-charcoal-900/80 border border-charcoal-800 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h4 className="text-base font-mono font-bold text-white flex items-center space-x-2">
+          <h4 className="text-base font-mono font-bold text-slate-900 flex items-center space-x-2">
             <span>READY TO ADVANCE INVESTIGATION</span>
           </h4>
-          <p className="text-xs text-gray-400 mt-0.5 font-sans">
+          <p className="text-xs text-slate-500 mt-0.5 font-sans">
             You have surveyed the crime scene. Next, analyze the multi-camera CCTV recordings and cross-examine the surveillance timeline.
           </p>
         </div>
@@ -468,7 +468,7 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
             soundFX.playCameraSwitch();
             onProceed();
           }}
-          className="inline-flex items-center justify-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-red-600 to-amber-500 hover:from-red-500 hover:to-amber-400 text-charcoal-950 font-mono font-bold text-sm tracking-wider uppercase transition-all shadow-[0_0_20px_rgba(245,158,11,0.3)] transform hover:scale-[1.02]"
+          className="inline-flex items-center justify-center space-x-2 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-mono font-bold text-sm tracking-wider uppercase transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
         >
           <span>PROCEED TO STAGE 02: CCTV RECORDINGS</span>
           <ArrowRight className="w-4 h-4" />
