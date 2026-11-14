@@ -233,6 +233,45 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
             </div>
           </div>
 
+          {/* Quick Clue Shortcuts for Image 3 (Find Clues Instantly) */}
+          <div className="bg-[#f5f0e6] border border-[#cfc7b7] p-3.5 rounded-xl space-y-2 shadow-sm font-mono text-xs">
+            <div className="flex items-center justify-between">
+              <span className="text-blue-950 font-bold flex items-center space-x-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-blue-800" />
+                <span>FORENSIC CLUES ON IMAGE 3 (1-CLICK INSPECT & LOG):</span>
+              </span>
+              <span className="text-stone-600 text-[11px] font-semibold">6 FORENSIC POINTS</span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 pt-1">
+              {visualHotspots.map((hs) => {
+                const isLogged = collectedEvidence.includes(hs.evidenceCode);
+
+                return (
+                  <button
+                    key={hs.id}
+                    onClick={() => {
+                      soundFX.playClueFound();
+                      setActiveVisualHotspot(hs);
+                      onCollectEvidence(hs.evidenceCode);
+                    }}
+                    className={`p-2 rounded-lg border text-left transition flex flex-col justify-between ${
+                      isLogged
+                        ? 'bg-blue-100 border-2 border-blue-900 text-blue-950 font-bold shadow-sm'
+                        : 'bg-[#fbf9f5] text-stone-900 border-[#cfc7b7] hover:border-blue-700 font-semibold'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[10px] uppercase font-bold text-amber-900">{hs.evidenceCode}</span>
+                      {isLogged && <CheckCircle2 className="w-3.5 h-3.5 text-blue-900" />}
+                    </div>
+                    <span className="text-[11px] font-bold line-clamp-1">{hs.title}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Hotspot Inspector Modal */}
           {activeVisualHotspot && (
             <div className="p-6 rounded-2xl bg-[#f5f0e6] border-2 border-[#b8b09f] shadow-xl space-y-4 animate-fade-in text-[#1c1917]">

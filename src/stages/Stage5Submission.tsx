@@ -328,6 +328,41 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
         </p>
 
         <div className="space-y-2">
+          {/* Quick-Fill Evidence Point Helpers for 15-Minute Rush */}
+          <div className="flex flex-wrap items-center gap-1.5 pt-1 pb-1">
+            <span className="text-[11px] font-mono text-stone-600 font-bold">⚡ QUICK INSERT EVIDENCE BULLETS:</span>
+            <button
+              type="button"
+              onClick={() => {
+                const text = "1. FALSE ALIBI & CCTV: Dr. Evelyn Hayes claimed she stayed in the B-Wing Lab from 11:00 to 11:25 PM. However, CCTV CAM 3 captures her walking into the conservatory passage at 11:12 PM, and CAM 4 records her returning at 11:18 PM carrying a glowing blue orchid cloth.";
+                setExplanation(prev => prev ? prev + "\n\n" + text : text);
+              }}
+              className="px-2.5 py-1 rounded-lg bg-[#e6dfd2] hover:bg-[#ded6c7] border border-[#cfc7b7] text-[11px] font-mono text-blue-950 font-bold transition shadow-sm"
+            >
+              + CCTV & Alibi Contradiction
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const text = "2. LAB FORENSICS: Lab computer records show zero activity from 11:00 to 11:22 PM. Discarded latex gloves and stained tissue glowing with bioluminescent blue orchid pollen were found in the lab waste bin, and a matching left-handed pollen smudge was found on the sink faucet handle (Evelyn is left-handed).";
+                setExplanation(prev => prev ? prev + "\n\n" + text : text);
+              }}
+              className="px-2.5 py-1 rounded-lg bg-[#e6dfd2] hover:bg-[#ded6c7] border border-[#cfc7b7] text-[11px] font-mono text-blue-950 font-bold transition shadow-sm"
+            >
+              + Lab Forensics & Faucet Smudge
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const text = "3. POISON & MOTIVE: Dr. Vance discovered Dr. Evelyn Hayes's funding fraud. To silence him, Evelyn slipped toxic Cyanocryptin extracted from the rare Midnight Orchid into his delivered tea, causing fatal collapse at 11:24 PM.";
+                setExplanation(prev => prev ? prev + "\n\n" + text : text);
+              }}
+              className="px-2.5 py-1 rounded-lg bg-[#e6dfd2] hover:bg-[#ded6c7] border border-[#cfc7b7] text-[11px] font-mono text-blue-950 font-bold transition shadow-sm"
+            >
+              + Method & Financial Motive
+            </button>
+          </div>
+
           <textarea
             value={explanation}
             onChange={(e) => setExplanation(e.target.value)}

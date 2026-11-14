@@ -84,6 +84,42 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
         </div>
       </div>
 
+      {/* At-A-Glance CCTV Surveillance Timeline for 15-Minute Solving */}
+      <div className="bg-[#f5f0e6] border border-[#cfc7b7] p-4 rounded-xl space-y-2 shadow-sm font-mono text-xs">
+        <div className="flex items-center justify-between border-b border-[#cfc7b7] pb-2">
+          <span className="text-blue-950 font-bold flex items-center space-x-1.5">
+            <Clock className="w-4 h-4 text-blue-800" />
+            <span>ESTATE SURVEILLANCE TIMELINE RECONSTRUCTION (11:00 PM – 11:24 PM)</span>
+          </span>
+          <span className="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-950 border border-blue-300 font-bold text-[10px]">
+            KEY FORENSIC SEQUENCE
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-5 gap-2 text-[11px] pt-1">
+          <div className="p-2.5 rounded-lg bg-[#e6dfd2] border border-[#cfc7b7]">
+            <span className="text-stone-600 font-bold block">11:00 PM (CAM 1)</span>
+            <span className="text-stone-900 font-medium">Chef Marco delivers tea. Victor at Lobby Bar. Tea is 100% pure.</span>
+          </div>
+          <div className="p-2.5 rounded-lg bg-[#e6dfd2] border border-[#cfc7b7]">
+            <span className="text-stone-600 font-bold block">11:05 PM (CAM 2)</span>
+            <span className="text-stone-900 font-medium">Clara checks heater. Vance is alive. Clara exits at 11:08 PM.</span>
+          </div>
+          <div className="p-2.5 rounded-lg bg-amber-100 border border-amber-300">
+            <span className="text-amber-950 font-bold block">11:12 PM (CAM 3) ⚠</span>
+            <span className="text-amber-950 font-medium">Dr. Evelyn Hayes enters the conservatory service passage.</span>
+          </div>
+          <div className="p-2.5 rounded-lg bg-red-100 border border-red-300">
+            <span className="text-red-950 font-bold block">11:18 PM (CAM 4) ⚠</span>
+            <span className="text-red-950 font-medium">Dr. Evelyn Hayes returns holding glowing blue pollen cloth!</span>
+          </div>
+          <div className="p-2.5 rounded-lg bg-[#e6dfd2] border border-[#cfc7b7]">
+            <span className="text-stone-600 font-bold block">11:24 PM (CAM 1)</span>
+            <span className="text-stone-900 font-medium">Fatal collapse. Teacup & pollen jar shatter. Watch stops.</span>
+          </div>
+        </div>
+      </div>
+
       {/* Main Investigation Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         

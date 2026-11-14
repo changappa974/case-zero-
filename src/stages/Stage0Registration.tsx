@@ -89,6 +89,12 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
             <span className="text-amber-900 font-bold">INCIDENT TIME:</span>
             <span className="font-semibold text-stone-800">23:24:00 (Surveillance Window: 22:50 – 23:30)</span>
           </div>
+          <div className="flex justify-between pb-2 border-b border-[#cfc7b7] bg-amber-100/70 -mx-4 px-4 py-1.5 rounded-lg">
+            <span className="text-amber-950 font-bold flex items-center space-x-1">
+              <span>⏱️ TIME LIMIT:</span>
+            </span>
+            <span className="text-amber-950 font-black">15 MINUTES (Live countdown begins on start)</span>
+          </div>
           <div className="flex justify-between">
             <span className="text-amber-900 font-bold">INCIDENT:</span>
             <span className="text-red-800 font-bold">Dr. Arthur Vance found deceased with poisoned tea & glowing blue orchid pollen</span>

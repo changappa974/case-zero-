@@ -1,5 +1,5 @@
-import React from 'react';
-import { Volume2, VolumeX, Lock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Volume2, VolumeX, Lock, Clock } from 'lucide-react';
 import { InvestigationStage, Participant, InvestigationSession } from '../types';
 import { soundFX } from '../lib/audioService';
 
@@ -15,13 +15,46 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({
   currentStage,
-  maxStageReached,
   onNavigateStage,
   participant,
   session,
   isMuted,
   onToggleMute,
 }) => {
+  // 15-Minute Countdown Timer (900 seconds)
+  const [timeLeft, setTimeLeft] = useState<number>(900);
+
+  useEffect(() => {
+    if (!participant) return;
+
+    const storageKey = `case_zero_timer_${participant.id}`;
+    let startTime = localStorage.getItem(storageKey);
+    if (!startTime) {
+      startTime = session?.started_at ? new Date(session.started_at).getTime().toString() : Date.now().toString();
+      localStorage.setItem(storageKey, startTime);
+    }
+
+    const startMs = parseInt(startTime, 10) || Date.now();
+    const updateTimer = () => {
+      if (session?.status === 'submitted') return;
+      const elapsed = Math.floor((Date.now() - startMs) / 1000);
+      const remaining = Math.max(0, 900 - elapsed);
+      setTimeLeft(remaining);
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [participant, session]);
+
+  const formatTimer = (secs: number) => {
+    const mins = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${mins.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
+
+  const isSubmitted = session?.status === 'submitted';
+
   const stages: { stage: InvestigationStage; label: string; short: string }[] = [
     { stage: 1, label: 'Stage 1: The Crime Scene', short: '01 Scene' },
     { stage: 2, label: 'Stage 2: CCTV Recordings', short: '02 CCTV' },
@@ -32,11 +65,11 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header className="sticky top-0 z-50 bg-[#f5f0e6]/95 backdrop-blur-md border-b border-[#cfc7b7] text-[#1c1917] shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
         
-        {/* Brand (Icon box removed as requested) */}
+        {/* Brand */}
         <div 
-          className="flex items-center cursor-pointer group py-1" 
+          className="flex items-center cursor-pointer group py-1 shrink-0" 
           onClick={() => onNavigateStage(participant ? 1 : 0)}
         >
           <div>
@@ -48,58 +81,75 @@ export const Navbar: React.FC<NavbarProps> = ({
                 FORENSIC HUD
               </span>
             </div>
-            <p className="text-[11px] text-stone-600 hidden sm:block tracking-wide font-medium">
+            <p className="text-[11px] text-stone-600 hidden lg:block tracking-wide font-medium">
               Frostpeak Conservatory Murder Investigation
             </p>
           </div>
         </div>
 
-        {/* Stage Progress Pills (Shown when participant registered) */}
+        {/* Stage Progress Pills (All unlocked once registered so users don't get stuck) */}
         {participant && (
           <nav className="hidden md:flex items-center space-x-1.5 lg:space-x-2">
             {stages.map((s) => {
               const isCurrent = currentStage === s.stage;
-              const isUnlocked = s.stage <= maxStageReached;
-              const isSubmitted = session?.status === 'submitted' && s.stage === 5;
+              const isVerdictSubmitted = isSubmitted && s.stage === 5;
 
               return (
                 <button
                   key={s.stage}
                   onClick={() => {
-                    if (isUnlocked) {
-                      soundFX.playCameraSwitch();
-                      onNavigateStage(s.stage);
-                    }
+                    soundFX.playCameraSwitch();
+                    onNavigateStage(s.stage);
                   }}
-                  disabled={!isUnlocked}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-mono tracking-wider transition-all flex items-center space-x-1.5 ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-mono tracking-wider transition-all flex items-center space-x-1.5 ${
                     isCurrent
                       ? 'bg-blue-800 text-white border border-blue-900 shadow-sm font-bold'
-                      : isUnlocked
-                      ? 'bg-[#e6dfd2] text-stone-800 hover:text-stone-950 hover:bg-[#ded6c7] border border-[#cfc7b7] font-semibold'
-                      : 'bg-[#eae4d8] text-stone-400 border border-[#ddd6c8] cursor-not-allowed opacity-60'
+                      : 'bg-[#e6dfd2] text-stone-800 hover:text-stone-950 hover:bg-[#ded6c7] border border-[#cfc7b7] font-semibold'
                   }`}
                 >
                   <span>{s.short}</span>
-                  {isSubmitted ? (
+                  {isVerdictSubmitted && (
                     <Lock className="w-3 h-3 text-emerald-700" />
-                  ) : !isUnlocked ? (
-                    <Lock className="w-2.5 h-2.5 text-stone-400" />
-                  ) : null}
+                  )}
                 </button>
               );
             })}
           </nav>
         )}
 
-        {/* Right Tools & Badges */}
-        <div className="flex items-center space-x-3">
+        {/* Right Tools & 15-Minute Countdown Timer */}
+        <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
+          
+          {/* 15-Minute Countdown Timer */}
+          {participant && (
+            <div
+              title="15-Minute Investigation Time Limit"
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg font-mono text-xs font-bold border transition-all shadow-sm ${
+                isSubmitted
+                  ? 'bg-emerald-100 text-emerald-950 border-emerald-300'
+                  : timeLeft <= 120
+                  ? 'bg-red-100 text-red-950 border-red-400 animate-pulse'
+                  : timeLeft <= 300
+                  ? 'bg-amber-100 text-amber-950 border-amber-400'
+                  : 'bg-[#e6dfd2] text-stone-900 border-[#cfc7b7]'
+              }`}
+            >
+              <Clock className={`w-3.5 h-3.5 ${!isSubmitted && timeLeft <= 120 ? 'text-red-700 animate-spin' : 'text-stone-700'}`} />
+              <span className="font-mono text-sm tracking-wide">
+                {isSubmitted ? 'SUBMITTED' : formatTimer(timeLeft)}
+              </span>
+              <span className="text-[10px] text-stone-600 uppercase font-semibold hidden sm:inline">
+                {isSubmitted ? 'SEALED' : 'LEFT'}
+              </span>
+            </div>
+          )}
+
           {/* Active Participant info */}
           {participant && (
-            <div className="flex items-center space-x-2 text-xs font-mono bg-[#e6dfd2] px-3.5 py-1.5 rounded-lg border border-[#cfc7b7] shadow-inner">
+            <div className="hidden sm:flex items-center space-x-2 text-xs font-mono bg-[#e6dfd2] px-3 py-1.5 rounded-lg border border-[#cfc7b7] shadow-inner">
               <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
               <span className="text-stone-600 font-semibold">AGENT:</span>
-              <span className="text-blue-900 font-bold truncate max-w-[130px]">
+              <span className="text-blue-900 font-bold truncate max-w-[100px] lg:max-w-[130px]">
                 {participant.participant_name}
               </span>
             </div>
@@ -126,14 +176,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           {stages.map((s) => (
             <button
               key={s.stage}
-              onClick={() => s.stage <= maxStageReached && onNavigateStage(s.stage)}
-              disabled={s.stage > maxStageReached}
+              onClick={() => onNavigateStage(s.stage)}
               className={`px-2.5 py-1 rounded-md whitespace-nowrap mr-1.5 ${
                 currentStage === s.stage
                   ? 'bg-blue-800 text-white font-bold shadow-sm'
-                  : s.stage <= maxStageReached
-                  ? 'text-stone-800 bg-[#f5f0e6] border border-[#cfc7b7] font-medium'
-                  : 'text-stone-400 bg-[#eae4d8] border border-[#ddd6c8] opacity-60'
+                  : 'text-stone-800 bg-[#f5f0e6] border border-[#cfc7b7] font-medium'
               }`}
             >
               {s.short}
