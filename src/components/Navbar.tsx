@@ -1,5 +1,5 @@
 import React from 'react';
-import { Volume2, VolumeX, Lock, Shield, Sparkles, User } from 'lucide-react';
+import { Volume2, VolumeX, Lock } from 'lucide-react';
 import { InvestigationStage, Participant, InvestigationSession } from '../types';
 import { soundFX } from '../lib/audioService';
 
@@ -31,27 +31,24 @@ export const Navbar: React.FC<NavbarProps> = ({
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 text-slate-800 shadow-sm">
+    <header className="sticky top-0 z-50 bg-[#f5f0e6]/95 backdrop-blur-md border-b border-[#cfc7b7] text-[#1c1917] shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         
-        {/* Brand / Logo */}
+        {/* Brand (Icon box removed as requested) */}
         <div 
-          className="flex items-center space-x-3 cursor-pointer group" 
+          className="flex items-center cursor-pointer group py-1" 
           onClick={() => onNavigateStage(participant ? 1 : 0)}
         >
-          <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 text-amber-400 font-bold font-mono text-sm tracking-wider shadow-sm group-hover:bg-slate-800 transition">
-            CZ
-            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-600 rounded-full animate-ping"></span>
-            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-600 rounded-full"></span>
-          </div>
           <div>
             <div className="flex items-center space-x-2">
-              <span className="font-mono font-black tracking-widest text-slate-900 text-base">CASE ZERO</span>
-              <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300 font-bold">
+              <span className="font-mono font-black tracking-widest text-[#1c1917] text-lg group-hover:text-blue-900 transition">
+                CASE ZERO
+              </span>
+              <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-amber-200/90 text-amber-900 border border-amber-300 font-bold">
                 FORENSIC HUD
               </span>
             </div>
-            <p className="text-[11px] text-slate-500 hidden sm:block tracking-wide font-medium">
+            <p className="text-[11px] text-stone-600 hidden sm:block tracking-wide font-medium">
               Frostpeak Conservatory Murder Investigation
             </p>
           </div>
@@ -77,17 +74,17 @@ export const Navbar: React.FC<NavbarProps> = ({
                   disabled={!isUnlocked}
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-mono tracking-wider transition-all flex items-center space-x-1.5 ${
                     isCurrent
-                      ? 'bg-blue-600 text-white border border-blue-600 shadow-sm font-bold'
+                      ? 'bg-blue-800 text-white border border-blue-900 shadow-sm font-bold'
                       : isUnlocked
-                      ? 'bg-slate-100 text-slate-700 hover:text-slate-900 hover:bg-slate-200 border border-slate-200 font-semibold'
-                      : 'bg-slate-50 text-slate-400 border border-slate-200 cursor-not-allowed opacity-60'
+                      ? 'bg-[#e6dfd2] text-stone-800 hover:text-stone-950 hover:bg-[#ded6c7] border border-[#cfc7b7] font-semibold'
+                      : 'bg-[#eae4d8] text-stone-400 border border-[#ddd6c8] cursor-not-allowed opacity-60'
                   }`}
                 >
                   <span>{s.short}</span>
                   {isSubmitted ? (
-                    <Lock className="w-3 h-3 text-emerald-600" />
+                    <Lock className="w-3 h-3 text-emerald-700" />
                   ) : !isUnlocked ? (
-                    <Lock className="w-2.5 h-2.5 text-slate-400" />
+                    <Lock className="w-2.5 h-2.5 text-stone-400" />
                   ) : null}
                 </button>
               );
@@ -99,9 +96,9 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center space-x-3">
           {/* Active Participant info */}
           {participant && (
-            <div className="flex items-center space-x-2 text-xs font-mono bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 shadow-inner">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span className="text-slate-500 font-semibold">AGENT:</span>
+            <div className="flex items-center space-x-2 text-xs font-mono bg-[#e6dfd2] px-3.5 py-1.5 rounded-lg border border-[#cfc7b7] shadow-inner">
+              <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+              <span className="text-stone-600 font-semibold">AGENT:</span>
               <span className="text-blue-900 font-bold truncate max-w-[130px]">
                 {participant.participant_name}
               </span>
@@ -115,9 +112,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               soundFX.playCameraSwitch();
             }}
             title={isMuted ? 'Unmute Sound FX' : 'Mute Sound FX'}
-            className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 hover:text-slate-900 transition shadow-sm"
+            className="p-2 rounded-lg bg-[#e6dfd2] hover:bg-[#ded6c7] border border-[#cfc7b7] text-stone-700 hover:text-stone-900 transition shadow-sm"
           >
-            {isMuted ? <VolumeX className="w-4 h-4 text-red-500" /> : <Volume2 className="w-4 h-4 text-slate-700" />}
+            {isMuted ? <VolumeX className="w-4 h-4 text-red-600" /> : <Volume2 className="w-4 h-4 text-stone-800" />}
           </button>
         </div>
 
@@ -125,7 +122,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Mobile Stage Selector */}
       {participant && (
-        <div className="md:hidden flex items-center justify-between px-3 py-2 bg-slate-100 border-t border-slate-200 overflow-x-auto text-[11px] font-mono">
+        <div className="md:hidden flex items-center justify-between px-3 py-2 bg-[#ede7dc] border-t border-[#cfc7b7] overflow-x-auto text-[11px] font-mono">
           {stages.map((s) => (
             <button
               key={s.stage}
@@ -133,10 +130,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               disabled={s.stage > maxStageReached}
               className={`px-2.5 py-1 rounded-md whitespace-nowrap mr-1.5 ${
                 currentStage === s.stage
-                  ? 'bg-blue-600 text-white font-bold shadow-sm'
+                  ? 'bg-blue-800 text-white font-bold shadow-sm'
                   : s.stage <= maxStageReached
-                  ? 'text-slate-700 bg-white border border-slate-200 font-medium'
-                  : 'text-slate-400 bg-slate-50 border border-slate-200 opacity-60'
+                  ? 'text-stone-800 bg-[#f5f0e6] border border-[#cfc7b7] font-medium'
+                  : 'text-stone-400 bg-[#eae4d8] border border-[#ddd6c8] opacity-60'
               }`}
             >
               {s.short}

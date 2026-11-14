@@ -125,7 +125,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-amber-200 selection:text-amber-900">
+    <div className="min-h-screen bg-[#ede7dc] text-[#1c1917] flex flex-col font-sans selection:bg-amber-200 selection:text-amber-900">
       
       {/* Navigation Header */}
       <Navbar
@@ -190,9 +190,9 @@ export const App: React.FC = () => {
       </main>
 
       {/* Cinematic Footer */}
-      <footer className="border-t border-slate-200 bg-white py-6 text-center text-xs font-mono text-slate-500 shadow-sm">
+      <footer className="border-t border-[#cfc7b7] bg-[#f5f0e6] py-6 text-center text-xs font-mono text-stone-600 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span className="font-bold text-slate-700">CASE ZERO // THE VISUAL MYSTERY CHALLENGE</span>
+          <span className="font-bold text-stone-900">CASE ZERO // THE VISUAL MYSTERY CHALLENGE</span>
           <span className="text-gray-500">
             FROSTPEAK CONSERVATORY FORENSIC INCIDENT ARCHIVE
           </span>

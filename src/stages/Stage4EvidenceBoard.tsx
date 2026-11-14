@@ -133,23 +133,23 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#cfc7b7] pb-4">
         <div>
-          <div className="flex items-center space-x-2 text-amber-700 font-mono text-xs tracking-wider font-bold">
+          <div className="flex items-center space-x-2 text-amber-900 font-mono text-xs tracking-wider font-bold">
             <span>STAGE 04 OF 05</span>
             <span>//</span>
             <span>CORRELATION MATRIX</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black font-mono text-slate-900 mt-1">
+          <h2 className="text-2xl sm:text-3xl font-black font-mono text-[#1c1917] mt-1">
             INTERACTIVE EVIDENCE BOARD
           </h2>
-          <p className="text-xs sm:text-sm text-slate-600 mt-1">
+          <p className="text-xs sm:text-sm text-stone-700 mt-1">
             Inspect B-Wing Lab & Side Door forensic panels, examine evidence cards, scrub the timeline, and link clues to suspects.
           </p>
         </div>
 
         {/* View Switcher Tabs */}
-        <div className="flex items-center space-x-1.5 bg-slate-100 p-1.5 rounded-xl border border-slate-200 font-mono text-xs overflow-x-auto">
+        <div className="flex items-center space-x-1.5 bg-[#e2dbce] p-1.5 rounded-xl border border-[#cfc7b7] font-mono text-xs overflow-x-auto">
           <button
             onClick={() => {
               soundFX.playCameraSwitch();
@@ -157,8 +157,8 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
             }}
             className={`px-3.5 py-2 rounded-lg whitespace-nowrap transition font-semibold ${
               activeTab === 'visual_sheets'
-                ? 'bg-blue-600 text-white font-bold shadow-sm'
-                : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200'
+                ? 'bg-blue-800 text-white font-bold shadow-sm'
+                : 'text-stone-800 hover:text-stone-950 hover:bg-[#d6cebf]'
             }`}
           >
             VISUAL EVIDENCE SHEET (IMG 3)
@@ -170,8 +170,8 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
             }}
             className={`px-3.5 py-2 rounded-lg whitespace-nowrap transition font-semibold ${
               activeTab === 'board'
-                ? 'bg-blue-600 text-white font-bold shadow-sm'
-                : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200'
+                ? 'bg-blue-800 text-white font-bold shadow-sm'
+                : 'text-stone-800 hover:text-stone-950 hover:bg-[#d6cebf]'
             }`}
           >
             EVIDENCE DOSSIER ({INITIAL_EVIDENCE.length})
@@ -183,8 +183,8 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
             }}
             className={`px-3.5 py-2 rounded-lg whitespace-nowrap transition font-semibold ${
               activeTab === 'timeline'
-                ? 'bg-blue-600 text-white font-bold shadow-sm'
-                : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200'
+                ? 'bg-blue-800 text-white font-bold shadow-sm'
+                : 'text-stone-800 hover:text-stone-950 hover:bg-[#d6cebf]'
             }`}
           >
             TIMELINE SCRUBBER
@@ -196,8 +196,8 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
             }}
             className={`px-3.5 py-2 rounded-lg whitespace-nowrap transition font-semibold ${
               activeTab === 'links'
-                ? 'bg-blue-600 text-white font-bold shadow-sm'
-                : 'text-slate-700 hover:text-slate-900 hover:bg-slate-200'
+                ? 'bg-blue-800 text-white font-bold shadow-sm'
+                : 'text-stone-800 hover:text-stone-950 hover:bg-[#d6cebf]'
             }`}
           >
             SUSPECT-CLUE MATRIX ({connectedLinks.length} PINS)
@@ -208,20 +208,20 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
       {/* VIEW 1: VISUAL EVIDENCE SHEETS (IMAGE 3 RECREATION) */}
       {activeTab === 'visual_sheets' && (
         <div className="space-y-6">
-          <div className="bg-white border border-slate-200 p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono shadow-sm">
+          <div className="bg-[#f5f0e6] border border-[#cfc7b7] p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono shadow-sm">
             <div>
-              <span className="text-blue-900 font-bold">FORENSIC REFERENCE SHEET 03 // LAB & SERVICE ENTRANCE</span>
-              <p className="text-slate-500 text-[11px] mt-0.5 font-sans">
+              <span className="text-blue-950 font-bold">FORENSIC REFERENCE SHEET 03 // LAB & SERVICE ENTRANCE</span>
+              <p className="text-stone-600 text-[11px] mt-0.5 font-sans">
                 Click on the interactive markers below to inspect keycard logs, faucet smudges, gloves, deadbolts, and footprints.
               </p>
             </div>
-            <span className="px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 font-bold">
+            <span className="px-3 py-1 rounded-full bg-blue-100 border border-blue-300 text-blue-950 font-bold">
               CLICK TO INVESTIGATE HOTSPOTS
             </span>
           </div>
 
           {/* Interactive Sheet Container */}
-          <div className="relative rounded-2xl overflow-hidden bg-slate-900 border-2 border-slate-300 shadow-xl">
+          <div className="relative rounded-2xl overflow-hidden bg-slate-900 border-2 border-[#b8b09f] shadow-xl">
             <div className="relative w-full aspect-[16/9]">
               <img
                 src="/reference/evidence-sheet.jpg"
@@ -253,7 +253,7 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
                           ? 'bg-amber-500 border-white text-slate-900 font-bold'
                           : isCollected
                           ? 'bg-emerald-600 border-white text-white'
-                          : 'bg-blue-600 border-white text-white'
+                          : 'bg-blue-800 border-white text-white'
                       }`}>
                         <Eye className="w-4 h-4" />
                       </span>
@@ -271,26 +271,26 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
 
           {/* Hotspot Inspector Modal */}
           {activeVisualHotspot && (
-            <div className="p-6 rounded-2xl bg-white border-2 border-slate-200 shadow-xl space-y-4 animate-fade-in text-slate-900">
-              <div className="flex items-start justify-between border-b border-slate-200 pb-3">
+            <div className="p-6 rounded-2xl bg-[#f5f0e6] border-2 border-[#b8b09f] shadow-xl space-y-4 animate-fade-in text-[#1c1917]">
+              <div className="flex items-start justify-between border-b border-[#cfc7b7] pb-3">
                 <div>
-                  <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200 font-bold">
+                  <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-950 border border-blue-300 font-bold">
                     FORENSIC TARGET // {activeVisualHotspot.evidenceCode}
                   </span>
-                  <h4 className="text-xl font-bold font-mono text-slate-900 mt-1">
+                  <h4 className="text-xl font-bold font-mono text-[#1c1917] mt-1">
                     {activeVisualHotspot.title}
                   </h4>
                 </div>
                 <button
                   onClick={() => setActiveVisualHotspot(null)}
-                  className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition"
+                  className="p-1 rounded-lg bg-[#e6dfd2] hover:bg-[#ded6c7] text-stone-600 hover:text-stone-900 transition"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5 font-mono text-xs">
-                <div className="rounded-xl overflow-hidden bg-slate-100 border border-slate-200 aspect-video md:aspect-square flex items-center justify-center">
+                <div className="rounded-xl overflow-hidden bg-[#e6dfd2] border border-[#cfc7b7] aspect-video md:aspect-square flex items-center justify-center">
                   <img
                     src={activeVisualHotspot.previewImg}
                     alt={activeVisualHotspot.title}
@@ -299,23 +299,23 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
                 </div>
 
                 <div className="md:col-span-2 space-y-3">
-                  <p className="text-slate-800 text-sm leading-relaxed font-sans font-medium">
+                  <p className="text-stone-800 text-sm leading-relaxed font-sans font-medium">
                     {activeVisualHotspot.details}
                   </p>
 
-                  <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 space-y-1">
-                    <span className="text-amber-800 font-bold block text-[11px]">EXAMINATION NOTE:</span>
+                  <div className="p-3.5 rounded-xl bg-[#e6dfd2] border border-[#cfc7b7] text-stone-800 space-y-1">
+                    <span className="text-amber-950 font-bold block text-[11px]">EXAMINATION NOTE:</span>
                     <p className="font-sans text-xs">{activeVisualHotspot.notes}</p>
                   </div>
 
                   <div className="pt-2 flex items-center justify-between">
-                    <span className="text-slate-600 font-semibold">
-                      EVIDENCE CODE: <strong className="text-blue-700">{activeVisualHotspot.evidenceCode}</strong>
+                    <span className="text-stone-700 font-semibold">
+                      EVIDENCE CODE: <strong className="text-blue-900">{activeVisualHotspot.evidenceCode}</strong>
                     </span>
 
                     {collectedEvidence.includes(activeVisualHotspot.evidenceCode) ? (
-                      <span className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-700 font-bold">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      <span className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-100 border border-emerald-300 text-emerald-900 font-bold">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-700" />
                         <span>LOGGED IN EVIDENCE INVENTORY</span>
                       </span>
                     ) : (
@@ -324,7 +324,7 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
                           soundFX.playClueFound();
                           onCollectEvidence(activeVisualHotspot.evidenceCode);
                         }}
-                        className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition shadow-md"
+                        className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-blue-800 hover:bg-blue-900 text-white font-bold transition shadow-md"
                       >
                         <Sparkles className="w-4 h-4" />
                         <span>COLLECT THIS CLUE</span>
@@ -353,8 +353,8 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
                 }}
                 className={`px-3.5 py-2 rounded-xl border whitespace-nowrap transition font-semibold ${
                   selectedType === f.id
-                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                    : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                    ? 'bg-blue-800 text-white border-blue-900 shadow-sm'
+                    : 'bg-[#f5f0e6] border-[#cfc7b7] text-stone-800 hover:bg-[#ece5d8]'
                 }`}
               >
                 {f.label}
@@ -370,12 +370,12 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
               return (
                 <div
                   key={ev.id}
-                  className="group bg-white border border-slate-200 hover:border-blue-400 rounded-2xl overflow-hidden transition-all duration-200 shadow-sm hover:shadow-md flex flex-col justify-between"
+                  className="group bg-[#f5f0e6] border border-[#cfc7b7] hover:border-[#9e9484] rounded-2xl overflow-hidden transition-all duration-200 shadow-sm hover:shadow-md flex flex-col justify-between"
                 >
                   <div>
                     {/* Media Thumbnail with Zoom */}
                     <div
-                      className="relative aspect-video w-full overflow-hidden bg-slate-100 cursor-pointer"
+                      className="relative aspect-video w-full overflow-hidden bg-[#e6dfd2] cursor-pointer"
                       onClick={() => {
                         soundFX.playCameraSwitch();
                         setModalEvidence(ev);
@@ -389,32 +389,32 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
                       
                       {/* Top Overlay Badge */}
                       <div className="absolute top-2 left-2 flex items-center space-x-1.5">
-                        <span className="px-2 py-0.5 rounded-md bg-white/95 border border-slate-200 text-blue-800 font-mono text-[11px] font-bold shadow-sm">
+                        <span className="px-2 py-0.5 rounded-md bg-[#f5f0e6]/95 border border-[#cfc7b7] text-blue-950 font-mono text-[11px] font-bold shadow-sm">
                           {ev.code}
                         </span>
-                        <span className="px-1.5 py-0.5 rounded-md bg-white/95 border border-slate-200 text-[10px] font-mono text-slate-600 uppercase font-semibold">
+                        <span className="px-1.5 py-0.5 rounded-md bg-[#f5f0e6]/95 border border-[#cfc7b7] text-[10px] font-mono text-stone-700 uppercase font-semibold">
                           {ev.evidence_type}
                         </span>
                       </div>
 
-                      <div className="absolute top-2 right-2 p-1.5 rounded-md bg-white/90 text-slate-600 group-hover:text-blue-600 shadow-sm transition">
+                      <div className="absolute top-2 right-2 p-1.5 rounded-md bg-[#f5f0e6]/90 text-stone-700 group-hover:text-blue-800 shadow-sm transition">
                         <ZoomIn className="w-3.5 h-3.5" />
                       </div>
                     </div>
 
                     {/* Card Content */}
                     <div className="p-4 space-y-2">
-                      <h4 className="text-sm font-bold font-mono text-slate-900 leading-tight">
+                      <h4 className="text-sm font-bold font-mono text-[#1c1917] leading-tight">
                         {ev.title}
                       </h4>
-                      <p className="text-xs text-slate-600 font-sans line-clamp-3 leading-relaxed">
+                      <p className="text-xs text-stone-700 font-sans line-clamp-3 leading-relaxed">
                         {ev.description}
                       </p>
                     </div>
                   </div>
 
                   {/* Card Footer Actions */}
-                  <div className="p-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs font-mono">
+                  <div className="p-3 bg-[#e6dfd2] border-t border-[#cfc7b7] flex items-center justify-between text-xs font-mono">
                     <button
                       onClick={() => {
                         soundFX.playClueFound();
@@ -422,8 +422,8 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
                       }}
                       className={`px-3 py-1.5 rounded-lg transition flex items-center space-x-1.5 font-bold ${
                         isCollected
-                          ? 'bg-emerald-50 border border-emerald-300 text-emerald-700'
-                          : 'bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 shadow-sm'
+                          ? 'bg-emerald-100 border border-emerald-300 text-emerald-900'
+                          : 'bg-[#fbf9f5] hover:bg-white border border-[#cfc7b7] text-stone-800 shadow-sm'
                       }`}
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" />
@@ -435,7 +435,7 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
                         soundFX.playCameraSwitch();
                         setModalEvidence(ev);
                       }}
-                      className="text-slate-600 hover:text-blue-600 font-semibold transition flex items-center space-x-1"
+                      className="text-stone-700 hover:text-blue-900 font-semibold transition flex items-center space-x-1"
                     >
                       <span>INSPECT</span>
                       <ChevronRight className="w-3.5 h-3.5" />
@@ -452,17 +452,17 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
 
       {/* VIEW 3: INTERACTIVE TIMELINE SCRUBBER */}
       {activeTab === 'timeline' && (
-        <div className="p-6 rounded-2xl bg-white border border-slate-200 space-y-6 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+        <div className="p-6 rounded-2xl bg-[#f5f0e6] border border-[#cfc7b7] space-y-6 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#cfc7b7] pb-4">
             <div>
-              <h3 className="text-lg font-bold font-mono text-slate-900">
+              <h3 className="text-lg font-bold font-mono text-[#1c1917]">
                 FROSTPEAK CONSERVATORY CRIME TIMELINE (22:50 – 23:30)
               </h3>
-              <p className="text-xs text-slate-500 font-sans">
+              <p className="text-xs text-stone-600 font-sans">
                 Drag the time scrubber to cross-reference suspect movements, tea delivery, corridor transits, and fatal toxin timing.
               </p>
             </div>
-            <div className="text-xs font-mono text-blue-900 bg-blue-50 px-3.5 py-1.5 rounded-xl border border-blue-200 font-bold">
+            <div className="text-xs font-mono text-blue-950 bg-blue-100 px-3.5 py-1.5 rounded-xl border border-blue-300 font-bold">
               CURRENT EVENT: {TIMELINE_EVENTS[timelineIndex].timestamp}
             </div>
           </div>
@@ -479,13 +479,13 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
                 soundFX.playCameraSwitch();
                 setTimelineIndex(parseInt(e.target.value));
               }}
-              className="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+              className="w-full h-2.5 bg-[#cfc7b7] rounded-lg appearance-none cursor-pointer accent-blue-800"
             />
-            <div className="flex justify-between text-[11px] font-mono text-slate-500 font-semibold">
+            <div className="flex justify-between text-[11px] font-mono text-stone-600 font-semibold">
               <span>22:50 (VICTOR ATTEMPT)</span>
               <span>23:00 (TEA DELIVERY)</span>
-              <span className="text-blue-700 font-bold">23:12 (EVELYN TRANSIT)</span>
-              <span className="text-red-600 font-bold">23:24 (COLLAPSE)</span>
+              <span className="text-blue-900 font-bold">23:12 (EVELYN TRANSIT)</span>
+              <span className="text-red-700 font-bold">23:24 (COLLAPSE)</span>
               <span>23:30 (DISCOVERY)</span>
             </div>
           </div>
@@ -496,35 +496,35 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
             return (
               <div className={`p-5 rounded-2xl border transition-all ${
                 ev.isAnomaly
-                  ? 'bg-amber-50/70 border-2 border-amber-300 shadow-sm'
-                  : 'bg-slate-50 border-slate-200'
+                  ? 'bg-amber-100/70 border-2 border-amber-400 shadow-sm'
+                  : 'bg-[#e6dfd2] border-[#cfc7b7]'
               }`}>
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-2 font-mono text-xs">
                   <div className="flex items-center space-x-2">
-                    <Clock className="w-4 h-4 text-blue-600" />
-                    <span className="text-blue-900 font-bold text-sm">{ev.timestamp}</span>
+                    <Clock className="w-4 h-4 text-blue-800" />
+                    <span className="text-blue-950 font-bold text-sm">{ev.timestamp}</span>
                     {ev.isAnomaly && (
-                      <span className="px-2.5 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-300 text-[10px] uppercase font-bold">
+                      <span className="px-2.5 py-0.5 rounded-full bg-red-100 text-red-900 border border-red-300 text-[10px] uppercase font-bold">
                         CRITICAL ANOMALY
                       </span>
                     )}
                   </div>
-                  <span className="text-slate-600 font-semibold flex items-center space-x-1">
-                    <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                  <span className="text-stone-700 font-semibold flex items-center space-x-1">
+                    <MapPin className="w-3.5 h-3.5 text-stone-500" />
                     <span>{ev.location}</span>
                   </span>
                 </div>
 
-                <h4 className="text-base font-bold font-mono text-slate-900 mb-1.5">
+                <h4 className="text-base font-bold font-mono text-[#1c1917] mb-1.5">
                   {ev.title}
                 </h4>
-                <p className="text-xs sm:text-sm text-slate-700 font-sans leading-relaxed font-medium">
+                <p className="text-xs sm:text-sm text-stone-800 font-sans leading-relaxed font-medium">
                   {ev.detail}
                 </p>
 
-                <div className="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between text-xs font-mono text-slate-600">
-                  <span>SUBJECT INVOLVED: <strong className="text-slate-900">{ev.involvedParty}</strong></span>
-                  <span className="text-[11px] text-slate-500 uppercase font-semibold">SOURCE: {ev.sourceType}</span>
+                <div className="mt-4 pt-3 border-t border-[#cfc7b7] flex items-center justify-between text-xs font-mono text-stone-700">
+                  <span>SUBJECT INVOLVED: <strong className="text-[#1c1917]">{ev.involvedParty}</strong></span>
+                  <span className="text-[11px] text-stone-600 uppercase font-semibold">SOURCE: {ev.sourceType}</span>
                 </div>
               </div>
             );
@@ -535,12 +535,12 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
 
       {/* VIEW 4: SUSPECT-CLUE CORRELATION MATRIX */}
       {activeTab === 'links' && (
-        <div className="p-6 rounded-2xl bg-white border border-slate-200 space-y-6 shadow-sm">
-          <div className="border-b border-slate-200 pb-4">
-            <h3 className="text-lg font-bold font-mono text-slate-900">
+        <div className="p-6 rounded-2xl bg-[#f5f0e6] border border-[#cfc7b7] space-y-6 shadow-sm">
+          <div className="border-b border-[#cfc7b7] pb-4">
+            <h3 className="text-lg font-bold font-mono text-[#1c1917]">
               SUSPECT & EVIDENCE CORRELATION PINBOARD
             </h3>
-            <p className="text-xs text-slate-500 font-sans mt-0.5">
+            <p className="text-xs text-stone-600 font-sans mt-0.5">
               Click the pin buttons to connect or disconnect evidence clues to suspects. Link multiple clues to build your case.
             </p>
           </div>
@@ -550,16 +550,16 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
               const suspectLinks = connectedLinks.filter((l) => l.suspectId === suspect.id);
 
               return (
-                <div key={suspect.id} className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-4">
-                  <div className="flex items-center space-x-3 border-b border-slate-200 pb-3">
+                <div key={suspect.id} className="p-4 rounded-xl bg-[#e6dfd2] border border-[#cfc7b7] space-y-4">
+                  <div className="flex items-center space-x-3 border-b border-[#cfc7b7] pb-3">
                     <img
                       src={suspect.portrait_url}
                       alt={suspect.display_name}
-                      className="w-10 h-10 rounded-full object-cover border-2 border-slate-200"
+                      className="w-10 h-10 rounded-full object-cover border-2 border-[#cfc7b7]"
                     />
                     <div>
-                      <h4 className="text-sm font-bold font-mono text-slate-900">{suspect.display_name}</h4>
-                      <span className="text-[10px] font-mono text-blue-700 font-bold">
+                      <h4 className="text-sm font-bold font-mono text-[#1c1917]">{suspect.display_name}</h4>
+                      <span className="text-[10px] font-mono text-blue-900 font-bold">
                         {suspectLinks.length} CLUES PINNED
                       </span>
                     </div>
@@ -575,12 +575,12 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
                           onClick={() => handleLinkClick(suspect.id, ev.code)}
                           className={`w-full text-left p-2 rounded-lg text-xs font-mono transition flex items-center justify-between border ${
                             linked
-                              ? 'bg-blue-100 border-2 border-blue-600 text-blue-900 font-bold shadow-sm'
-                              : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                              ? 'bg-blue-100 border-2 border-blue-900 text-blue-950 font-bold shadow-sm'
+                              : 'bg-[#fbf9f5] border-[#cfc7b7] text-stone-800 hover:border-[#b8b09f]'
                           }`}
                         >
                           <span className="truncate pr-2">{ev.code}: {ev.title}</span>
-                          <Link2 className={`w-3.5 h-3.5 shrink-0 ${linked ? 'text-blue-700' : 'text-slate-400'}`} />
+                          <Link2 className={`w-3.5 h-3.5 shrink-0 ${linked ? 'text-blue-900' : 'text-stone-500'}`} />
                         </button>
                       );
                     })}
@@ -594,22 +594,22 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
 
       {/* Modal Evidence Viewer */}
       {modalEvidence && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <div className="relative w-full max-w-2xl bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl space-y-4 font-mono text-xs">
-            <div className="flex items-start justify-between border-b border-slate-200 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="relative w-full max-w-2xl bg-[#f5f0e6] border border-[#cfc7b7] rounded-2xl p-6 shadow-2xl space-y-4 font-mono text-xs text-[#1c1917]">
+            <div className="flex items-start justify-between border-b border-[#cfc7b7] pb-3">
               <div>
-                <span className="text-blue-700 font-bold text-sm">{modalEvidence.code}</span>
-                <h3 className="text-lg font-bold text-slate-900 mt-0.5">{modalEvidence.title}</h3>
+                <span className="text-blue-900 font-bold text-sm">{modalEvidence.code}</span>
+                <h3 className="text-lg font-bold text-[#1c1917] mt-0.5">{modalEvidence.title}</h3>
               </div>
               <button
                 onClick={() => setModalEvidence(null)}
-                className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition"
+                className="p-1 rounded-lg bg-[#e6dfd2] hover:bg-[#ded6c7] text-stone-600 hover:text-stone-900 transition"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="aspect-video w-full rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
+            <div className="aspect-video w-full rounded-xl overflow-hidden bg-[#e6dfd2] border border-[#cfc7b7]">
               <img
                 src={modalEvidence.media_url}
                 alt={modalEvidence.title}
@@ -617,17 +617,17 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
               />
             </div>
 
-            <p className="text-slate-700 text-sm font-sans leading-relaxed font-medium">
+            <p className="text-stone-800 text-sm font-sans leading-relaxed font-medium">
               {modalEvidence.description}
             </p>
 
             {modalEvidence.metadata && (
-              <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-1">
-                <span className="text-blue-900 font-bold block text-[11px]">METADATA ATTRIBUTES:</span>
+              <div className="bg-[#e6dfd2] p-3.5 rounded-xl border border-[#cfc7b7] space-y-1">
+                <span className="text-blue-950 font-bold block text-[11px]">METADATA ATTRIBUTES:</span>
                 {Object.entries(modalEvidence.metadata).map(([k, v]) => (
-                  <div key={k} className="flex justify-between text-slate-600 text-[11px]">
+                  <div key={k} className="flex justify-between text-stone-700 text-[11px]">
                     <span className="uppercase font-semibold">{k.replace('_', ' ')}:</span>
-                    <span className="text-slate-900 font-bold">{String(v)}</span>
+                    <span className="text-[#1c1917] font-bold">{String(v)}</span>
                   </div>
                 ))}
               </div>
@@ -640,7 +640,7 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
                   onCollectEvidence(modalEvidence.code);
                   setModalEvidence(null);
                 }}
-                className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold uppercase transition shadow-md"
+                className="px-5 py-2.5 rounded-xl bg-blue-800 hover:bg-blue-900 text-white font-bold uppercase transition shadow-md"
               >
                 {collectedEvidence.includes(modalEvidence.code) ? 'ALREADY LOGGED' : 'ADD TO EVIDENCE DOSSIER'}
               </button>
@@ -650,8 +650,8 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
       )}
 
       {/* Navigation Footer */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-slate-200 bg-white p-6 rounded-2xl shadow-sm">
-        <p className="text-xs font-mono text-slate-600 font-medium">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-[#cfc7b7] bg-[#f5f0e6] p-6 rounded-2xl shadow-sm">
+        <p className="text-xs font-mono text-stone-700 font-medium">
           Ensure you have correlated the evidence with the CCTV movements before making your final accusation.
         </p>
         <button
@@ -659,7 +659,7 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
             soundFX.playCameraSwitch();
             onProceed();
           }}
-          className="px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold font-mono text-xs tracking-wider flex items-center space-x-2 transition shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+          className="px-6 py-3.5 rounded-xl bg-blue-800 hover:bg-blue-900 text-white font-bold font-mono text-xs tracking-wider flex items-center space-x-2 transition shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
         >
           <span>PROCEED TO STAGE 05: FINAL SUBMISSION</span>
           <ArrowRight className="w-4 h-4" />

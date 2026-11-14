@@ -62,24 +62,24 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#cfc7b7] pb-5">
         <div>
-          <div className="flex items-center space-x-2 text-amber-700 font-mono text-xs tracking-wider font-bold">
+          <div className="flex items-center space-x-2 text-amber-900 font-mono text-xs tracking-wider font-bold">
             <span>STAGE 02 OF 05</span>
             <span>//</span>
             <span>SURVEILLANCE & RECONSTRUCTION</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black font-mono text-slate-900 mt-1">
+          <h2 className="text-2xl sm:text-3xl font-black font-mono text-[#1c1917] mt-1">
             INVESTIGATE THE CCTV RECORDINGS & AUDIO REELS
           </h2>
-          <p className="text-xs sm:text-sm text-slate-600 mt-1 font-sans">
+          <p className="text-xs sm:text-sm text-stone-700 mt-1 font-sans">
             Review 5 synchronized estate surveillance camera feeds. Switch angles, scrub the timeline, inspect suspicious reflections with the magnify lens, and listen to intercepted audio recordings.
           </p>
         </div>
 
         <div className="flex items-center space-x-2 font-mono text-xs">
-          <span className="px-3.5 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 shadow-sm font-semibold">
-            CLUES LOGGED: <strong className="text-blue-700 font-bold">{collectedEvidence.length} / 8</strong>
+          <span className="px-3.5 py-1.5 rounded-xl bg-[#f5f0e6] border border-[#cfc7b7] text-stone-800 shadow-sm font-semibold">
+            CLUES LOGGED: <strong className="text-blue-900 font-bold">{collectedEvidence.length} / 8</strong>
           </span>
         </div>
       </div>
@@ -90,8 +90,8 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
         {/* Left Column: CCTV Monitor & Active Video (Span 3) */}
         <div className="lg:col-span-3 space-y-4">
           
-          {/* Cinematic Canvas Surveillance Player in clean container */}
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+          {/* Cinematic Canvas Surveillance Player in warm card container */}
+          <div className="bg-[#f5f0e6] p-4 rounded-2xl border border-[#cfc7b7] shadow-sm">
             <CinematicVideoPlayer
               key={selectedCam.id}
               posterUrl={selectedCam.posterUrl}
@@ -119,20 +119,20 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
                   onClick={() => handleSelectCam(cam)}
                   className={`p-3 rounded-xl border text-left font-mono transition-all relative overflow-hidden ${
                     isSelected
-                      ? 'bg-blue-50 border-2 border-blue-600 shadow-md ring-1 ring-blue-100'
-                      : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 shadow-sm'
+                      ? 'bg-[#dfd7c8] border-2 border-blue-900 shadow-md ring-1 ring-blue-300'
+                      : 'bg-[#f5f0e6] border-[#cfc7b7] hover:border-[#b8b09f] hover:bg-[#ece5d8] text-stone-800 shadow-sm'
                   }`}
                 >
                   <div className="flex items-center justify-between text-[10px] mb-1">
-                    <span className={`font-bold ${isSelected ? 'text-blue-700' : 'text-slate-500'}`}>
+                    <span className={`font-bold ${isSelected ? 'text-blue-950 font-black' : 'text-stone-600'}`}>
                       {cam.camCode}
                     </span>
                     <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
                   </div>
-                  <p className={`text-xs font-bold truncate font-mono ${isSelected ? 'text-blue-950 font-black' : 'text-slate-900'}`}>
+                  <p className={`text-xs font-bold truncate font-mono ${isSelected ? 'text-blue-950 font-black' : 'text-stone-900'}`}>
                     {cam.title}
                   </p>
-                  <p className="text-[10px] text-slate-500 truncate mt-0.5 font-semibold">
+                  <p className="text-[10px] text-stone-600 truncate mt-0.5 font-semibold">
                     {cam.timestamp}
                   </p>
                 </button>
@@ -146,13 +146,13 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
         <div className="space-y-6">
           
           {/* Acoustic & Audio Logs Panel */}
-          <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-4 shadow-sm">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <div className="flex items-center space-x-2 text-blue-900 font-mono text-xs font-bold">
-                <Radio className="w-4 h-4 text-blue-600" />
+          <div className="p-5 rounded-2xl bg-[#f5f0e6] border border-[#cfc7b7] space-y-4 shadow-sm">
+            <div className="flex items-center justify-between border-b border-[#cfc7b7] pb-3">
+              <div className="flex items-center space-x-2 text-blue-950 font-mono text-xs font-bold">
+                <Radio className="w-4 h-4 text-blue-800" />
                 <span>AUDIO INTERCEPT REELS</span>
               </div>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 font-bold">
+              <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-[#e6dfd2] border border-[#cfc7b7] text-stone-800 font-bold">
                 {AUDIO_LOGS.length} TAPES
               </span>
             </div>
@@ -166,18 +166,18 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
                     key={log.id}
                     className={`p-3.5 rounded-xl border transition-all ${
                       isPlayingThis
-                        ? 'bg-amber-50 border-2 border-amber-400 shadow-sm'
-                        : 'bg-slate-50 border-slate-200 hover:border-slate-300'
+                        ? 'bg-amber-100 border-2 border-amber-500 shadow-sm'
+                        : 'bg-[#e6dfd2] border-[#cfc7b7] hover:border-[#b8b09f]'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1 text-[11px] font-mono">
-                      <span className="text-amber-800 font-bold">{log.code}</span>
-                      <span className="text-slate-500 font-semibold">{log.timestamp}</span>
+                      <span className="text-amber-950 font-bold">{log.code}</span>
+                      <span className="text-stone-600 font-semibold">{log.timestamp}</span>
                     </div>
-                    <p className="text-xs font-bold text-slate-900 mb-1">
+                    <p className="text-xs font-bold text-[#1c1917] mb-1">
                       {log.title}
                     </p>
-                    <p className="text-[11px] text-slate-700 font-mono italic mb-3 leading-relaxed bg-white p-2 rounded border border-slate-200">
+                    <p className="text-[11px] text-stone-800 font-mono italic mb-3 leading-relaxed bg-[#fbf9f5] p-2 rounded border border-[#cfc7b7]">
                       “{log.transcript}”
                     </p>
 
@@ -186,13 +186,13 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
                       onClick={() => handlePlayAudio(log)}
                       className={`w-full py-2 rounded-lg font-mono text-xs font-bold flex items-center justify-center space-x-2 transition ${
                         isPlayingThis
-                          ? 'bg-amber-500 text-slate-950 shadow-md animate-pulse'
-                          : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm'
+                          ? 'bg-amber-500 text-stone-950 shadow-md animate-pulse'
+                          : 'bg-blue-800 hover:bg-blue-900 text-white shadow-sm'
                       }`}
                     >
                       {isPlayingThis ? (
                         <>
-                          <Activity className="w-3.5 h-3.5 animate-spin text-slate-950" />
+                          <Activity className="w-3.5 h-3.5 animate-spin text-stone-950" />
                           <span>TRANSMITTING... (STOP)</span>
                         </>
                       ) : (
@@ -210,25 +210,25 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
 
           {/* Quick Hotspot Inspector Box */}
           {activeHotspot ? (
-            <div className="p-5 rounded-2xl bg-white border-2 border-blue-500 shadow-xl space-y-3 animate-fade-in">
-              <div className="flex items-center justify-between text-blue-900 font-mono text-xs border-b border-slate-200 pb-2">
+            <div className="p-5 rounded-2xl bg-[#f5f0e6] border-2 border-blue-800 shadow-xl space-y-3 animate-fade-in">
+              <div className="flex items-center justify-between text-blue-950 font-mono text-xs border-b border-[#cfc7b7] pb-2">
                 <span className="font-bold flex items-center space-x-1.5">
-                  <Sparkles className="w-4 h-4 text-amber-500" />
+                  <Sparkles className="w-4 h-4 text-amber-600" />
                   <span>INSPECTED DETAIL</span>
                 </span>
                 <button
                   onClick={() => setActiveHotspot(null)}
-                  className="text-slate-400 hover:text-slate-800 p-1"
+                  className="text-stone-500 hover:text-stone-900 p-1"
                 >
                   ✕
                 </button>
               </div>
 
               <div>
-                <h4 className="text-sm font-bold font-mono text-slate-900">
+                <h4 className="text-sm font-bold font-mono text-[#1c1917]">
                   {activeHotspot.title}
                 </h4>
-                <p className="text-xs text-slate-700 mt-1 leading-relaxed font-sans font-medium">
+                <p className="text-xs text-stone-800 mt-1 leading-relaxed font-sans font-medium">
                   {activeHotspot.description}
                 </p>
               </div>
@@ -236,14 +236,14 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
               {activeHotspot.clueCode && (
                 <div className="pt-2">
                   {collectedEvidence.includes(activeHotspot.clueCode) ? (
-                    <div className="flex items-center space-x-1.5 text-xs font-mono text-emerald-700 bg-emerald-50 p-2.5 rounded-lg border border-emerald-300 font-bold">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <div className="flex items-center space-x-1.5 text-xs font-mono text-emerald-900 bg-emerald-100 p-2.5 rounded-lg border border-emerald-300 font-bold">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700" />
                       <span>LOGGED IN EVIDENCE BOARD ({activeHotspot.clueCode})</span>
                     </div>
                   ) : (
                     <button
                       onClick={() => handleCollectClue(activeHotspot.clueCode!)}
-                      className="w-full py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold font-mono text-xs flex items-center justify-center space-x-1.5 transition shadow-md"
+                      className="w-full py-2.5 rounded-lg bg-blue-800 hover:bg-blue-900 text-white font-bold font-mono text-xs flex items-center justify-center space-x-1.5 transition shadow-md"
                     >
                       <CheckCircle2 className="w-4 h-4" />
                       <span>COLLECT CLUE TO EVIDENCE BOARD ({activeHotspot.clueCode})</span>
@@ -253,8 +253,8 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
               )}
             </div>
           ) : (
-            <div className="p-5 rounded-2xl bg-white border border-slate-200 text-center py-6 text-xs text-slate-500 font-mono space-y-2 shadow-sm">
-              <Eye className="w-6 h-6 mx-auto text-slate-400" />
+            <div className="p-5 rounded-2xl bg-[#f5f0e6] border border-[#cfc7b7] text-center py-6 text-xs text-stone-600 font-mono space-y-2 shadow-sm">
+              <Eye className="w-6 h-6 mx-auto text-stone-500" />
               <p>Click any pulsing amber marker on the footage to inspect suspicious objects.</p>
             </div>
           )}
@@ -264,8 +264,8 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
       </div>
 
       {/* Navigation footer */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-slate-200 bg-white p-6 rounded-2xl shadow-sm">
-        <p className="text-xs font-mono text-slate-600 font-medium">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-[#cfc7b7] bg-[#f5f0e6] p-6 rounded-2xl shadow-sm">
+        <p className="text-xs font-mono text-stone-700 font-medium">
           Make sure to review all 5 cameras and listen to the audio logs before questioning the suspects.
         </p>
         <button
@@ -274,7 +274,7 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
             soundFX.playCameraSwitch();
             onProceed();
           }}
-          className="px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold font-mono text-xs tracking-wider flex items-center space-x-2 transition shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+          className="px-6 py-3.5 rounded-xl bg-blue-800 hover:bg-blue-900 text-white font-bold font-mono text-xs tracking-wider flex items-center space-x-2 transition shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
         >
           <span>PROCEED TO STAGE 03: EXAMINE SUSPECTS</span>
           <ArrowRight className="w-4 h-4" />

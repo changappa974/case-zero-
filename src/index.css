@@ -1,39 +1,47 @@
 @import "tailwindcss";
 
 @theme {
-  --color-charcoal-950: #f8fafc;
-  --color-charcoal-900: #ffffff;
-  --color-charcoal-850: #f1f5f9;
-  --color-charcoal-800: #e2e8f0;
-  --color-charcoal-700: #cbd5e1;
-  --color-charcoal-600: #94a3b8;
-  --color-crime-red: #dc2626;
-  --color-crime-amber: #d97706;
+  --color-archive-bg: #ede7dc;
+  --color-archive-card: #f5f0e6;
+  --color-archive-sub: #e2dbce;
+  --color-archive-border: #cfc7b7;
+  --color-archive-border-strong: #9e9484;
+  --color-archive-text: #1c1917;
+  --color-archive-muted: #57534e;
+
+  --color-charcoal-950: #ede7dc;
+  --color-charcoal-900: #f5f0e6;
+  --color-charcoal-850: #e8e1d4;
+  --color-charcoal-800: #cfc7b7;
+  --color-charcoal-700: #b8b09f;
+  --color-charcoal-600: #8c8270;
+  --color-crime-red: #b91c1c;
+  --color-crime-amber: #b45309;
   --color-crime-cyan: #0284c7;
-  --color-crime-dim: #64748b;
+  --color-crime-dim: #57534e;
 }
 
 body {
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: #ede7dc;
+  color: #1c1917;
   min-height: 100vh;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
-/* Custom clean light forensic scrollbar */
+/* Custom warm archival scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #e4ddd0;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #c2b9a7;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #9e9484;
 }
 
 @keyframes fadeIn {
