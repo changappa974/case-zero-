@@ -6,7 +6,6 @@ import { Stage2SceneInvestigation } from './stages/Stage2SceneInvestigation';
 import { Stage3Suspects } from './stages/Stage3Suspects';
 import { Stage4EvidenceBoard } from './stages/Stage4EvidenceBoard';
 import { Stage5Submission } from './stages/Stage5Submission';
-import { OrganizerDashboard } from './components/OrganizerDashboard';
 import { InvestigationStage, Participant, InvestigationSession, SubmissionReceipt } from './types';
 import { restoreActiveSession, updateSessionProgress } from './lib/supabase';
 import { soundFX } from './lib/audioService';
@@ -20,9 +19,6 @@ export const App: React.FC = () => {
   const [connectedLinks, setConnectedLinks] = useState<{ suspectId: string; evidenceCode: string; note?: string }[]>([]);
   const [suspectNotes, setSuspectNotes] = useState<Record<string, string>>({});
   const [submissionReceipt, setSubmissionReceipt] = useState<SubmissionReceipt | null>(null);
-  
-  // Organizer overlay modal
-  const [showOrganizer, setShowOrganizer] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(false);
 
   // Restore session from Supabase on mount
@@ -138,7 +134,6 @@ export const App: React.FC = () => {
         onNavigateStage={goToStage}
         participant={participant}
         session={session}
-        onOpenOrganizer={() => setShowOrganizer(true)}
         isMuted={isMuted}
         onToggleMute={handleToggleMute}
       />
@@ -194,13 +189,8 @@ export const App: React.FC = () => {
         )}
       </main>
 
-      {/* Organizer Console Modal */}
-      {showOrganizer && (
-        <OrganizerDashboard onClose={() => setShowOrganizer(false)} />
-      )}
-
       {/* Cinematic Footer */}
-      <footer className="border-t border-charcoal-800/80 bg-charcoal-950 py-6 text-center text-xs font-mono text-gray-600">
+      <footer className="border-t border-charcoal-800/80 bg-charcoal-950 py-6 text-center text-xs font-mono text-gray-500">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <span>CASE ZERO // THE VISUAL MYSTERY CHALLENGE</span>
           <span className="text-gray-500">

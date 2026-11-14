@@ -1,8 +1,8 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
-  Play, Pause, RotateCcw, Volume2, VolumeX, Maximize2, AlertTriangle, 
-  ArrowRight, Eye, Film, Info, ZoomIn, ZoomOut, CheckCircle2, Search, X, Sparkles, MapPin
+  Eye, Film, ZoomIn, ZoomOut, CheckCircle2, Search, X, Sparkles, ArrowRight, Shield 
 } from 'lucide-react';
+import { CinematicVideoPlayer } from '../components/CinematicVideoPlayer';
 import { soundFX } from '../lib/audioService';
 
 interface Stage1StoryProps {
@@ -29,14 +29,6 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
   collectedEvidence = [],
   onCollectEvidence 
 }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(8);
-  const [speed, setSpeed] = useState(1);
-  const [showSubtitles, setShowSubtitles] = useState(true);
-  const [hasWatchedFull, setHasWatchedFull] = useState(false);
-
   // Crime Scene Interactive View State
   const [sceneZoom, setSceneZoom] = useState(1);
   const [selectedHotspot, setSelectedHotspot] = useState<CrimeSceneHotspot | null>(null);
@@ -185,86 +177,12 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
     }
   ];
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const onTimeUpdate = () => {
-      setCurrentTime(video.currentTime);
-      if (video.duration && video.currentTime >= video.duration * 0.9) {
-        setHasWatchedFull(true);
-      }
-    };
-
-    const onLoadedMetadata = () => {
-      setDuration(video.duration || 8);
-    };
-
-    const onEnded = () => {
-      setIsPlaying(false);
-      setHasWatchedFull(true);
-      soundFX.playAlertBeep();
-    };
-
-    video.addEventListener('timeupdate', onTimeUpdate);
-    video.addEventListener('loadedmetadata', onLoadedMetadata);
-    video.addEventListener('ended', onEnded);
-
-    return () => {
-      video.removeEventListener('timeupdate', onTimeUpdate);
-      video.removeEventListener('loadedmetadata', onLoadedMetadata);
-      video.removeEventListener('ended', onEnded);
-    };
-  }, []);
-
-  const togglePlay = () => {
-    soundFX.playCameraSwitch();
-    if (!videoRef.current) return;
-    if (isPlaying) {
-      videoRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      videoRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
-    }
-  };
-
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const time = parseFloat(e.target.value);
-    setCurrentTime(time);
-    if (videoRef.current) {
-      videoRef.current.currentTime = time;
-    }
-  };
-
-  const handleReplay = () => {
-    soundFX.playCameraSwitch();
-    if (videoRef.current) {
-      videoRef.current.currentTime = 0;
-      videoRef.current.play();
-      setIsPlaying(true);
-    }
-  };
-
-  const changeSpeed = () => {
-    const speeds = [0.5, 1, 1.5, 2];
-    const nextIdx = (speeds.indexOf(speed) + 1) % speeds.length;
-    const nextSpeed = speeds[nextIdx];
-    setSpeed(nextSpeed);
-    if (videoRef.current) {
-      videoRef.current.playbackRate = nextSpeed;
-    }
-    soundFX.playCameraSwitch();
-  };
-
-  const toggleFullscreen = () => {
-    if (videoRef.current) {
-      if (document.fullscreenElement) {
-        document.exitFullscreen().catch(() => {});
-      } else {
-        videoRef.current.requestFullscreen().catch(() => {});
-      }
-    }
-  };
+  const subtitles = [
+    { start: 0, end: 3, text: '23:24:00 — Frostpeak Conservatory. Founding botanist Dr. Arthur Vance is found dead on the stone tiles.' },
+    { start: 3, end: 6, text: 'Spilled glowing blue bioluminescent orchid pollen and an overturned cup of Earl Grey tea surround the victim.' },
+    { start: 6, end: 9, text: 'A shattered wristwatch freezes the moment of collapse at 11:24 PM. Four individuals were present on the estate grounds.' },
+    { start: 9, end: 12, text: 'Every detail tells a story. Inspect the crime scene, examine the CCTV recordings, and discover what truly happened.' }
+  ];
 
   const handleSelectHotspot = (hotspot: CrimeSceneHotspot) => {
     soundFX.playCameraSwitch();
@@ -278,19 +196,6 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
     if (onCollectEvidence) {
       onCollectEvidence(code);
       soundFX.playClueFound();
-    }
-  };
-
-  // Subtitle synchronization based on playback time
-  const getActiveSubtitle = () => {
-    if (currentTime < 2.0) {
-      return "23:24:00 — Frostpeak Conservatory. Founding botanist Dr. Arthur Vance is found dead on the stone tiles.";
-    } else if (currentTime < 4.5) {
-      return "Spilled glowing blue bioluminescent orchid pollen and an overturned cup of Earl Grey tea surround the victim.";
-    } else if (currentTime < 6.5) {
-      return "A shattered wristwatch freezes the moment of collapse at 11:24 PM. Four individuals were present on the estate grounds.";
-    } else {
-      return "Every detail tells a story. Inspect the crime scene, examine the CCTV recordings, and discover what truly happened.";
     }
   };
 
@@ -308,13 +213,13 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
           <h2 className="text-2xl sm:text-3xl font-black font-mono text-white mt-1">
             CASE ZERO: MURDER AT FROSTPEAK CONSERVATORY
           </h2>
-          <p className="text-xs sm:text-sm text-gray-400 mt-1 max-w-3xl">
+          <p className="text-xs sm:text-sm text-gray-400 mt-1 max-w-3xl font-sans">
             Explore Frostpeak Conservatory and inspect the victim’s surroundings. Click on suspicious objects, fallen pollen, teacups, door locks, and environmental traces to uncover forensic leads.
           </p>
         </div>
 
         <div className="flex items-center space-x-2">
-          <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded bg-red-950/60 border border-red-800/60 text-red-400 font-mono text-xs">
+          <span className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-red-950/60 border border-red-800/60 text-red-400 font-mono text-xs font-bold">
             <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
             <span>CRIME SCENE SEALED</span>
           </span>
@@ -326,120 +231,21 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
         <div className="flex items-center justify-between text-xs font-mono text-gray-400">
           <span className="flex items-center space-x-2 text-amber-400 font-semibold">
             <Film className="w-4 h-4 text-amber-500" />
-            <span>INCIDENT OVERVIEW RECORDING // FROSTPEAK ARCHIVE</span>
+            <span>INCIDENT OVERVIEW CINEMATIC RECORDING</span>
           </span>
           <span className="text-[11px] text-gray-500">FORMAT: 1080P IR CINEMATIC</span>
         </div>
 
-        <div className="relative rounded-xl overflow-hidden bg-black border border-charcoal-700/80 shadow-[0_0_40px_rgba(0,0,0,0.8)]">
-          
-          {/* Letterbox Video Area */}
-          <div className="relative aspect-video w-full bg-charcoal-950 flex items-center justify-center cursor-pointer" onClick={togglePlay}>
-            <video
-              ref={videoRef}
-              src="/video/main-story.mp4"
-              poster="/reference/crime-scene.jpg"
-              playsInline
-              className="w-full h-full object-contain"
-            />
-
-            {/* Subtitles Overlay */}
-            {showSubtitles && (
-              <div className="absolute bottom-14 left-4 right-4 text-center pointer-events-none">
-                <span className="inline-block px-4 py-2 rounded bg-black/85 border border-charcoal-800 text-amber-300 font-mono text-xs sm:text-sm tracking-wide shadow-lg">
-                  {getActiveSubtitle()}
-                </span>
-              </div>
-            )}
-
-            {/* Big Play Button Overlay when paused */}
-            {!isPlaying && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px] transition">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    togglePlay();
-                  }}
-                  className="w-20 h-20 rounded-full bg-gradient-to-tr from-red-600 to-amber-500 hover:from-red-500 hover:to-amber-400 text-charcoal-950 flex items-center justify-center transition-all shadow-[0_0_30px_rgba(245,158,11,0.5)] transform hover:scale-105"
-                >
-                  <Play className="w-8 h-8 ml-1 fill-current" />
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Video Control Bar */}
-          <div className="bg-charcoal-900 border-t border-charcoal-800 p-3 sm:p-4 space-y-3">
-            
-            {/* Progress Slider */}
-            <div className="flex items-center space-x-3">
-              <span className="text-[11px] font-mono text-amber-500 w-12 text-right">
-                {Math.floor(currentTime)}s
-              </span>
-              <input
-                type="range"
-                min={0}
-                max={duration || 8}
-                step={0.1}
-                value={currentTime}
-                onChange={handleSeek}
-                className="w-full h-1.5 bg-charcoal-700 rounded-lg appearance-none cursor-pointer accent-amber-500"
-              />
-              <span className="text-[11px] font-mono text-gray-400 w-12">
-                {Math.floor(duration)}s
-              </span>
-            </div>
-
-            {/* Buttons Row */}
-            <div className="flex items-center justify-between flex-wrap gap-2 pt-1 text-xs font-mono">
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={togglePlay}
-                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded bg-charcoal-800 hover:bg-charcoal-700 text-white transition"
-                >
-                  {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-                  <span>{isPlaying ? 'PAUSE' : 'PLAY'}</span>
-                </button>
-
-                <button
-                  onClick={handleReplay}
-                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded bg-charcoal-800 hover:bg-charcoal-700 text-gray-300 hover:text-white transition"
-                >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  <span>REPLAY</span>
-                </button>
-
-                <button
-                  onClick={changeSpeed}
-                  className="px-2.5 py-1.5 rounded bg-charcoal-800 hover:bg-charcoal-700 text-amber-400 transition"
-                >
-                  {speed}x
-                </button>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => setShowSubtitles(!showSubtitles)}
-                  className={`px-3 py-1.5 rounded border transition ${
-                    showSubtitles
-                      ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                      : 'bg-charcoal-800 text-gray-400 border-transparent hover:text-white'
-                  }`}
-                >
-                  CC
-                </button>
-
-                <button
-                  onClick={toggleFullscreen}
-                  className="p-1.5 rounded bg-charcoal-800 hover:bg-charcoal-700 text-gray-300 hover:text-white transition"
-                  title="Fullscreen"
-                >
-                  <Maximize2 className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <CinematicVideoPlayer
+          posterUrl="/reference/crime-scene.jpg"
+          camCode="INCIDENT ARCHIVE"
+          title="Frostpeak Conservatory Crime Scene"
+          timestamp="23:24:00"
+          duration={12}
+          panMode="pan_right"
+          subtitles={subtitles}
+          autoPlay={true}
+        />
       </div>
 
       {/* 2. Explorable Interactive 3D Crime Scene Canvas */}
@@ -448,9 +254,9 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
           <div>
             <h3 className="text-lg font-mono font-bold text-white flex items-center space-x-2">
               <Eye className="w-5 h-5 text-amber-500" />
-              <span>EXPLORE THE CRIME SCENE: INTERACTIVE 3D INVESTIGATION</span>
+              <span>EXPLORE THE CRIME SCENE: INTERACTIVE INVESTIGATION</span>
             </h3>
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-gray-400 font-sans">
               Click on the glowing forensic markers to inspect individual objects, zoom into suspicious items, and extract evidence.
             </p>
           </div>
@@ -462,21 +268,21 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
             <div className="flex items-center space-x-1">
               <button
                 onClick={() => setSceneZoom((prev) => Math.min(prev + 0.25, 2.0))}
-                className="p-1.5 rounded bg-charcoal-800 hover:bg-charcoal-700 text-gray-200 transition"
+                className="p-1.5 rounded-lg bg-charcoal-800 hover:bg-charcoal-700 text-gray-200 transition"
                 title="Zoom In"
               >
                 <ZoomIn className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setSceneZoom((prev) => Math.max(prev - 0.25, 1.0))}
-                className="p-1.5 rounded bg-charcoal-800 hover:bg-charcoal-700 text-gray-200 transition"
+                className="p-1.5 rounded-lg bg-charcoal-800 hover:bg-charcoal-700 text-gray-200 transition"
                 title="Zoom Out"
               >
                 <ZoomOut className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setSceneZoom(1.0)}
-                className="px-2 py-1 rounded bg-charcoal-800 hover:bg-charcoal-700 text-gray-200 text-[11px] transition"
+                className="px-2.5 py-1 rounded-lg bg-charcoal-800 hover:bg-charcoal-700 text-gray-200 text-[11px] transition"
               >
                 100%
               </button>
@@ -485,7 +291,7 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
         </div>
 
         {/* Crime Scene Graphic with Interactive Pulsing Hotspots */}
-        <div className="relative rounded-xl overflow-hidden bg-black border border-charcoal-700 shadow-2xl">
+        <div className="relative rounded-2xl overflow-hidden bg-black border border-charcoal-700/80 shadow-2xl">
           
           <div 
             className="relative w-full aspect-[16/9] overflow-hidden transition-transform duration-300"
@@ -551,7 +357,7 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
           </div>
 
           {/* Quick HUD Legend */}
-          <div className="bg-charcoal-900 border-t border-charcoal-800 px-4 py-2 flex flex-wrap items-center justify-between text-xs font-mono text-gray-400">
+          <div className="bg-charcoal-950 border-t border-charcoal-800/80 px-4 py-2.5 flex flex-wrap items-center justify-between text-xs font-mono text-gray-400">
             <div className="flex items-center space-x-4">
               <span className="flex items-center space-x-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-red-500"></span>
@@ -574,10 +380,10 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
 
         {/* Hotspot Inspection Modal / Detail Panel */}
         {selectedHotspot && (
-          <div className="bg-charcoal-900 border border-charcoal-700 rounded-xl p-5 sm:p-6 shadow-2xl space-y-4 animate-in fade-in duration-200">
+          <div className="bg-charcoal-900 border border-charcoal-700 rounded-2xl p-5 sm:p-6 shadow-2xl space-y-4 animate-fade-in">
             <div className="flex items-start justify-between border-b border-charcoal-800 pb-3">
               <div>
-                <span className="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono text-[10px] tracking-wider uppercase">
+                <span className="px-2.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono text-[10px] tracking-wider uppercase font-bold">
                   {selectedHotspot.category}
                 </span>
                 <h4 className="text-xl font-mono font-bold text-white mt-1">
@@ -586,14 +392,14 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
               </div>
               <button
                 onClick={() => setSelectedHotspot(null)}
-                className="p-1 rounded bg-charcoal-800 hover:bg-charcoal-700 text-gray-400 hover:text-white transition"
+                className="p-1.5 rounded-lg bg-charcoal-800 hover:bg-charcoal-700 text-gray-400 hover:text-white transition"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              <div className="rounded-lg overflow-hidden bg-black border border-charcoal-800 aspect-video md:aspect-square flex items-center justify-center">
+              <div className="rounded-xl overflow-hidden bg-black border border-charcoal-800 aspect-video md:aspect-square flex items-center justify-center">
                 <img
                   src={selectedHotspot.previewImg}
                   alt={selectedHotspot.name}
@@ -602,15 +408,15 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
               </div>
 
               <div className="md:col-span-2 space-y-3 font-mono text-xs">
-                <p className="text-gray-300 text-sm leading-relaxed">
+                <p className="text-gray-300 text-sm leading-relaxed font-sans">
                   {selectedHotspot.detailedAnalysis}
                 </p>
 
-                <div className="bg-charcoal-950/70 p-3 rounded-lg border border-charcoal-800/80 space-y-1.5">
+                <div className="bg-charcoal-950/80 p-3.5 rounded-xl border border-charcoal-800/80 space-y-1.5">
                   <span className="text-amber-500 font-bold block text-[11px]">
                     CRITICAL FORENSIC OBSERVATIONS:
                   </span>
-                  <ul className="space-y-1 text-gray-300 list-disc list-inside">
+                  <ul className="space-y-1 text-gray-300 list-disc list-inside font-sans text-xs">
                     {selectedHotspot.forensicPoints.map((pt, i) => (
                       <li key={i}>{pt}</li>
                     ))}
@@ -624,14 +430,14 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
                     </span>
 
                     {collectedEvidence.includes(selectedHotspot.evidenceCode) ? (
-                      <span className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded bg-emerald-950/70 border border-emerald-800/80 text-emerald-400">
+                      <span className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/70 border border-emerald-800/80 text-emerald-400 font-bold">
                         <CheckCircle2 className="w-4 h-4" />
                         <span>ADDED TO EVIDENCE DOSSIER</span>
                       </span>
                     ) : (
                       <button
                         onClick={() => handleCollectClue(selectedHotspot.evidenceCode!)}
-                        className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded bg-amber-500 hover:bg-amber-400 text-charcoal-950 font-bold transition shadow-md"
+                        className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-charcoal-950 font-bold transition shadow-md"
                       >
                         <Sparkles className="w-4 h-4" />
                         <span>ADD TO EVIDENCE INVENTORY</span>
@@ -647,12 +453,12 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
       </div>
 
       {/* Stage Completion Banner */}
-      <div className="bg-charcoal-900/80 border border-charcoal-800 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-charcoal-900/80 border border-charcoal-800 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h4 className="text-base font-mono font-bold text-white flex items-center space-x-2">
             <span>READY TO ADVANCE INVESTIGATION</span>
           </h4>
-          <p className="text-xs text-gray-400 mt-0.5">
+          <p className="text-xs text-gray-400 mt-0.5 font-sans">
             You have surveyed the crime scene. Next, analyze the multi-camera CCTV recordings and cross-examine the surveillance timeline.
           </p>
         </div>
@@ -662,7 +468,7 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
             soundFX.playCameraSwitch();
             onProceed();
           }}
-          className="inline-flex items-center justify-center space-x-2 px-6 py-3 rounded-lg bg-gradient-to-r from-red-600 to-amber-500 hover:from-red-500 hover:to-amber-400 text-charcoal-950 font-mono font-bold text-sm tracking-wider uppercase transition-all shadow-[0_0_20px_rgba(245,158,11,0.3)] transform hover:scale-[1.02]"
+          className="inline-flex items-center justify-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-red-600 to-amber-500 hover:from-red-500 hover:to-amber-400 text-charcoal-950 font-mono font-bold text-sm tracking-wider uppercase transition-all shadow-[0_0_20px_rgba(245,158,11,0.3)] transform hover:scale-[1.02]"
         >
           <span>PROCEED TO STAGE 02: CCTV RECORDINGS</span>
           <ArrowRight className="w-4 h-4" />
