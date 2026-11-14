@@ -25,11 +25,11 @@ export const Navbar: React.FC<NavbarProps> = ({
   onToggleMute,
 }) => {
   const stages: { stage: InvestigationStage; label: string; short: string }[] = [
-    { stage: 1, label: 'Stage 1: Watch Story', short: '01 Story' },
-    { stage: 2, label: 'Stage 2: Scene & CCTV', short: '02 Scene' },
-    { stage: 3, label: 'Stage 3: Suspects', short: '03 Suspects' },
+    { stage: 1, label: 'Stage 1: The Crime Scene', short: '01 Scene' },
+    { stage: 2, label: 'Stage 2: CCTV Recordings', short: '02 CCTV' },
+    { stage: 3, label: 'Stage 3: Suspect Files', short: '03 Suspects' },
     { stage: 4, label: 'Stage 4: Evidence Board', short: '04 Evidence' },
-    { stage: 5, label: 'Stage 5: Final Submission', short: '05 Submit' },
+    { stage: 5, label: 'Stage 5: Final Verdict', short: '05 Verdict' },
   ];
 
   return (
@@ -51,7 +51,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </span>
             </div>
             <p className="text-[11px] text-gray-400 hidden sm:block tracking-wide">
-              Meridian Innovation Hall Investigation
+              Frostpeak Conservatory Murder Investigation
             </p>
           </div>
         </div>

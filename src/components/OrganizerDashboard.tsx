@@ -25,11 +25,12 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onClose 
   const [showConfidentialSolution, setShowConfidentialSolution] = useState<boolean>(false);
 
   // Default demo access key for local evaluation
-  const ORGANIZER_KEY = 'meridian-zero-2026';
+  const ORGANIZER_KEY = 'frostpeak-zero-2026';
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (passphrase.trim() === ORGANIZER_KEY || passphrase.trim().toLowerCase() === 'admin' || passphrase.trim() === 'organizer') {
+    const clean = passphrase.trim().toLowerCase();
+    if (clean === ORGANIZER_KEY || clean === 'meridian-zero-2026' || clean === 'admin' || clean === 'organizer') {
       setIsAuthenticated(true);
       setAuthError('');
       soundFX.playClueFound();
@@ -128,7 +129,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onClose 
                 </span>
               </div>
               <p className="text-[11px] font-mono text-gray-500">
-                Meridian Innovation Hall // Case Zero Submission Registry
+                Frostpeak Conservatory // Case Zero Submission Registry
               </p>
             </div>
           </div>
@@ -255,12 +256,12 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onClose 
                   <div className="p-4 rounded-lg bg-charcoal-950 border border-charcoal-800 font-mono text-xs text-gray-300 space-y-3 animate-fade-in">
                     <div>
                       <span className="text-amber-500 font-bold block mb-1">TRUE CULPRIT:</span>
-                      <strong className="text-white text-sm">Rhea Das (Event Coordinator)</strong>
+                      <strong className="text-white text-sm">Dr. Evelyn Hayes (Co-Owner & Senior Biochemist)</strong>
                     </div>
                     <div>
                       <span className="text-amber-500 font-bold block mb-1">INTENDED MOTIVE & EXPLANATION:</span>
                       <p className="leading-relaxed text-gray-300 font-sans text-xs">
-                        Rhea Das discovered at 20:13 that the AURORA prototype battery telemetry had surged to 58.2°C (exceeding safe operating threshold of 45°C), risking catastrophic thermal runaway and explosion. As Event Coordinator responsible for venue safety, she decided to rapidly secure the device. To safely decouple the charging current without triggering loud hall alarms, she manually tripped isolated Sub-Panel B-4 at 20:14:12, creating a 74-second blackout around the central exhibition pedestal. She used her assigned brass Key #04 to unlock the display case and transported the prototype in a padded thermal case into the emergency climate-controlled safety vault (Room S-102) at 20:15:02, before returning and restoring the breaker at 20:15:26. She did not intend to steal the prototype, but concealed her involvement to avoid panic, embarrassment, and disruption to the high-stakes exhibition.
+                        Dr. Evelyn Hayes murdered Dr. Arthur Vance by introducing a lethal concentration of toxic Midnight Orchid compound (Cyanocryptin) into his Earl Grey tea. Vance had uncovered that Hayes had systematically embezzled institutional research grant funding and was preparing an audit report. To silence him, Hayes left the B-Wing Prep Lab at 11:12 PM via the service passage (captured on CAM 3), entered the conservatory, poisoned the tea, causing the blue orchid pollen jar to shatter on the floor, and returned to the B-Wing corridor at 11:18 PM clutching a pollen-stained cloth (captured on CAM 4). She washed her hands in the lab sink, leaving a left-handed pollen smudge on the faucet handle, and discarded the contaminated gloves in the lab bin. Her alibi of working continuously in the lab from 11:00 PM to 11:25 PM is refuted by digital terminal logs showing zero activity between 11:00 PM and 11:22 PM.
                       </p>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 border-t border-charcoal-800 text-[11px]">
@@ -269,7 +270,7 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onClose 
                         <strong className="text-white">40 Points</strong>
                       </div>
                       <div>
-                        <span className="text-gray-500 block">KEY EVIDENCE (EV-01, 02, 04, 05):</span>
+                        <span className="text-gray-500 block">KEY EVIDENCE (EV-01, 03, 04, 05):</span>
                         <strong className="text-white">Up to 30 Points</strong>
                       </div>
                       <div>

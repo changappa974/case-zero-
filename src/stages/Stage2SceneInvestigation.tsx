@@ -323,7 +323,7 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
                 <span className="font-bold">AUDIO INTERCEPT LOGS</span>
               </div>
               <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-charcoal-800 text-gray-400">
-                3 TAPES
+                {AUDIO_LOGS.length} TAPES
               </span>
             </div>
 

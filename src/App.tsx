@@ -150,7 +150,11 @@ export const App: React.FC = () => {
         )}
 
         {currentStage === 1 && (
-          <Stage1Story onProceed={() => goToStage(2)} />
+          <Stage1Story
+            onProceed={() => goToStage(2)}
+            collectedEvidence={collectedEvidence}
+            onCollectEvidence={handleCollectEvidence}
+          />
         )}
 
         {currentStage === 2 && (
@@ -200,7 +204,7 @@ export const App: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <span>CASE ZERO // THE VISUAL MYSTERY CHALLENGE</span>
           <span className="text-gray-500">
-            MERIDIAN INNOVATION HALL SECURITY INCIDENT ARCHIVE
+            FROSTPEAK CONSERVATORY FORENSIC INCIDENT ARCHIVE
           </span>
           <span className="text-amber-500/80">
             “Every Detail Tells a Story. Can You Find the Truth?”

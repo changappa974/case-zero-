@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldAlert, ArrowRight, Video, Search, Users, Database, Fingerprint, Lock } from 'lucide-react';
+import { ShieldAlert, ArrowRight, Video, Search, Users, Database, Fingerprint, Lock, Compass } from 'lucide-react';
 import { registerParticipant } from '../lib/supabase';
 import { Participant, InvestigationSession } from '../types';
 import { soundFX } from '../lib/audioService';
@@ -55,13 +55,13 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
             </span>
           </div>
           <span className="text-[11px] font-mono text-gray-500">
-            REF: MERIDIAN-2026-B4
+            REF: FROSTPEAK-2026-CASE-0
           </span>
         </div>
 
         {/* Title & Tagline matching Prompt Specification */}
         <div className="text-center space-y-3 mb-8">
-          <div className="inline-block px-3 py-1 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono text-xs tracking-widest">
+          <div className="inline-block px-3 py-1 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono text-xs tracking-widest uppercase">
             THE VISUAL MYSTERY CHALLENGE
           </div>
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white font-mono">
@@ -70,24 +70,28 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
           <p className="text-sm sm:text-base font-medium text-amber-500/90 tracking-wide font-sans italic">
             “Every Detail Tells a Story. Can You Find the Truth?”
           </p>
-          <p className="text-sm text-gray-400 max-w-md mx-auto pt-2">
+          <p className="text-sm text-gray-300 max-w-md mx-auto pt-2">
             An incident has occurred. The truth is hidden in what you see.
           </p>
         </div>
 
         {/* Brief Incident Context */}
-        <div className="bg-charcoal-950/60 border border-charcoal-800/80 rounded-lg p-4 mb-8 text-xs font-mono text-gray-400 space-y-1.5">
-          <div className="flex justify-between text-gray-300 pb-1 border-b border-charcoal-800">
-            <span className="text-amber-500">LOCATION:</span>
-            <span>Meridian Innovation Hall — Tech Exhibition</span>
+        <div className="bg-charcoal-950/70 border border-charcoal-800/80 rounded-lg p-4 mb-8 text-xs font-mono text-gray-400 space-y-2">
+          <div className="flex justify-between text-gray-300 pb-1.5 border-b border-charcoal-800/80">
+            <span className="text-amber-500">CASE FILE:</span>
+            <span className="text-white font-semibold">MURDER AT FROSTPEAK CONSERVATORY</span>
           </div>
-          <div className="flex justify-between text-gray-300 pb-1 border-b border-charcoal-800">
+          <div className="flex justify-between text-gray-300 pb-1.5 border-b border-charcoal-800/80">
+            <span className="text-amber-500">LOCATION:</span>
+            <span>Frostpeak Conservatory & B-Wing Laboratory</span>
+          </div>
+          <div className="flex justify-between text-gray-300 pb-1.5 border-b border-charcoal-800/80">
             <span className="text-amber-500">INCIDENT TIME:</span>
-            <span>20:14:12 – 20:15:26 (74 Seconds Outage)</span>
+            <span>23:24:00 (Surveillance Window: 22:50 – 23:30)</span>
           </div>
           <div className="flex justify-between text-gray-300">
-            <span className="text-amber-500">MISSING ASSET:</span>
-            <span className="text-red-400 font-semibold">Emergency Communication Prototype “AURORA”</span>
+            <span className="text-amber-500">INCIDENT:</span>
+            <span className="text-red-400 font-semibold">Dr. Arthur Vance found deceased with poisoned tea & glowing blue orchid pollen</span>
           </div>
         </div>
 
@@ -102,62 +106,51 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
                 id="fullName"
                 type="text"
                 value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Enter your full name to generate session..."
+                onChange={(e) => {
+                  setFullName(e.target.value);
+                  if (errorMessage) setErrorMessage('');
+                }}
+                placeholder="e.g., Detective Alex Mercer"
+                maxLength={60}
                 disabled={loading}
-                className="w-full bg-charcoal-950 border border-charcoal-700 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 rounded-lg px-4 py-3.5 text-sm text-white placeholder-gray-600 font-mono transition outline-none"
+                className="w-full bg-charcoal-950 border border-charcoal-700 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 rounded-lg px-4 py-3 text-sm font-mono text-white placeholder-gray-600 transition"
                 autoFocus
               />
-              <Fingerprint className="absolute right-3.5 top-3.5 w-5 h-5 text-gray-600" />
             </div>
-            <p className="text-[11px] text-gray-500 mt-1.5 font-mono">
-              No email or phone number required. Your name is bound to your encrypted investigation session.
+            {errorMessage && (
+              <p className="mt-2 text-xs font-mono text-red-400 flex items-center space-x-1">
+                <span>⚠</span>
+                <span>{errorMessage}</span>
+              </p>
+            )}
+            <p className="mt-2 text-[11px] font-mono text-gray-500">
+              Your name links to your secure investigation session and final submission receipt. No email, phone, or password required.
             </p>
           </div>
-
-          {errorMessage && (
-            <div className="p-3 rounded-lg bg-red-950/50 border border-red-800/70 text-red-300 text-xs font-mono flex items-center space-x-2">
-              <ShieldAlert className="w-4 h-4 text-red-400 shrink-0" />
-              <span>{errorMessage}</span>
-            </div>
-          )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-charcoal-950 font-bold font-mono tracking-wider py-4 rounded-lg flex items-center justify-center space-x-2 transition-all shadow-[0_0_20px_rgba(245,158,11,0.25)] hover:shadow-[0_0_25px_rgba(245,158,11,0.4)] disabled:opacity-50"
+            className="w-full group relative flex items-center justify-center space-x-2 bg-gradient-to-r from-red-700 via-amber-600 to-amber-500 hover:from-red-600 hover:to-amber-400 text-charcoal-950 font-mono font-bold text-sm tracking-wider uppercase py-3.5 px-6 rounded-lg shadow-lg hover:shadow-[0_0_25px_rgba(245,158,11,0.4)] transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:pointer-events-none"
           >
-            {loading ? (
-              <span className="flex items-center space-x-2">
-                <span className="w-4 h-4 border-2 border-charcoal-950 border-t-transparent rounded-full animate-spin"></span>
-                <span>INITIALIZING FORENSIC HUD...</span>
-              </span>
-            ) : (
-              <>
-                <span>START INVESTIGATION</span>
-                <ArrowRight className="w-4 h-4" />
-              </>
-            )}
+            <span>{loading ? 'INITIALIZING INVESTIGATION...' : 'START INVESTIGATION'}</span>
+            <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition" />
           </button>
         </form>
 
-        {/* Feature Pills */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-8 pt-6 border-t border-charcoal-800/80 text-[11px] font-mono text-gray-400">
-          <div className="flex items-center space-x-1.5 p-2 rounded bg-charcoal-950/40 border border-charcoal-800/60">
-            <Video className="w-3.5 h-3.5 text-amber-500" />
-            <span>Cinematic CCTV</span>
+        {/* Visual Pillars */}
+        <div className="grid grid-cols-3 gap-3 pt-6 mt-6 border-t border-charcoal-800/80 text-center font-mono text-[11px] text-gray-400">
+          <div className="p-2 rounded bg-charcoal-950/40 border border-charcoal-800/50">
+            <Video className="w-4 h-4 mx-auto mb-1 text-amber-500/80" />
+            <span>Cinematic Scene</span>
           </div>
-          <div className="flex items-center space-x-1.5 p-2 rounded bg-charcoal-950/40 border border-charcoal-800/60">
-            <Search className="w-3.5 h-3.5 text-amber-500" />
-            <span>Evidence Board</span>
+          <div className="p-2 rounded bg-charcoal-950/40 border border-charcoal-800/50">
+            <Search className="w-4 h-4 mx-auto mb-1 text-amber-500/80" />
+            <span>Forensic Evidence</span>
           </div>
-          <div className="flex items-center space-x-1.5 p-2 rounded bg-charcoal-950/40 border border-charcoal-800/60">
-            <Users className="w-3.5 h-3.5 text-amber-500" />
-            <span>4 Suspects</span>
-          </div>
-          <div className="flex items-center space-x-1.5 p-2 rounded bg-charcoal-950/40 border border-charcoal-800/60">
-            <Lock className="w-3.5 h-3.5 text-amber-500" />
-            <span>Locked Submission</span>
+          <div className="p-2 rounded bg-charcoal-950/40 border border-charcoal-800/50">
+            <Users className="w-4 h-4 mx-auto mb-1 text-amber-500/80" />
+            <span>4 Real Suspects</span>
           </div>
         </div>
 

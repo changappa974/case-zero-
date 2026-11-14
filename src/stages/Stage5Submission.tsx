@@ -158,7 +158,7 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
             </div>
             {chosenSuspect && (
               <div>
-                <span className="text-gray-500 block">SELECTED RESPONSIBLE PARTY:</span>
+                <span className="text-gray-500 block">ACCUSED MURDERER:</span>
                 <span className="text-amber-400 font-bold text-sm">{chosenSuspect.display_name}</span>
               </div>
             )}
@@ -220,16 +220,16 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
         </div>
       )}
 
-      {/* QUESTION 1: WHO IS RESPONSIBLE? */}
+      {/* QUESTION 1: WHO IS THE MURDERER? */}
       <div className="p-6 rounded-xl bg-charcoal-900 border border-charcoal-800 space-y-4">
         <div className="flex items-center space-x-2 text-amber-500 font-mono text-sm font-bold">
           <span className="w-6 h-6 rounded-full bg-amber-500/10 border border-amber-500/40 flex items-center justify-center text-xs">
             1
           </span>
-          <h3>WHO IS RESPONSIBLE FOR THE INCIDENT?</h3>
+          <h3>WHO IS THE MURDERER?</h3>
         </div>
         <p className="text-xs text-gray-400 font-sans">
-          Select the person who took or moved the prototype during the 74-second outage.
+          Select the individual responsible for the murder of Dr. Arthur Vance at Frostpeak Conservatory.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2">
@@ -276,7 +276,7 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
           <h3>WHICH PIECES OF EVIDENCE PROVE YOUR CONCLUSION?</h3>
         </div>
         <p className="text-xs text-gray-400 font-sans">
-          Select all critical clues that substantiate what happened (select at least 2).
+          Select all critical clues that substantiate the murder method, false alibi, and forensic link to the culprit (select at least 2).
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2">
@@ -315,16 +315,16 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
         </div>
       </div>
 
-      {/* QUESTION 3: HOW EXACTLY DID IT HAPPEN? */}
+      {/* QUESTION 3: HOW WAS THE MURDER COMMITTED & WHAT EVIDENCE PROVES IT? */}
       <div className="p-6 rounded-xl bg-charcoal-900 border border-charcoal-800 space-y-4">
         <div className="flex items-center space-x-2 text-amber-500 font-mono text-sm font-bold">
           <span className="w-6 h-6 rounded-full bg-amber-500/10 border border-amber-500/40 flex items-center justify-center text-xs">
             3
           </span>
-          <h3>HOW EXACTLY DID IT HAPPEN?</h3>
+          <h3>HOW WAS THE MURDER COMMITTED & WHAT EVIDENCE PROVES IT?</h3>
         </div>
         <p className="text-xs text-gray-400 font-sans">
-          Explain what triggered the outage, how the prototype was secured or removed, where it was placed, and the individual's motive or reasoning.
+          Explain the sequence of events: How was the Midnight Orchid toxin introduced into the tea? What disproves the culprit's alibi? What forensic traces (left-handed smudge, gloves in bin, corridor movements, financial audit) prove your conclusion?
         </p>
 
         <div className="space-y-2">
@@ -332,7 +332,7 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
             value={explanation}
             onChange={(e) => setExplanation(e.target.value)}
             rows={5}
-            placeholder="Detail your explanation: What hazard was detected? Why was Sub-Panel B-4 isolated? What key or access was used, and where is the prototype now?..."
+            placeholder="Detail your explanation: Explain how Dr. Arthur Vance was poisoned, how the Midnight Orchid toxin was introduced into his Earl Grey tea, the timeline contradiction between the B-Wing lab and corridor CCTV, and the physical traces (faucet smudge, gloves, funding fraud) proving who committed the murder..."
             className="w-full bg-charcoal-950 border border-charcoal-700 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 rounded-xl p-4 text-xs sm:text-sm text-white placeholder-gray-600 font-mono outline-none"
           />
           <div className="flex justify-between text-[11px] font-mono text-gray-500">
