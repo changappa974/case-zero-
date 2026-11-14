@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { 
-  FolderLock, CheckCircle2, Link2, Clock, ZoomIn, AlertTriangle, 
-  ArrowRight, Filter, ChevronRight, X, ShieldAlert, Sparkles, MapPin, Eye, Search 
+  FolderLock, CheckCircle2, ZoomIn, AlertTriangle, 
+  ArrowRight, Filter, ChevronRight, X, ShieldAlert, Sparkles, Eye, Search 
 } from 'lucide-react';
-import { INITIAL_EVIDENCE, INITIAL_SUSPECTS, TIMELINE_EVENTS } from '../lib/caseData';
-import { Evidence, Suspect } from '../types';
+import { INITIAL_EVIDENCE } from '../lib/caseData';
+import { Evidence } from '../types';
 import { soundFX } from '../lib/audioService';
 
 interface Stage4EvidenceBoardProps {
   collectedEvidence: string[];
   onCollectEvidence: (code: string) => void;
-  connectedLinks: { suspectId: string; evidenceCode: string; note?: string }[];
-  onToggleLink: (suspectId: string, evidenceCode: string) => void;
+  connectedLinks?: { suspectId: string; evidenceCode: string; note?: string }[];
+  onToggleLink?: (suspectId: string, evidenceCode: string) => void;
   onProceed: () => void;
 }
 
@@ -36,8 +36,7 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
 }) => {
   const [selectedType, setSelectedType] = useState<string>('all');
   const [modalEvidence, setModalEvidence] = useState<Evidence | null>(null);
-  const [activeTab, setActiveTab] = useState<'visual_sheets' | 'board' | 'timeline' | 'links'>('visual_sheets');
-  const [timelineIndex, setTimelineIndex] = useState<number>(6); // default to 23:12:00
+  const [activeTab, setActiveTab] = useState<'visual_sheets' | 'board'>('visual_sheets');
   const [activeVisualHotspot, setActiveVisualHotspot] = useState<VisualEvidenceHotspot | null>(null);
 
   const visualHotspots: VisualEvidenceHotspot[] = [
@@ -120,15 +119,6 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
     return ev.evidence_type === selectedType;
   });
 
-  const isLinked = (suspectId: string, evidenceCode: string) => {
-    return connectedLinks.some((l) => l.suspectId === suspectId && l.evidenceCode === evidenceCode);
-  };
-
-  const handleLinkClick = (suspectId: string, evidenceCode: string) => {
-    soundFX.playClueFound();
-    onToggleLink(suspectId, evidenceCode);
-  };
-
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
       
@@ -144,7 +134,7 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
             INTERACTIVE EVIDENCE BOARD
           </h2>
           <p className="text-xs sm:text-sm text-stone-700 mt-1">
-            Inspect B-Wing Lab & Side Door forensic panels, examine evidence cards, scrub the timeline, and link clues to suspects.
+            Inspect B-Wing Lab & Side Door forensic panels and examine collected evidence dossiers.
           </p>
         </div>
 
@@ -175,32 +165,6 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
             }`}
           >
             EVIDENCE DOSSIER ({INITIAL_EVIDENCE.length})
-          </button>
-          <button
-            onClick={() => {
-              soundFX.playCameraSwitch();
-              setActiveTab('timeline');
-            }}
-            className={`px-3.5 py-2 rounded-lg whitespace-nowrap transition font-semibold ${
-              activeTab === 'timeline'
-                ? 'bg-blue-800 text-white font-bold shadow-sm'
-                : 'text-stone-800 hover:text-stone-950 hover:bg-[#d6cebf]'
-            }`}
-          >
-            TIMELINE SCRUBBER
-          </button>
-          <button
-            onClick={() => {
-              soundFX.playCameraSwitch();
-              setActiveTab('links');
-            }}
-            className={`px-3.5 py-2 rounded-lg whitespace-nowrap transition font-semibold ${
-              activeTab === 'links'
-                ? 'bg-blue-800 text-white font-bold shadow-sm'
-                : 'text-stone-800 hover:text-stone-950 hover:bg-[#d6cebf]'
-            }`}
-          >
-            SUSPECT-CLUE MATRIX ({connectedLinks.length} PINS)
           </button>
         </div>
       </div>
@@ -447,148 +411,6 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
             })}
           </div>
 
-        </div>
-      )}
-
-      {/* VIEW 3: INTERACTIVE TIMELINE SCRUBBER */}
-      {activeTab === 'timeline' && (
-        <div className="p-6 rounded-2xl bg-[#f5f0e6] border border-[#cfc7b7] space-y-6 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#cfc7b7] pb-4">
-            <div>
-              <h3 className="text-lg font-bold font-mono text-[#1c1917]">
-                FROSTPEAK CONSERVATORY CRIME TIMELINE (22:50 – 23:30)
-              </h3>
-              <p className="text-xs text-stone-600 font-sans">
-                Drag the time scrubber to cross-reference suspect movements, tea delivery, corridor transits, and fatal toxin timing.
-              </p>
-            </div>
-            <div className="text-xs font-mono text-blue-950 bg-blue-100 px-3.5 py-1.5 rounded-xl border border-blue-300 font-bold">
-              CURRENT EVENT: {TIMELINE_EVENTS[timelineIndex].timestamp}
-            </div>
-          </div>
-
-          {/* Timeline Range Slider */}
-          <div className="space-y-2">
-            <input
-              type="range"
-              min={0}
-              max={TIMELINE_EVENTS.length - 1}
-              step={1}
-              value={timelineIndex}
-              onChange={(e) => {
-                soundFX.playCameraSwitch();
-                setTimelineIndex(parseInt(e.target.value));
-              }}
-              className="w-full h-2.5 bg-[#cfc7b7] rounded-lg appearance-none cursor-pointer accent-blue-800"
-            />
-            <div className="flex justify-between text-[11px] font-mono text-stone-600 font-semibold">
-              <span>22:50 (VICTOR ATTEMPT)</span>
-              <span>23:00 (TEA DELIVERY)</span>
-              <span className="text-blue-900 font-bold">23:12 (EVELYN TRANSIT)</span>
-              <span className="text-red-700 font-bold">23:24 (COLLAPSE)</span>
-              <span>23:30 (DISCOVERY)</span>
-            </div>
-          </div>
-
-          {/* Active Timeline Item Card */}
-          {(() => {
-            const ev = TIMELINE_EVENTS[timelineIndex];
-            return (
-              <div className={`p-5 rounded-2xl border transition-all ${
-                ev.isAnomaly
-                  ? 'bg-amber-100/70 border-2 border-amber-400 shadow-sm'
-                  : 'bg-[#e6dfd2] border-[#cfc7b7]'
-              }`}>
-                <div className="flex flex-wrap items-center justify-between gap-2 mb-2 font-mono text-xs">
-                  <div className="flex items-center space-x-2">
-                    <Clock className="w-4 h-4 text-blue-800" />
-                    <span className="text-blue-950 font-bold text-sm">{ev.timestamp}</span>
-                    {ev.isAnomaly && (
-                      <span className="px-2.5 py-0.5 rounded-full bg-red-100 text-red-900 border border-red-300 text-[10px] uppercase font-bold">
-                        CRITICAL ANOMALY
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-stone-700 font-semibold flex items-center space-x-1">
-                    <MapPin className="w-3.5 h-3.5 text-stone-500" />
-                    <span>{ev.location}</span>
-                  </span>
-                </div>
-
-                <h4 className="text-base font-bold font-mono text-[#1c1917] mb-1.5">
-                  {ev.title}
-                </h4>
-                <p className="text-xs sm:text-sm text-stone-800 font-sans leading-relaxed font-medium">
-                  {ev.detail}
-                </p>
-
-                <div className="mt-4 pt-3 border-t border-[#cfc7b7] flex items-center justify-between text-xs font-mono text-stone-700">
-                  <span>SUBJECT INVOLVED: <strong className="text-[#1c1917]">{ev.involvedParty}</strong></span>
-                  <span className="text-[11px] text-stone-600 uppercase font-semibold">SOURCE: {ev.sourceType}</span>
-                </div>
-              </div>
-            );
-          })()}
-
-        </div>
-      )}
-
-      {/* VIEW 4: SUSPECT-CLUE CORRELATION MATRIX */}
-      {activeTab === 'links' && (
-        <div className="p-6 rounded-2xl bg-[#f5f0e6] border border-[#cfc7b7] space-y-6 shadow-sm">
-          <div className="border-b border-[#cfc7b7] pb-4">
-            <h3 className="text-lg font-bold font-mono text-[#1c1917]">
-              SUSPECT & EVIDENCE CORRELATION PINBOARD
-            </h3>
-            <p className="text-xs text-stone-600 font-sans mt-0.5">
-              Click the pin buttons to connect or disconnect evidence clues to suspects. Link multiple clues to build your case.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {INITIAL_SUSPECTS.map((suspect) => {
-              const suspectLinks = connectedLinks.filter((l) => l.suspectId === suspect.id);
-
-              return (
-                <div key={suspect.id} className="p-4 rounded-xl bg-[#e6dfd2] border border-[#cfc7b7] space-y-4">
-                  <div className="flex items-center space-x-3 border-b border-[#cfc7b7] pb-3">
-                    <img
-                      src={suspect.portrait_url}
-                      alt={suspect.display_name}
-                      className="w-10 h-10 rounded-full object-cover border-2 border-[#cfc7b7]"
-                    />
-                    <div>
-                      <h4 className="text-sm font-bold font-mono text-[#1c1917]">{suspect.display_name}</h4>
-                      <span className="text-[10px] font-mono text-blue-900 font-bold">
-                        {suspectLinks.length} CLUES PINNED
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    {INITIAL_EVIDENCE.map((ev) => {
-                      const linked = isLinked(suspect.id, ev.code);
-
-                      return (
-                        <button
-                          key={ev.id}
-                          onClick={() => handleLinkClick(suspect.id, ev.code)}
-                          className={`w-full text-left p-2 rounded-lg text-xs font-mono transition flex items-center justify-between border ${
-                            linked
-                              ? 'bg-blue-100 border-2 border-blue-900 text-blue-950 font-bold shadow-sm'
-                              : 'bg-[#fbf9f5] border-[#cfc7b7] text-stone-800 hover:border-[#b8b09f]'
-                          }`}
-                        >
-                          <span className="truncate pr-2">{ev.code}: {ev.title}</span>
-                          <Link2 className={`w-3.5 h-3.5 shrink-0 ${linked ? 'text-blue-900' : 'text-stone-500'}`} />
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
         </div>
       )}
 
