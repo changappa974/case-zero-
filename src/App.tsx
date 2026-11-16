@@ -9,6 +9,7 @@ import { Stage5Submission } from './stages/Stage5Submission';
 import { InvestigationStage, Participant, InvestigationSession, SubmissionReceipt } from './types';
 import { restoreActiveSession, updateSessionProgress } from './lib/supabase';
 import { soundFX } from './lib/audioService';
+import { AdminLeaderboard } from './pages/AdminLeaderboard';
 
 export const App: React.FC = () => {
   const [participant, setParticipant] = useState<Participant | null>(null);
@@ -20,6 +21,37 @@ export const App: React.FC = () => {
   const [suspectNotes, setSuspectNotes] = useState<Record<string, string>>({});
   const [submissionReceipt, setSubmissionReceipt] = useState<SubmissionReceipt | null>(null);
   const [isMuted, setIsMuted] = useState<boolean>(false);
+  const [isAdminView, setIsAdminView] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    const path = window.location.pathname.toLowerCase();
+    const hash = window.location.hash.toLowerCase();
+    return (
+      path.includes('admin') ||
+      path.includes('leaderboard') ||
+      hash.includes('admin') ||
+      hash.includes('leaderboard')
+    );
+  });
+
+  useEffect(() => {
+    const handleLocationChange = () => {
+      const path = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      setIsAdminView(
+        path.includes('admin') ||
+        path.includes('leaderboard') ||
+        hash.includes('admin') ||
+        hash.includes('leaderboard')
+      );
+    };
+
+    window.addEventListener('popstate', handleLocationChange);
+    window.addEventListener('hashchange', handleLocationChange);
+    return () => {
+      window.removeEventListener('popstate', handleLocationChange);
+      window.removeEventListener('hashchange', handleLocationChange);
+    };
+  }, []);
 
   // Restore session from Supabase on mount
   useEffect(() => {
@@ -123,6 +155,22 @@ export const App: React.FC = () => {
     const muted = soundFX.toggleMute();
     setIsMuted(muted);
   };
+
+  if (isAdminView) {
+    return (
+      <AdminLeaderboard
+        onExit={() => {
+          if (window.location.hash) {
+            window.location.hash = '';
+          }
+          if (window.location.pathname !== '/') {
+            window.history.pushState(null, '', '/');
+          }
+          setIsAdminView(false);
+        }}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#ede7dc] text-[#1c1917] flex flex-col font-sans selection:bg-amber-200 selection:text-amber-900">

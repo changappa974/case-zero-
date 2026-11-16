@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { Participant, InvestigationSession, CaseZeroSubmission, SubmissionReceipt, Suspect, Evidence, MysteryCase } from '../types';
+import { Participant, InvestigationSession, CaseZeroSubmission, SubmissionReceipt, Suspect, Evidence, MysteryCase, LeaderboardEntry } from '../types';
 import { CASE_DATA, INITIAL_SUSPECTS, INITIAL_EVIDENCE } from './caseData';
 
 // Supabase Project: rlroapuecsibkgedvqbn
@@ -259,11 +259,21 @@ export async function submitInvestigation(
   participantId: string,
   selectedSuspectId: string,
   selectedEvidenceCodes: string[],
-  incidentExplanation: string
+  incidentExplanation: string,
+  participantName?: string,
+  startedAt?: string
 ): Promise<SubmissionReceipt> {
   const explanation = incidentExplanation.trim();
   if (explanation.length < 30) {
     throw new Error('Please provide a substantive explanation of what happened (minimum 30 characters).');
+  }
+
+  // Calculate duration in seconds
+  let durationSeconds = 0;
+  if (startedAt) {
+    try {
+      durationSeconds = Math.max(1, Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000));
+    } catch (e) {}
   }
 
   // 1. Try Supabase SECURITY DEFINER RPC
@@ -328,6 +338,8 @@ export async function submitInvestigation(
     incident_explanation: explanation,
     score: score,
     evaluation_details: {
+      participant_name: participantName || 'Agent',
+      duration_seconds: durationSeconds,
       suspect_matched: isCulpritMatch,
       suspect_score: isCulpritMatch ? 40 : 0,
       evidence_score: evidenceScore,
@@ -337,6 +349,18 @@ export async function submitInvestigation(
     submission_status: 'verified',
     submitted_at: new Date().toISOString(),
   };
+
+  // Direct insert to Supabase table
+  try {
+    await supabase.from('case_zero_submissions').insert(submissionRecord);
+    await supabase.from('investigation_sessions').update({
+      status: 'submitted',
+      stage_reached: 5,
+      last_activity_at: new Date().toISOString(),
+    }).eq('id', sessionId);
+  } catch (err) {
+    console.warn('Direct Supabase insert failed, stored in local storage:', err);
+  }
 
   const submissions = getLocalStore<CaseZeroSubmission>(LOCAL_SUBMISSIONS_KEY);
   submissions.unshift(submissionRecord);
@@ -375,7 +399,6 @@ export async function getOrganizerSubmissions(): Promise<CaseZeroSubmission[]> {
       .order('submitted_at', { ascending: false });
 
     if (!error && data && data.length > 0) {
-      // Merge with local list if any unique
       const ids = new Set(data.map((d: any) => d.id));
       const combined = [...data, ...localList.filter((l) => !ids.has(l.id))];
       return combined as CaseZeroSubmission[];
@@ -384,6 +407,116 @@ export async function getOrganizerSubmissions(): Promise<CaseZeroSubmission[]> {
 
   return localList;
 }
+
+export async function fetchLeaderboardEntries(): Promise<LeaderboardEntry[]> {
+  const localList = getLocalStore<CaseZeroSubmission>(LOCAL_SUBMISSIONS_KEY);
+  let allSubmissions: CaseZeroSubmission[] = [...localList];
+
+  let participantsMap: Record<string, string> = {};
+  let sessionsMap: Record<string, string> = {};
+
+  try {
+    const { data: remoteSubs } = await supabase
+      .from('case_zero_submissions')
+      .select('*')
+      .order('submitted_at', { ascending: false });
+
+    if (remoteSubs && remoteSubs.length > 0) {
+      const ids = new Set(remoteSubs.map((d: any) => d.id));
+      allSubmissions = [...remoteSubs, ...localList.filter((l) => !ids.has(l.id))];
+    }
+
+    const { data: pList } = await supabase.from('participants').select('id, participant_name');
+    if (pList) {
+      pList.forEach((p: any) => {
+        participantsMap[p.id] = p.participant_name;
+      });
+    }
+
+    const { data: sList } = await supabase.from('investigation_sessions').select('id, started_at');
+    if (sList) {
+      sList.forEach((s: any) => {
+        sessionsMap[s.id] = s.started_at;
+      });
+    }
+  } catch (err) {
+    console.warn('Error fetching live leaderboard from Supabase:', err);
+  }
+
+  const localParticipants = getLocalStore<Participant>(LOCAL_PARTICIPANTS_KEY);
+  localParticipants.forEach((p) => {
+    if (!participantsMap[p.id]) participantsMap[p.id] = p.participant_name;
+  });
+
+  const localSessions = getLocalStore<InvestigationSession>(LOCAL_SESSIONS_KEY);
+  localSessions.forEach((s) => {
+    if (!sessionsMap[s.id]) sessionsMap[s.id] = s.started_at;
+  });
+
+  const entries: LeaderboardEntry[] = allSubmissions.map((sub) => {
+    const participantName =
+      sub.evaluation_details?.participant_name ||
+      participantsMap[sub.participant_id] ||
+      'Agent ' + sub.participant_id.substring(0, 6);
+
+    let durationSeconds = sub.evaluation_details?.duration_seconds || 0;
+    if (!durationSeconds && sessionsMap[sub.session_id] && sub.submitted_at) {
+      const startMs = new Date(sessionsMap[sub.session_id]).getTime();
+      const endMs = new Date(sub.submitted_at).getTime();
+      durationSeconds = Math.max(1, Math.floor((endMs - startMs) / 1000));
+    }
+
+    const mins = Math.floor(durationSeconds / 60);
+    const secs = durationSeconds % 60;
+    const timeTakenFormatted = durationSeconds > 0 ? `${mins}m ${secs.toString().padStart(2, '0')}s` : '< 1m';
+
+    const isCorrectCulprit = Boolean(
+      sub.selected_suspect_id === '11111111-2222-3333-4444-555555555503' ||
+      (sub.selected_suspect && sub.selected_suspect.toLowerCase().includes('evelyn'))
+    );
+
+    return {
+      id: sub.id,
+      rank: 0,
+      participantName,
+      score: sub.score || 0,
+      timeTakenSeconds: durationSeconds || 9999,
+      timeTakenFormatted,
+      accusedSuspect: sub.selected_suspect || 'Unknown',
+      isCorrectCulprit,
+      cluesCount: sub.selected_evidence ? sub.selected_evidence.length : 0,
+      evidenceCodes: sub.selected_evidence || [],
+      explanation: sub.incident_explanation || '',
+      submittedAt: sub.submitted_at || new Date().toISOString(),
+      confirmationCode: 'CZ-' + sub.id.substring(0, 8).toUpperCase(),
+    };
+  });
+
+  // Sort: High score first; if tied, faster time wins; if tied, earlier submission wins
+  entries.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    if (a.timeTakenSeconds !== b.timeTakenSeconds) return a.timeTakenSeconds - b.timeTakenSeconds;
+    return new Date(a.submittedAt).getTime() - new Date(b.submittedAt).getTime();
+  });
+
+  entries.forEach((e, idx) => {
+    e.rank = idx + 1;
+  });
+
+  return entries;
+}
+
+export async function clearAllSubmissions(passcode: string): Promise<boolean> {
+  if (passcode !== 'admin2026' && passcode !== 'frostpeak2026') {
+    throw new Error('Invalid organizer authorization passcode.');
+  }
+  setLocalStore(LOCAL_SUBMISSIONS_KEY, []);
+  try {
+    await supabase.from('case_zero_submissions').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+  } catch (e) {}
+  return true;
+}
+
 
 // --------------------------------------------------------------------------
 // 6. Query Live Case Data from Supabase

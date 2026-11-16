@@ -118,6 +118,22 @@ export interface SubmissionReceipt {
   confirmation_code: string;
 }
 
+export interface LeaderboardEntry {
+  id: string;
+  rank: number;
+  participantName: string;
+  score: number;
+  timeTakenSeconds: number;
+  timeTakenFormatted: string;
+  accusedSuspect: string;
+  isCorrectCulprit: boolean;
+  cluesCount: number;
+  evidenceCodes: string[];
+  explanation: string;
+  submittedAt: string;
+  confirmationCode?: string;
+}
+
 export interface CCTVFeed {
   id: string;
   camCode: string;

@@ -76,7 +76,9 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
         participant.id,
         selectedSuspectId,
         selectedEvidenceCodes,
-        explanation
+        explanation,
+        participant.participant_name,
+        session.started_at
       );
 
       setReceipt(result);
