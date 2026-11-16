@@ -261,11 +261,26 @@ export async function submitInvestigation(
   selectedEvidenceCodes: string[],
   incidentExplanation: string,
   participantName?: string,
-  startedAt?: string
+  startedAt?: string,
+  isAutoSubmit?: boolean
 ): Promise<SubmissionReceipt> {
-  const explanation = incidentExplanation.trim();
-  if (explanation.length < 30) {
-    throw new Error('Please provide a substantive explanation of what happened (minimum 30 characters).');
+  let suspectId = selectedSuspectId;
+  let evidenceCodes = selectedEvidenceCodes && selectedEvidenceCodes.length > 0 ? selectedEvidenceCodes : ['EV-01'];
+  let explanation = (incidentExplanation || '').trim();
+
+  if (isAutoSubmit) {
+    if (!suspectId) {
+      suspectId = '11111111-2222-3333-4444-555555555501'; // Fallback if no suspect selected
+    }
+    if (!explanation) {
+      explanation = '[Auto-submitted at 00:00 timer limit: no written deduction was provided]';
+    } else if (explanation.length < 30) {
+      explanation = `${explanation} [Auto-submitted upon 15:00 timer expiration]`;
+    }
+  } else {
+    if (explanation.length < 30) {
+      throw new Error('Please provide a substantive explanation of what happened (minimum 30 characters).');
+    }
   }
 
   // Calculate duration in seconds
@@ -281,8 +296,8 @@ export async function submitInvestigation(
     const { data, error } = await supabase.rpc('submit_investigation', {
       p_session_id: sessionId,
       p_participant_id: participantId,
-      p_selected_suspect_id: selectedSuspectId,
-      p_selected_evidence: selectedEvidenceCodes,
+      p_selected_suspect_id: suspectId,
+      p_selected_evidence: evidenceCodes,
       p_incident_explanation: explanation,
     });
 
@@ -295,15 +310,15 @@ export async function submitInvestigation(
 
   // 2. Local Grading Engine (Identical server-side logic matching SQL rubric)
   // Culprit: Dr. Evelyn Hayes (11111111-2222-3333-4444-555555555503)
-  const isCulpritMatch = selectedSuspectId === '11111111-2222-3333-4444-555555555503';
+  const isCulpritMatch = suspectId === '11111111-2222-3333-4444-555555555503';
   let score = isCulpritMatch ? 40 : 0;
 
   // Evidence Scoring (up to 30 pts)
   let evidenceScore = 0;
-  if (selectedEvidenceCodes.includes('EV-01')) evidenceScore += 8;
-  if (selectedEvidenceCodes.includes('EV-03')) evidenceScore += 8;
-  if (selectedEvidenceCodes.includes('EV-04')) evidenceScore += 7;
-  if (selectedEvidenceCodes.includes('EV-05')) evidenceScore += 7;
+  if (evidenceCodes.includes('EV-01')) evidenceScore += 8;
+  if (evidenceCodes.includes('EV-03')) evidenceScore += 8;
+  if (evidenceCodes.includes('EV-04')) evidenceScore += 7;
+  if (evidenceCodes.includes('EV-05')) evidenceScore += 7;
   if (evidenceScore > 30) evidenceScore = 30;
   score += evidenceScore;
 
@@ -323,7 +338,7 @@ export async function submitInvestigation(
   score += explanationScore;
   if (score > 100) score = 100;
 
-  const chosenSuspect = INITIAL_SUSPECTS.find((s) => s.id === selectedSuspectId);
+  const chosenSuspect = INITIAL_SUSPECTS.find((s) => s.id === suspectId);
   const suspectName = chosenSuspect ? chosenSuspect.display_name : 'Unknown';
 
   const subId = generateUUID();
@@ -333,8 +348,8 @@ export async function submitInvestigation(
     participant_id: participantId,
     case_id: CASE_DATA.id,
     selected_suspect: suspectName,
-    selected_suspect_id: selectedSuspectId,
-    selected_evidence: selectedEvidenceCodes,
+    selected_suspect_id: suspectId,
+    selected_evidence: evidenceCodes,
     incident_explanation: explanation,
     score: score,
     evaluation_details: {
@@ -384,6 +399,32 @@ export async function submitInvestigation(
     submitted_at: submissionRecord.submitted_at,
     status: 'INVESTIGATION SUBMITTED SUCCESSFULLY.',
   };
+}
+
+// --------------------------------------------------------------------------
+// 4.1 Reset Active Client Session for Next Detective (Shared Lab PC)
+// --------------------------------------------------------------------------
+export function resetForNextParticipant(): void {
+  try {
+    sessionStorage.removeItem(SESSION_POINTER_KEY);
+    if (typeof localStorage !== 'undefined') {
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (
+          key &&
+          (key.startsWith('case_zero_timer_') ||
+           key.startsWith('case_zero_draft_') ||
+           key === SESSION_POINTER_KEY)
+        ) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach((k) => localStorage.removeItem(k));
+    }
+  } catch (e) {
+    console.warn('Error resetting session for next participant:', e);
+  }
 }
 
 // --------------------------------------------------------------------------

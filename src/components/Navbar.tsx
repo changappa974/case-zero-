@@ -11,6 +11,7 @@ interface NavbarProps {
   session: InvestigationSession | null;
   isMuted: boolean;
   onToggleMute: () => void;
+  timeLeft?: number;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -20,12 +21,13 @@ export const Navbar: React.FC<NavbarProps> = ({
   session,
   isMuted,
   onToggleMute,
+  timeLeft: externalTimeLeft,
 }) => {
   // 15-Minute Countdown Timer (900 seconds)
-  const [timeLeft, setTimeLeft] = useState<number>(900);
+  const [localTimeLeft, setLocalTimeLeft] = useState<number>(900);
 
   useEffect(() => {
-    if (!participant) return;
+    if (!participant || externalTimeLeft !== undefined) return;
 
     const storageKey = `case_zero_timer_${participant.id}`;
     let startTime = localStorage.getItem(storageKey);
@@ -39,13 +41,15 @@ export const Navbar: React.FC<NavbarProps> = ({
       if (session?.status === 'submitted') return;
       const elapsed = Math.floor((Date.now() - startMs) / 1000);
       const remaining = Math.max(0, 900 - elapsed);
-      setTimeLeft(remaining);
+      setLocalTimeLeft(remaining);
     };
 
     updateTimer();
     const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
-  }, [participant, session]);
+  }, [participant, session, externalTimeLeft]);
+
+  const timeLeft = externalTimeLeft !== undefined ? externalTimeLeft : localTimeLeft;
 
   const formatTimer = (secs: number) => {
     const mins = Math.floor(secs / 60);

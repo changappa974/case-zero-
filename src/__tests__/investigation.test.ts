@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { registerParticipant, submitInvestigation, getOrganizerSubmissions } from '../lib/supabase';
+import { registerParticipant, submitInvestigation, getOrganizerSubmissions, resetForNextParticipant } from '../lib/supabase';
 import { CASE_DATA, INITIAL_SUSPECTS, INITIAL_EVIDENCE } from '../lib/caseData';
 
 describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity', () => {
@@ -83,4 +83,36 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
       submitInvestigation(session.id, participant.id, evelyn!.id, ['EV-01'], 'Too short')
     ).rejects.toThrow('minimum 30 characters');
   }, 15000);
+
+  it('safely auto-submits when 00:00 timer expires without losing partial work', async () => {
+    const { participant, session } = await registerParticipant('Taylor Quick');
+    const evelyn = INITIAL_SUSPECTS.find((s) => s.display_name === 'Dr. Evelyn Hayes');
+
+    // Auto submit with partial short explanation
+    const receipt = await submitInvestigation(
+      session.id,
+      participant.id,
+      evelyn!.id,
+      ['EV-01', 'EV-03'],
+      'Evelyn poisoned the tea',
+      participant.participant_name,
+      session.started_at,
+      true // isAutoSubmit = true
+    );
+
+    expect(receipt.success).toBe(true);
+    expect(receipt.confirmation_code).toBeDefined();
+  }, 15000);
+
+  it('resets local storage session pointer for next detective in shared lab PC', () => {
+    sessionStorage.setItem('cz_session_pointer', '{"sessionId":"test","participantId":"test"}');
+    localStorage.setItem('case_zero_timer_test', '12345');
+    localStorage.setItem('case_zero_draft_test', '{"explanation":"draft"}');
+
+    resetForNextParticipant();
+
+    expect(sessionStorage.getItem('cz_session_pointer')).toBeNull();
+    expect(localStorage.getItem('case_zero_timer_test')).toBeNull();
+    expect(localStorage.getItem('case_zero_draft_test')).toBeNull();
+  });
 });

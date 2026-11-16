@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Navbar } from './components/Navbar';
 import { Stage0Registration } from './stages/Stage0Registration';
 import { Stage1Story } from './stages/Stage1Story';
@@ -7,9 +7,10 @@ import { Stage3Suspects } from './stages/Stage3Suspects';
 import { Stage4EvidenceBoard } from './stages/Stage4EvidenceBoard';
 import { Stage5Submission } from './stages/Stage5Submission';
 import { InvestigationStage, Participant, InvestigationSession, SubmissionReceipt } from './types';
-import { restoreActiveSession, updateSessionProgress } from './lib/supabase';
+import { restoreActiveSession, updateSessionProgress, submitInvestigation, resetForNextParticipant } from './lib/supabase';
 import { soundFX } from './lib/audioService';
 import { AdminLeaderboard } from './pages/AdminLeaderboard';
+import { RotateCcw } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [participant, setParticipant] = useState<Participant | null>(null);
@@ -21,6 +22,16 @@ export const App: React.FC = () => {
   const [suspectNotes, setSuspectNotes] = useState<Record<string, string>>({});
   const [submissionReceipt, setSubmissionReceipt] = useState<SubmissionReceipt | null>(null);
   const [isMuted, setIsMuted] = useState<boolean>(false);
+
+  // 15-Minute Timer & Auto-Submit States
+  const [timeLeft, setTimeLeft] = useState<number>(900);
+  const [isAutoSubmitting, setIsAutoSubmitting] = useState<boolean>(false);
+  const [isResetting, setIsResetting] = useState<boolean>(false);
+  const [draftSuspectId, setDraftSuspectId] = useState<string>('');
+  const [draftEvidenceCodes, setDraftEvidenceCodes] = useState<string[]>([]);
+  const [draftExplanation, setDraftExplanation] = useState<string>('');
+  const autoSubmitTriggeredRef = useRef<boolean>(false);
+
   const [isAdminView, setIsAdminView] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
     const path = window.location.pathname.toLowerCase();
@@ -75,9 +86,128 @@ export const App: React.FC = () => {
           setCurrentStage(5);
           setMaxStageReached(5);
         }
+        if (saved.participant) {
+          try {
+            const rawDraft = localStorage.getItem(`case_zero_draft_${saved.participant.id}`);
+            if (rawDraft) {
+              const parsed = JSON.parse(rawDraft);
+              if (parsed.selectedSuspectId) setDraftSuspectId(parsed.selectedSuspectId);
+              if (parsed.selectedEvidenceCodes) setDraftEvidenceCodes(parsed.selectedEvidenceCodes);
+              if (parsed.explanation) setDraftExplanation(parsed.explanation);
+            }
+          } catch (e) {}
+        }
       }
     });
   }, []);
+
+  // 15-Minute Countdown Timer (900 seconds) & Auto-Submit on 00:00
+  useEffect(() => {
+    if (!participant || !session) return;
+    if (session.status === 'submitted') {
+      setTimeLeft(0);
+      return;
+    }
+
+    const storageKey = `case_zero_timer_${participant.id}`;
+    let startTime = localStorage.getItem(storageKey);
+    if (!startTime) {
+      startTime = session.started_at ? new Date(session.started_at).getTime().toString() : Date.now().toString();
+      localStorage.setItem(storageKey, startTime);
+    }
+
+    const startMs = parseInt(startTime, 10) || Date.now();
+
+    const checkTimer = () => {
+      if (session.status === 'submitted') return;
+      const elapsed = Math.floor((Date.now() - startMs) / 1000);
+      const remaining = Math.max(0, 900 - elapsed);
+      setTimeLeft(remaining);
+
+      // Auto-Submit on 00:00: Automatically submit whatever they have answered so their work is never lost
+      if (remaining === 0 && !autoSubmitTriggeredRef.current) {
+        autoSubmitTriggeredRef.current = true;
+        handleAutoSubmit();
+      }
+    };
+
+    checkTimer();
+    const interval = setInterval(checkTimer, 1000);
+    return () => clearInterval(interval);
+  }, [participant, session, draftSuspectId, draftEvidenceCodes, draftExplanation]);
+
+  const handleAutoSubmit = async () => {
+    if (!participant || !session || session.status === 'submitted') return;
+
+    setIsAutoSubmitting(true);
+    soundFX.playAlertBeep();
+
+    // Check drafts from state or localStorage
+    let suspectId = draftSuspectId;
+    let evidenceCodes = draftEvidenceCodes;
+    let explanation = draftExplanation;
+
+    if (!suspectId || !explanation) {
+      try {
+        const raw = localStorage.getItem(`case_zero_draft_${participant.id}`);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (!suspectId && parsed.selectedSuspectId) suspectId = parsed.selectedSuspectId;
+          if ((!evidenceCodes || evidenceCodes.length === 0) && parsed.selectedEvidenceCodes) {
+            evidenceCodes = parsed.selectedEvidenceCodes;
+          }
+          if (!explanation && parsed.explanation) explanation = parsed.explanation;
+        }
+      } catch (e) {}
+    }
+
+    try {
+      const receipt = await submitInvestigation(
+        session.id,
+        participant.id,
+        suspectId,
+        evidenceCodes,
+        explanation,
+        participant.participant_name,
+        session.started_at,
+        true // isAutoSubmit = true
+      );
+
+      setSubmissionReceipt(receipt);
+      setSession((prev) => (prev ? { ...prev, status: 'submitted' } : null));
+      setCurrentStage(5);
+      setMaxStageReached(5);
+      soundFX.playClueFound();
+    } catch (err) {
+      console.error('Failed to auto-submit investigation:', err);
+    } finally {
+      setIsAutoSubmitting(false);
+    }
+  };
+
+  const handleResetForNextDetective = () => {
+    setIsResetting(true);
+    soundFX.playCameraSwitch();
+
+    setTimeout(() => {
+      resetForNextParticipant();
+      setParticipant(null);
+      setSession(null);
+      setCurrentStage(0);
+      setMaxStageReached(1);
+      setCollectedEvidence([]);
+      setConnectedLinks([]);
+      setSuspectNotes({});
+      setSubmissionReceipt(null);
+      setDraftSuspectId('');
+      setDraftEvidenceCodes([]);
+      setDraftExplanation('');
+      setTimeLeft(900);
+      autoSubmitTriggeredRef.current = false;
+      setIsResetting(false);
+      soundFX.playClueFound();
+    }, 1000);
+  };
 
   // Update session stage helper
   const goToStage = (stage: InvestigationStage) => {
@@ -99,6 +229,8 @@ export const App: React.FC = () => {
     setSession(newSession);
     setCurrentStage(1);
     setMaxStageReached(1);
+    setTimeLeft(900);
+    autoSubmitTriggeredRef.current = false;
     soundFX.startAmbientHum();
   };
 
@@ -184,6 +316,7 @@ export const App: React.FC = () => {
         session={session}
         isMuted={isMuted}
         onToggleMute={handleToggleMute}
+        timeLeft={timeLeft}
       />
 
       {/* Main Investigation Stage Views */}
@@ -233,9 +366,36 @@ export const App: React.FC = () => {
             collectedEvidence={collectedEvidence}
             onSubmissionSuccess={handleSubmissionSuccess}
             existingReceipt={submissionReceipt}
+            onResetForNext={handleResetForNextDetective}
+            draftSuspectId={draftSuspectId}
+            onDraftSuspectChange={setDraftSuspectId}
+            draftEvidenceCodes={draftEvidenceCodes}
+            onDraftEvidenceChange={setDraftEvidenceCodes}
+            draftExplanation={draftExplanation}
+            onDraftExplanationChange={setDraftExplanation}
+            isAutoSubmitting={isAutoSubmitting}
           />
         )}
       </main>
+
+      {/* 1-Second Lab PC Reset Transition Overlay */}
+      {isResetting && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md animate-fade-in text-[#1c1917]">
+          <div className="bg-[#f5f0e6] border-2 border-[#cfc7b7] rounded-3xl p-8 max-w-sm w-full text-center space-y-4 shadow-2xl">
+            <div className="w-14 h-14 rounded-full bg-blue-100 text-blue-900 border border-blue-300 mx-auto flex items-center justify-center animate-spin">
+              <RotateCcw className="w-7 h-7" />
+            </div>
+            <div>
+              <h3 className="font-display font-black text-xl text-[#1c1917]">
+                RESETTING FOR NEXT DETECTIVE...
+              </h3>
+              <p className="text-xs text-stone-600 font-mono mt-1">
+                Clearing active session caches in 1 second. Ready for the next participant!
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Cinematic Footer */}
       <footer className="border-t border-[#cfc7b7] bg-[#f5f0e6] py-6 text-center text-xs font-mono text-stone-600 shadow-sm">

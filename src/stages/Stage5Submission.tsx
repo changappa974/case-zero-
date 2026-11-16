@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { 
   Lock, CheckCircle2, AlertTriangle, ShieldCheck, FileCheck, 
-  Send, Sparkles, Printer, User, FileText, CornerDownRight 
+  Send, Sparkles, Printer, User, FileText, CornerDownRight,
+  RotateCcw, UserPlus, Clock
 } from 'lucide-react';
 import { INITIAL_SUSPECTS, INITIAL_EVIDENCE } from '../lib/caseData';
 import { Participant, InvestigationSession, SubmissionReceipt } from '../types';
@@ -16,6 +17,14 @@ interface Stage5SubmissionProps {
   initialSuspectId?: string;
   onSubmissionSuccess: (receipt: SubmissionReceipt) => void;
   existingReceipt?: SubmissionReceipt | null;
+  onResetForNext?: () => void;
+  draftSuspectId?: string;
+  onDraftSuspectChange?: (id: string) => void;
+  draftEvidenceCodes?: string[];
+  onDraftEvidenceChange?: (codes: string[]) => void;
+  draftExplanation?: string;
+  onDraftExplanationChange?: (text: string) => void;
+  isAutoSubmitting?: boolean;
 }
 
 export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
@@ -25,27 +34,91 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
   initialSuspectId,
   onSubmissionSuccess,
   existingReceipt,
+  onResetForNext,
+  draftSuspectId,
+  onDraftSuspectChange,
+  draftEvidenceCodes,
+  onDraftEvidenceChange,
+  draftExplanation,
+  onDraftExplanationChange,
+  isAutoSubmitting = false,
 }) => {
-  const [selectedSuspectId, setSelectedSuspectId] = useState<string>(initialSuspectId || '');
-  const [selectedEvidenceCodes, setSelectedEvidenceCodes] = useState<string[]>(
-    collectedEvidence.length > 0 ? collectedEvidence : ['EV-01', 'EV-04']
-  );
-  const [explanation, setExplanation] = useState<string>('');
+  // Initialize with drafted values or saved localStorage
+  const [selectedSuspectId, setSelectedSuspectId] = useState<string>(() => {
+    if (draftSuspectId) return draftSuspectId;
+    if (initialSuspectId) return initialSuspectId;
+    try {
+      const raw = localStorage.getItem(`case_zero_draft_${participant.id}`);
+      if (raw) return JSON.parse(raw).selectedSuspectId || '';
+    } catch (e) {}
+    return '';
+  });
+
+  const [selectedEvidenceCodes, setSelectedEvidenceCodes] = useState<string[]>(() => {
+    if (draftEvidenceCodes && draftEvidenceCodes.length > 0) return draftEvidenceCodes;
+    try {
+      const raw = localStorage.getItem(`case_zero_draft_${participant.id}`);
+      if (raw && JSON.parse(raw).selectedEvidenceCodes?.length) {
+        return JSON.parse(raw).selectedEvidenceCodes;
+      }
+    } catch (e) {}
+    return collectedEvidence.length > 0 ? collectedEvidence : ['EV-01', 'EV-04'];
+  });
+
+  const [explanation, setExplanation] = useState<string>(() => {
+    if (draftExplanation) return draftExplanation;
+    try {
+      const raw = localStorage.getItem(`case_zero_draft_${participant.id}`);
+      if (raw) return JSON.parse(raw).explanation || '';
+    } catch (e) {}
+    return '';
+  });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [receipt, setReceipt] = useState<SubmissionReceipt | null>(existingReceipt || null);
 
   const isLocked = session.status === 'submitted' || Boolean(receipt);
 
+  // Sync draft changes to parent state and localStorage
+  const handleSuspectSelect = (id: string) => {
+    if (isLocked) return;
+    soundFX.playCameraSwitch();
+    setSelectedSuspectId(id);
+    if (onDraftSuspectChange) onDraftSuspectChange(id);
+    try {
+      const draft = { selectedSuspectId: id, selectedEvidenceCodes, explanation };
+      localStorage.setItem(`case_zero_draft_${participant.id}`, JSON.stringify(draft));
+    } catch (e) {}
+  };
+
   const toggleEvidence = (code: string) => {
     if (isLocked) return;
     soundFX.playCameraSwitch();
+    let updated: string[];
     if (selectedEvidenceCodes.includes(code)) {
-      setSelectedEvidenceCodes(selectedEvidenceCodes.filter((c) => c !== code));
+      updated = selectedEvidenceCodes.filter((c) => c !== code);
     } else {
-      setSelectedEvidenceCodes([...selectedEvidenceCodes, code]);
+      updated = [...selectedEvidenceCodes, code];
     }
+    setSelectedEvidenceCodes(updated);
+    if (onDraftEvidenceChange) onDraftEvidenceChange(updated);
+    try {
+      const draft = { selectedSuspectId, selectedEvidenceCodes: updated, explanation };
+      localStorage.setItem(`case_zero_draft_${participant.id}`, JSON.stringify(draft));
+    } catch (e) {}
+  };
+
+  const handleExplanationChange = (text: string) => {
+    if (isLocked) return;
+    setExplanation(text);
+    if (onDraftExplanationChange) onDraftExplanationChange(text);
+    try {
+      const draft = { selectedSuspectId, selectedEvidenceCodes, explanation: text };
+      localStorage.setItem(`case_zero_draft_${participant.id}`, JSON.stringify(draft));
+    } catch (e) {}
   };
 
   const handleSubmit = async () => {
@@ -182,7 +255,84 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
               <span>PRINT RECEIPT</span>
             </button>
           </div>
+
+          {/* NEXT PARTICIPANT / LAB PC RESET BUTTON */}
+          {onResetForNext && (
+            <div className="pt-4 border-t-2 border-dashed border-[#cfc7b7] flex flex-col sm:flex-row items-center justify-between gap-4 bg-[#ede7dc] p-5 rounded-2xl">
+              <div className="space-y-1 text-center sm:text-left">
+                <span className="text-xs font-mono font-bold text-stone-900 uppercase flex items-center justify-center sm:justify-start space-x-1.5">
+                  <RotateCcw className="w-3.5 h-3.5 text-blue-900" />
+                  <span>LAB PC SHARING // ROUND RESET</span>
+                </span>
+                <p className="text-[11px] text-stone-600 font-sans">
+                  Taking turns in rounds? Clear this laptop in 1 second for the next student. ({participant.participant_name}'s score is already permanently saved in the organizer leaderboard).
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  soundFX.playCameraSwitch();
+                  setShowResetConfirm(true);
+                }}
+                className="w-full sm:w-auto px-5 py-3 rounded-xl bg-blue-900 hover:bg-blue-950 text-white font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center space-x-2 transition shadow-md hover:shadow-lg shrink-0 transform hover:-translate-y-0.5"
+              >
+                <UserPlus className="w-4 h-4 text-amber-300" />
+                <span>RESET FOR NEXT DETECTIVE</span>
+              </button>
+            </div>
+          )}
         </div>
+
+        {/* RESET CONFIRMATION MODAL */}
+        {showResetConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
+            <div className="bg-[#f5f0e6] border-2 border-[#cfc7b7] rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl text-[#1c1917]">
+              <div className="flex items-center space-x-3 text-blue-950 border-b border-[#cfc7b7] pb-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-900 border border-blue-200">
+                  <UserPlus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-display font-black text-[#1c1917] text-base">
+                    START FRESH FOR NEXT DETECTIVE?
+                  </h3>
+                  <p className="text-[11px] font-mono text-stone-500">1-SECOND LAB PC RESET</p>
+                </div>
+              </div>
+
+              <p className="text-xs sm:text-sm text-stone-700 font-sans leading-relaxed">
+                This will clear active session caches from this browser so the next detective can register their name and start immediately.
+              </p>
+
+              <div className="p-3.5 rounded-xl bg-[#e6dfd2] border border-[#cfc7b7] text-xs font-mono space-y-1">
+                <div className="text-emerald-900 font-bold flex items-center space-x-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>Submission confirmed for {participant.participant_name}</span>
+                </div>
+                <div className="text-stone-600 text-[11px]">
+                  Ref: {receipt?.confirmation_code || 'CZ-VERIFIED'} • Recorded in live jury leaderboard
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end space-x-3 pt-2">
+                <button
+                  onClick={() => setShowResetConfirm(false)}
+                  className="px-4 py-2.5 rounded-xl bg-[#e6dfd2] hover:bg-[#ded6c7] text-stone-800 font-mono text-xs font-bold transition"
+                >
+                  CANCEL
+                </button>
+                <button
+                  onClick={() => {
+                    setShowResetConfirm(false);
+                    if (onResetForNext) onResetForNext();
+                  }}
+                  className="px-5 py-2.5 rounded-xl bg-blue-900 hover:bg-blue-950 text-white font-mono text-xs font-bold flex items-center space-x-2 shadow-sm transition"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 text-amber-300" />
+                  <span>YES, RESET IN 1 SECOND</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
       </div>
     );
@@ -190,7 +340,33 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
 
   // Active Submission Form
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+    <div className="max-w-5xl mx-auto px-4 py-8 space-y-8 relative">
+      
+      {/* Auto-Submitting Overlay on Timer Expiration */}
+      {isAutoSubmitting && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-fade-in text-[#1c1917]">
+          <div className="bg-[#f5f0e6] border-2 border-red-500 rounded-3xl p-8 max-w-md w-full text-center space-y-4 shadow-2xl">
+            <div className="w-16 h-16 rounded-full bg-red-100 text-red-900 border-2 border-red-400 mx-auto flex items-center justify-center animate-pulse shadow-md">
+              <Clock className="w-8 h-8" />
+            </div>
+            <div>
+              <span className="text-[10px] font-mono uppercase px-3 py-1 rounded-full bg-red-200 text-red-950 font-bold border border-red-300">
+                15:00 TIME LIMIT EXPIRED
+              </span>
+              <h3 className="font-display font-black text-2xl text-[#1c1917] mt-2">
+                AUTO-SUBMITTING CASE...
+              </h3>
+              <p className="text-xs text-stone-700 font-mono mt-1.5 leading-relaxed">
+                Securing whatever answers and deductions you have typed so far. Your work is safely recorded in the database!
+              </p>
+            </div>
+            <div className="pt-2 flex items-center justify-center space-x-2 text-xs font-mono text-stone-600 font-bold">
+              <span className="w-2 h-2 rounded-full bg-blue-800 animate-ping"></span>
+              <span>Submitting to live event leaderboard...</span>
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#cfc7b7] pb-4">
@@ -241,10 +417,7 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
             return (
               <div
                 key={s.id}
-                onClick={() => {
-                  soundFX.playCameraSwitch();
-                  setSelectedSuspectId(s.id);
-                }}
+                onClick={() => handleSuspectSelect(s.id)}
                 className={`p-3 rounded-2xl border cursor-pointer transition-all flex sm:flex-col items-center sm:items-start space-x-3 sm:space-x-0 sm:space-y-2 ${
                   isSelected
                     ? 'bg-[#dfd7c8] border-2 border-blue-900 ring-2 ring-blue-300 text-[#1c1917] shadow-md'
@@ -332,7 +505,7 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
         <div className="space-y-2">
           <textarea
             value={explanation}
-            onChange={(e) => setExplanation(e.target.value)}
+            onChange={(e) => handleExplanationChange(e.target.value)}
             rows={6}
             placeholder="Type your complete investigative conclusion here: State who committed the murder, explain how the crime was executed, why their alibi fails against the physical evidence and CCTV timeline, and what motive drove them..."
             className="w-full bg-[#faf7f2] border-2 border-[#cfc7b7] focus:border-blue-800 focus:ring-2 focus:ring-blue-200 rounded-xl p-4 text-xs sm:text-sm text-[#1c1917] placeholder-stone-400 font-mono outline-none shadow-inner font-medium"
