@@ -64,7 +64,7 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
           <div className="inline-block px-3 py-1 rounded-full bg-amber-200/90 border border-amber-400 text-amber-950 font-mono text-xs tracking-widest uppercase font-bold">
             THE VISUAL MYSTERY CHALLENGE
           </div>
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-[#1c1917] font-mono">
+          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-[#1c1917] font-display">
             CASE ZERO
           </h1>
           <p className="text-base sm:text-lg font-semibold text-amber-900 tracking-wide font-sans italic">

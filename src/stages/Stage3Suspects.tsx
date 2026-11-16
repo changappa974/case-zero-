@@ -53,7 +53,7 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
             <span>//</span>
             <span>PERSONS OF INTEREST</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black font-mono text-[#1c1917] mt-1">
+          <h2 className="text-2xl sm:text-3xl font-black font-display text-[#1c1917] mt-1">
             EXAMINE THE FOUR SUSPECTS
           </h2>
           <p className="text-xs sm:text-sm text-stone-700 mt-1 font-sans">
@@ -105,7 +105,7 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
                 <span className="text-[10px] font-mono uppercase tracking-wider text-blue-900 font-bold">
                   SUSPECT 0{suspect.display_order}
                 </span>
-                <h3 className="text-base font-bold font-mono text-[#1c1917] leading-tight">
+                <h3 className="text-base font-bold font-display text-[#1c1917] leading-tight">
                   {suspect.display_name}
                 </h3>
                 <p className="text-xs text-stone-600 truncate font-sans font-medium mt-0.5">
@@ -179,7 +179,7 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
                   SUBJECT DOSSIER // 0{selectedSuspect.display_order}
                 </span>
               </div>
-              <h2 className="text-2xl font-black font-mono text-[#1c1917] mt-1">
+              <h2 className="text-2xl font-black font-display text-[#1c1917] mt-1">
                 {selectedSuspect.display_name}
               </h2>
               <p className="text-xs font-mono text-stone-700 font-semibold">

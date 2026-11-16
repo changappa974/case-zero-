@@ -74,7 +74,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         >
           <div>
             <div className="flex items-center space-x-2">
-              <span className="font-mono font-black tracking-widest text-[#1c1917] text-lg group-hover:text-blue-900 transition">
+              <span className="font-display font-black tracking-wide text-[#1c1917] text-xl group-hover:text-blue-900 transition">
                 CASE ZERO
               </span>
               <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-amber-200/90 text-amber-900 border border-amber-300 font-bold">

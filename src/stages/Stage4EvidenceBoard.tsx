@@ -130,7 +130,7 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
             <span>//</span>
             <span>CORRELATION MATRIX</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black font-mono text-[#1c1917] mt-1">
+          <h2 className="text-2xl sm:text-3xl font-black font-display text-[#1c1917] mt-1">
             INTERACTIVE EVIDENCE BOARD
           </h2>
           <p className="text-xs sm:text-sm text-stone-700 mt-1">
@@ -280,7 +280,7 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
                   <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-950 border border-blue-300 font-bold">
                     FORENSIC TARGET // {activeVisualHotspot.evidenceCode}
                   </span>
-                  <h4 className="text-xl font-bold font-mono text-[#1c1917] mt-1">
+                  <h4 className="text-xl font-bold font-display text-[#1c1917] mt-1">
                     {activeVisualHotspot.title}
                   </h4>
                 </div>
@@ -407,7 +407,7 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
 
                     {/* Card Content */}
                     <div className="p-4 space-y-2">
-                      <h4 className="text-sm font-bold font-mono text-[#1c1917] leading-tight">
+                      <h4 className="text-sm font-bold font-display text-[#1c1917] leading-tight">
                         {ev.title}
                       </h4>
                       <p className="text-xs text-stone-700 font-sans line-clamp-3 leading-relaxed">

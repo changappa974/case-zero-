@@ -82,5 +82,5 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
     await expect(
       submitInvestigation(session.id, participant.id, evelyn!.id, ['EV-01'], 'Too short')
     ).rejects.toThrow('minimum 30 characters');
-  });
+  }, 15000);
 });

@@ -69,7 +69,7 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
             <span>//</span>
             <span>SURVEILLANCE & RECONSTRUCTION</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black font-mono text-[#1c1917] mt-1">
+          <h2 className="text-2xl sm:text-3xl font-black font-display text-[#1c1917] mt-1">
             INVESTIGATE THE CCTV RECORDINGS & AUDIO REELS
           </h2>
           <p className="text-xs sm:text-sm text-stone-700 mt-1 font-sans">
@@ -267,7 +267,7 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
               </div>
 
               <div>
-                <h4 className="text-sm font-bold font-mono text-[#1c1917]">
+                <h4 className="text-sm font-bold font-display text-[#1c1917]">
                   {activeHotspot.title}
                 </h4>
                 <p className="text-xs text-stone-800 mt-1 leading-relaxed font-sans font-medium">

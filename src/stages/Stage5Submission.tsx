@@ -118,7 +118,7 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
             <span className="text-xs font-mono uppercase tracking-widest text-emerald-900 font-bold bg-emerald-100 px-3 py-1 rounded-full border border-emerald-300">
               OFFICIAL VERIFICATION CONFIRMED
             </span>
-            <h1 className="text-2xl sm:text-4xl font-black font-mono text-[#1c1917] tracking-tight pt-2">
+            <h1 className="text-2xl sm:text-4xl font-black font-display text-[#1c1917] tracking-tight pt-2">
               INVESTIGATION SUBMITTED SUCCESSFULLY.
             </h1>
             <p className="text-xs sm:text-sm text-stone-700 font-mono">
@@ -198,7 +198,7 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
             <span>//</span>
             <span>FINAL VERDICT</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black font-mono text-[#1c1917] mt-1">
+          <h2 className="text-2xl sm:text-3xl font-black font-display text-[#1c1917] mt-1">
             SUBMIT YOUR INVESTIGATION
           </h2>
           <p className="text-xs sm:text-sm text-stone-700 mt-1 font-sans">
@@ -405,7 +405,7 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
           <div className="bg-[#f5f0e6] border border-[#cfc7b7] rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl text-[#1c1917]">
             <div className="flex items-center space-x-3 text-blue-950 border-b border-[#cfc7b7] pb-3">
               <ShieldCheck className="w-6 h-6 text-blue-800" />
-              <h3 className="font-mono font-bold text-[#1c1917] text-base">
+              <h3 className="font-display font-bold text-[#1c1917] text-base">
                 CONFIRM FINAL SUBMISSION
               </h3>
             </div>

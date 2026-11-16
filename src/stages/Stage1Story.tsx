@@ -210,7 +210,7 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
             <span>//</span>
             <span>THE CRIME SCENE</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black font-mono text-[#1c1917] mt-1">
+          <h2 className="text-2xl sm:text-3xl font-black font-display text-[#1c1917] mt-1">
             CASE ZERO: MURDER AT FROSTPEAK CONSERVATORY
           </h2>
           <p className="text-xs sm:text-sm text-stone-700 mt-1 max-w-3xl font-sans">
@@ -252,7 +252,7 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
       <div className="space-y-4 pt-2 bg-[#f5f0e6] p-5 rounded-2xl border border-[#cfc7b7] shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h3 className="text-lg font-mono font-bold text-[#1c1917] flex items-center space-x-2">
+            <h3 className="text-lg font-display font-bold text-[#1c1917] flex items-center space-x-2">
               <Eye className="w-5 h-5 text-blue-800" />
               <span>EXPLORE THE CRIME SCENE: INTERACTIVE INVESTIGATION</span>
             </h3>
@@ -430,7 +430,7 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
                 <span className="px-2.5 py-0.5 rounded-full bg-amber-200/90 border border-amber-400 text-amber-950 font-mono text-[10px] tracking-wider uppercase font-bold">
                   {selectedHotspot.category}
                 </span>
-                <h4 className="text-xl font-mono font-black text-[#1c1917] mt-1">
+                <h4 className="text-xl font-display font-black text-[#1c1917] mt-1">
                   {selectedHotspot.name}
                 </h4>
               </div>
@@ -499,7 +499,7 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
       {/* Stage Completion Banner */}
       <div className="bg-[#f5f0e6] border border-[#cfc7b7] rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h4 className="text-base font-mono font-bold text-[#1c1917] flex items-center space-x-2">
+          <h4 className="text-base font-display font-bold text-[#1c1917] flex items-center space-x-2">
             <span>READY TO ADVANCE INVESTIGATION</span>
           </h4>
           <p className="text-xs text-stone-600 mt-0.5 font-sans">
