@@ -99,23 +99,23 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
         <div className="grid grid-cols-1 sm:grid-cols-5 gap-2 text-[11px] pt-1">
           <div className="p-2.5 rounded-lg bg-[#e6dfd2] border border-[#cfc7b7]">
             <span className="text-stone-600 font-bold block">11:00 PM (CAM 1)</span>
-            <span className="text-stone-900 font-medium">Chef Marco delivers tea. Victor at Lobby Bar. Tea is 100% pure.</span>
+            <span className="text-stone-900 font-medium">Chef Marco delivers tea tray to conservatory. Victor Thorne seen at Lobby Bar.</span>
           </div>
           <div className="p-2.5 rounded-lg bg-[#e6dfd2] border border-[#cfc7b7]">
             <span className="text-stone-600 font-bold block">11:05 PM (CAM 2)</span>
-            <span className="text-stone-900 font-medium">Clara checks heater. Vance is alive. Clara exits at 11:08 PM.</span>
+            <span className="text-stone-900 font-medium">Clara Sterling enters to calibrate radiator; departs at 11:08 PM.</span>
           </div>
-          <div className="p-2.5 rounded-lg bg-amber-100 border border-amber-300">
-            <span className="text-amber-950 font-bold block">11:12 PM (CAM 3) ⚠</span>
-            <span className="text-amber-950 font-medium">Dr. Evelyn Hayes enters the conservatory service passage.</span>
+          <div className="p-2.5 rounded-lg bg-[#e6dfd2] border border-[#cfc7b7]">
+            <span className="text-stone-600 font-bold block">11:12 PM (CAM 3)</span>
+            <span className="text-stone-900 font-medium">Individual in yellow cardigan and apron walks toward service passage.</span>
           </div>
-          <div className="p-2.5 rounded-lg bg-red-100 border border-red-300">
-            <span className="text-red-950 font-bold block">11:18 PM (CAM 4) ⚠</span>
-            <span className="text-red-950 font-medium">Dr. Evelyn Hayes returns holding glowing blue pollen cloth!</span>
+          <div className="p-2.5 rounded-lg bg-[#e6dfd2] border border-[#cfc7b7]">
+            <span className="text-stone-600 font-bold block">11:18 PM (CAM 4)</span>
+            <span className="text-stone-900 font-medium">Individual in yellow cardigan returns through B-Wing holding a cloth.</span>
           </div>
           <div className="p-2.5 rounded-lg bg-[#e6dfd2] border border-[#cfc7b7]">
             <span className="text-stone-600 font-bold block">11:24 PM (CAM 1)</span>
-            <span className="text-stone-900 font-medium">Fatal collapse. Teacup & pollen jar shatter. Watch stops.</span>
+            <span className="text-stone-900 font-medium">Dr. Vance collapses at table; orchid pollen jar and teacup strike floor.</span>
           </div>
         </div>
       </div>

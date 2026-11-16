@@ -117,49 +117,6 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
         })}
       </div>
 
-      {/* At-A-Glance Suspect Alibi & Exoneration Matrix for 15-Minute Solving */}
-      <div className="bg-[#f5f0e6] border border-[#cfc7b7] p-4 rounded-xl shadow-sm font-mono text-xs space-y-3">
-        <div className="flex items-center justify-between border-b border-[#cfc7b7] pb-2">
-          <span className="text-blue-950 font-bold flex items-center space-x-1.5">
-            <ShieldAlert className="w-4 h-4 text-blue-800" />
-            <span>SUSPECT ALIBI VERIFICATION & MOTIVE SUMMARY</span>
-          </span>
-          <span className="text-[11px] text-stone-600 font-semibold">
-            CROSS-REFERENCE TO IDENTIFY FALSE ALIBI
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-[11px]">
-          <div className="p-3 rounded-xl bg-[#e6dfd2] border border-[#cfc7b7] space-y-1">
-            <span className="font-bold text-stone-900 text-xs block">1. CLARA STERLING</span>
-            <p className="text-stone-700"><strong>Alibi:</strong> Checked radiator at 11:05 PM, exited 11:08 PM.</p>
-            <p className="text-emerald-800 font-semibold">✓ Corroborated by CAM 2 & heater telemetry.</p>
-            <span className="inline-block mt-1 px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 text-[10px] font-bold">EXONERATED</span>
-          </div>
-
-          <div className="p-3 rounded-xl bg-[#e6dfd2] border border-[#cfc7b7] space-y-1">
-            <span className="font-bold text-stone-900 text-xs block">2. VICTOR THORNE</span>
-            <p className="text-stone-700"><strong>Alibi:</strong> Side door locked at 10:50 PM; at Lobby Bar 11:00–11:30 PM.</p>
-            <p className="text-emerald-800 font-semibold">✓ Corroborated by bar footage & unbroken frost on door.</p>
-            <span className="inline-block mt-1 px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 text-[10px] font-bold">EXONERATED</span>
-          </div>
-
-          <div className="p-3 rounded-xl bg-[#e6dfd2] border border-[#cfc7b7] space-y-1">
-            <span className="font-bold text-stone-900 text-xs block">3. CHEF MARCO</span>
-            <p className="text-stone-700"><strong>Alibi:</strong> Delivered tea at 11:00 PM, returned to kitchen.</p>
-            <p className="text-emerald-800 font-semibold">✓ Corroborated by kitchen records; teapot was pure.</p>
-            <span className="inline-block mt-1 px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 text-[10px] font-bold">EXONERATED</span>
-          </div>
-
-          <div className="p-3 rounded-xl bg-red-100 border-2 border-red-400 space-y-1 shadow-sm">
-            <span className="font-black text-red-950 text-xs block">4. DR. EVELYN HAYES ⚠</span>
-            <p className="text-red-900"><strong>Claimed Alibi:</strong> Alone in B-Wing Lab 11:00–11:25 PM.</p>
-            <p className="text-red-950 font-bold">✗ CONTRADICTED: CCTV shows passage transit at 11:12 & 11:18 PM with glowing cloth. Zero lab activity 11:00–11:22 PM.</p>
-            <span className="inline-block mt-1 px-2 py-0.5 rounded bg-red-700 text-white text-[10px] font-bold uppercase">PRIMARY SUSPECT // FALSE ALIBI</span>
-          </div>
-        </div>
-      </div>
-
       {/* Selected Suspect Deep Dive Dossier */}
       <div className="bg-[#f5f0e6] border border-[#cfc7b7] rounded-2xl overflow-hidden shadow-sm">
         

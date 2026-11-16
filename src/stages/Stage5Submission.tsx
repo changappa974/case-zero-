@@ -324,50 +324,15 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
           <h3 className="text-base text-[#1c1917] font-black">HOW WAS THE MURDER COMMITTED & WHAT EVIDENCE PROVES IT?</h3>
         </div>
         <p className="text-xs text-stone-700 font-sans">
-          Explain the sequence of events: How was the Midnight Orchid toxin introduced into the tea? What disproves the culprit's alibi? What forensic traces (left-handed smudge, gloves in bin, corridor movements, financial audit) prove your conclusion?
+          State your conclusion clearly: Identify who committed the murder, analyze how their claimed alibi is disproved by the timeline and forensic evidence, explain how the crime was executed, and what motive drove the killer.
         </p>
 
         <div className="space-y-2">
-          {/* Quick-Fill Evidence Point Helpers for 15-Minute Rush */}
-          <div className="flex flex-wrap items-center gap-1.5 pt-1 pb-1">
-            <span className="text-[11px] font-mono text-stone-600 font-bold">⚡ QUICK INSERT EVIDENCE BULLETS:</span>
-            <button
-              type="button"
-              onClick={() => {
-                const text = "1. FALSE ALIBI & CCTV: Dr. Evelyn Hayes claimed she stayed in the B-Wing Lab from 11:00 to 11:25 PM. However, CCTV CAM 3 captures her walking into the conservatory passage at 11:12 PM, and CAM 4 records her returning at 11:18 PM carrying a glowing blue orchid cloth.";
-                setExplanation(prev => prev ? prev + "\n\n" + text : text);
-              }}
-              className="px-2.5 py-1 rounded-lg bg-[#e6dfd2] hover:bg-[#ded6c7] border border-[#cfc7b7] text-[11px] font-mono text-blue-950 font-bold transition shadow-sm"
-            >
-              + CCTV & Alibi Contradiction
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                const text = "2. LAB FORENSICS: Lab computer records show zero activity from 11:00 to 11:22 PM. Discarded latex gloves and stained tissue glowing with bioluminescent blue orchid pollen were found in the lab waste bin, and a matching left-handed pollen smudge was found on the sink faucet handle (Evelyn is left-handed).";
-                setExplanation(prev => prev ? prev + "\n\n" + text : text);
-              }}
-              className="px-2.5 py-1 rounded-lg bg-[#e6dfd2] hover:bg-[#ded6c7] border border-[#cfc7b7] text-[11px] font-mono text-blue-950 font-bold transition shadow-sm"
-            >
-              + Lab Forensics & Faucet Smudge
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                const text = "3. POISON & MOTIVE: Dr. Vance discovered Dr. Evelyn Hayes's funding fraud. To silence him, Evelyn slipped toxic Cyanocryptin extracted from the rare Midnight Orchid into his delivered tea, causing fatal collapse at 11:24 PM.";
-                setExplanation(prev => prev ? prev + "\n\n" + text : text);
-              }}
-              className="px-2.5 py-1 rounded-lg bg-[#e6dfd2] hover:bg-[#ded6c7] border border-[#cfc7b7] text-[11px] font-mono text-blue-950 font-bold transition shadow-sm"
-            >
-              + Method & Financial Motive
-            </button>
-          </div>
-
           <textarea
             value={explanation}
             onChange={(e) => setExplanation(e.target.value)}
-            rows={5}
-            placeholder="Detail your explanation: Explain how Dr. Arthur Vance was poisoned, how the Midnight Orchid toxin was introduced into his Earl Grey tea, the timeline contradiction between the B-Wing lab and corridor CCTV, and the physical traces (faucet smudge, gloves, funding fraud) proving who committed the murder..."
+            rows={6}
+            placeholder="Type your complete investigative conclusion here: State who committed the murder, explain how the crime was executed, why their alibi fails against the physical evidence and CCTV timeline, and what motive drove them..."
             className="w-full bg-[#faf7f2] border-2 border-[#cfc7b7] focus:border-blue-800 focus:ring-2 focus:ring-blue-200 rounded-xl p-4 text-xs sm:text-sm text-[#1c1917] placeholder-stone-400 font-mono outline-none shadow-inner font-medium"
           />
           <div className="flex justify-between text-[11px] font-mono text-stone-600 font-semibold">

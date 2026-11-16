@@ -49,7 +49,7 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
       evidenceCode: 'EV-05',
       previewImg: '/evidence/lab-keycard-log.jpg',
       notes: 'Last keycard swipe at 10:58 PM. Zero keystroke activity between 11:00 PM and 11:22 PM.',
-      details: 'Dr. Evelyn Hayes logged into the terminal at 10:58 PM, but the system logs show complete silence from 11:00 to 11:22 PM. This completely refutes her claim that she was working alone in the lab during the murder window.'
+      details: 'Dr. Evelyn Hayes logged into the terminal at 10:58 PM. However, the system logs show complete silence with zero keystrokes or instrument inputs from 11:00 to 11:22 PM. Investigators should compare this against suspect alibi claims.'
     },
     {
       id: 'faucet',
@@ -60,7 +60,7 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
       evidenceCode: 'EV-04',
       previewImg: '/evidence/faucet-blue-smudge.jpg',
       notes: 'Left-handed downward thumb grip on left faucet handle coated in 470nm blue bioluminescent orchid pollen.',
-      details: 'Fluorescence spectroscopy confirms the substance on the faucet handle is Midnight Orchid pollen. The smudge orientation indicates the perpetrator gripped and twisted the valve with their left hand. Dr. Evelyn Hayes is left-handed.'
+      details: 'Fluorescence spectroscopy confirms the substance on the faucet handle is Midnight Orchid pollen. The smudge orientation indicates the valve was operated using a left-handed downward thumb grip. Cross-reference with suspect physical profiles.'
     },
     {
       id: 'gloves',
@@ -71,7 +71,7 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
       evidenceCode: 'EV-03',
       previewImg: '/evidence/discarded-gloves.jpg',
       notes: 'Waste bin contains discarded latex gloves and crumpled tissue glowing brightly with bioluminescent orchid pollen.',
-      details: 'Found inside the B-Wing prep lab waste bin at 11:35 PM. The latex gloves match Dr. Evelyn Hayes hand size (Small) and carry residues of both Midnight Orchid pollen and Cyanocryptin neurotoxin.'
+      details: 'Found inside the B-Wing prep lab waste bin at 11:35 PM. Contains discarded latex examination gloves (Size Small) and crumpled laboratory tissue carrying residues of both Midnight Orchid pollen and Cyanocryptin neurotoxin.'
     },
     {
       id: 'deadbolt',
@@ -93,7 +93,7 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
       evidenceCode: 'EV-07',
       previewImg: '/evidence/green-tartan-handle.jpg',
       notes: 'Scrap of wool tartan snagged on exterior handle. Victor Thorne attempted door at 10:50 PM but could not enter.',
-      details: 'Matches Victor Thorne green tartan blazer. Snagged when Victor pulled on the locked exterior handle at 10:50 PM. Victor was exonerated by the inside deadbolt and his verified presence at the Lobby Bar from 11:00 to 11:25 PM.'
+      details: 'Matches wool fabric of Victor Thorne green tartan blazer. Snagged when the exterior handle was pulled from outside at 10:50 PM. Compare with side door deadbolt status and lobby timeline.'
     },
     {
       id: 'footprints',

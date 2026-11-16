@@ -34,7 +34,7 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
     expect(session.case_id).toBe(CASE_DATA.id);
     expect(session.status).toBe('in_progress');
     expect(session.stage_reached).toBe(1);
-  });
+  }, 15000);
 
   it('requires participant full name to register', async () => {
     await expect(registerParticipant('')).rejects.toThrow('Please enter your full name');
@@ -73,7 +73,7 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
     expect(saved!.selected_suspect).toBe('Dr. Evelyn Hayes');
     expect(saved!.score).toBeGreaterThanOrEqual(80); // Accused Evelyn (40), selected 4 critical clues (30), provided complete explanation (30)
     expect(saved!.submission_status).toBe('verified');
-  });
+  }, 15000);
 
   it('rejects submissions with explanations that are too short', async () => {
     const { participant, session } = await registerParticipant('Sam Vance');

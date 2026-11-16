@@ -124,7 +124,7 @@ export const INITIAL_EVIDENCE: Evidence[] = [
       location: 'B-Wing Prep Lab Floor Waste Bin',
       time_discovered: '23:35:00',
       substance_detected: 'Bioluminescent Orchid Pollen Residue & Cyanocryptin',
-      glove_size: 'Size Small (Matching Dr. Evelyn Hayes hand size)'
+      glove_size: 'Latex Size Small (fits smaller hand frame)'
     }
   },
   {
@@ -140,7 +140,7 @@ export const INITIAL_EVIDENCE: Evidence[] = [
       fixture: 'Prep Lab Sink Left Water Valve Handle',
       orientation: 'Left-handed downward thumb grip',
       fluorescence_match: 'Midnight Orchid bioluminescent pollen',
-      forensic_significance: 'Dr. Evelyn Hayes is left-handed; writes and handles gear with left hand'
+      forensic_significance: 'Valve operated with a left-handed downward thumb grip; check suspect profiles for handedness'
     }
   },
   {
@@ -155,7 +155,7 @@ export const INITIAL_EVIDENCE: Evidence[] = [
     metadata: {
       last_keycard_swipe: '22:58:00 (Dr. Evelyn Hayes)',
       idle_window: '23:00:00 - 23:22:00 (NO ACTIVITY LOGGED)',
-      alibi_status: 'CONTRADICTED: Lab was vacant during the time of murder',
+      alibi_status: 'System state: Terminal recorded 0 input events between 23:00 and 23:22',
       corroboration: 'Matches CAM 3 & CAM 4 corridor timestamps'
     }
   },
@@ -172,7 +172,7 @@ export const INITIAL_EVIDENCE: Evidence[] = [
       deadbolt_state: 'LOCKED FROM INSIDE (Brass cylinder engaged)',
       threshold_frost: 'CONTINUOUS UNBROKEN FROST LAYER',
       deduction: 'Nobody entered or exited through the side service door',
-      red_herring_target: 'Exonerates Victor Thorne of entering the conservatory'
+      red_herring_target: 'Physical proof: Exterior passage was not breached from the outside'
     }
   },
   {
@@ -383,7 +383,7 @@ export const AUDIO_LOGS: AudioLog[] = [
     speaker: 'Private Passage Sensor',
     transcript: '[Door Click] A heavy steel passage door quietly clicks open and shuts.',
     simpleMeaning: 'The private passage door between the B-Wing Lab and the conservatory opened and shut quietly.',
-    clueMeaning: 'Someone snuck through the passage while Dr. Evelyn Hayes had zero computer activity in her lab.',
+    clueMeaning: 'Acoustic confirmation that someone opened the private service door between the laboratory wing and the conservatory at 11:14 PM.',
     synthesizedFrequency: 220
   },
   {
