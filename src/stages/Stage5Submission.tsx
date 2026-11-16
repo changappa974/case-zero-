@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { 
   Lock, CheckCircle2, AlertTriangle, ShieldCheck, FileCheck, 
   Send, Sparkles, Printer, User, FileText, CornerDownRight,
-  RotateCcw, UserPlus, Clock
+  RotateCcw, UserPlus, Clock, Download, Award
 } from 'lucide-react';
 import { INITIAL_SUSPECTS, INITIAL_EVIDENCE } from '../lib/caseData';
 import { Participant, InvestigationSession, SubmissionReceipt } from '../types';
 import { submitInvestigation } from '../lib/supabase';
+import { downloadCertifiedCard } from '../lib/certificateGenerator';
 import { soundFX } from '../lib/audioService';
 import confetti from 'canvas-confetti';
 
@@ -200,6 +201,19 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
   if (isLocked) {
     const chosenSuspect = INITIAL_SUSPECTS.find((s) => s.id === selectedSuspectId);
 
+    const startMs = session.started_at ? new Date(session.started_at).getTime() : Date.now();
+    const endMs = receipt?.submitted_at ? new Date(receipt.submitted_at).getTime() : Date.now();
+    const durationSeconds = Math.max(1, Math.floor((endMs - startMs) / 1000));
+    const mins = Math.floor(durationSeconds / 60);
+    const secs = durationSeconds % 60;
+    const timeTakenFormatted = `${mins}m ${secs.toString().padStart(2, '0')}s`;
+    const filingDate = new Date(receipt?.submitted_at || Date.now()).toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+    const confirmationCode = receipt?.confirmation_code || 'CZ-' + session.id.substring(0, 8).toUpperCase();
+
     return (
       <div className="max-w-4xl mx-auto px-4 py-12 space-y-8 animate-fade-in">
         
@@ -225,8 +239,160 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
           <div className="inline-block p-4 rounded-xl bg-[#e6dfd2] border-2 border-[#cfc7b7] font-mono text-center shadow-sm">
             <span className="text-[11px] text-stone-600 font-bold block mb-1">OFFICIAL CASE REFERENCE CODE</span>
             <span className="text-xl sm:text-2xl font-black text-blue-950 tracking-widest">
-              {receipt?.confirmation_code || 'CZ-VERIFIED-2026'}
+              {confirmationCode}
             </span>
+          </div>
+        </div>
+
+        {/* STYLISH GRAPHIC CARD // CASE ZERO CERTIFIED */}
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
+            <div className="flex items-center space-x-2">
+              <Award className="w-5 h-5 text-amber-600" />
+              <h2 className="text-lg font-black font-display text-[#1c1917] uppercase tracking-wide">
+                OFFICIAL DETECTIVE CERTIFICATE & CARD
+              </h2>
+            </div>
+            <span className="text-[11px] font-mono text-stone-600 font-semibold">
+              Projector & Print Ready • Ready for Instant Download
+            </span>
+          </div>
+
+          {/* The Visual Graphic Card Container */}
+          <div className="relative rounded-3xl bg-gradient-to-br from-[#0a0d14] via-[#0f172a] to-[#050811] border-2 border-amber-500/80 p-6 sm:p-10 shadow-2xl text-white overflow-hidden font-sans">
+            
+            {/* Subtle Guilloche / Grid Lines */}
+            <div 
+              className="absolute inset-0 opacity-10 pointer-events-none"
+              style={{
+                backgroundImage: 'linear-gradient(#f59e0b 1px, transparent 1px), linear-gradient(90deg, #f59e0b 1px, transparent 1px)',
+                backgroundSize: '24px 24px',
+              }}
+            />
+
+            {/* Ornamental Gold Corner Accents */}
+            <div className="absolute top-3 left-3 w-6 h-6 border-t-2 border-l-2 border-amber-400 pointer-events-none" />
+            <div className="absolute top-3 right-3 w-6 h-6 border-t-2 border-r-2 border-amber-400 pointer-events-none" />
+            <div className="absolute bottom-3 left-3 w-6 h-6 border-b-2 border-l-2 border-amber-400 pointer-events-none" />
+            <div className="absolute bottom-3 right-3 w-6 h-6 border-b-2 border-r-2 border-amber-400 pointer-events-none" />
+
+            <div className="relative z-10 space-y-6">
+              
+              {/* Card Header */}
+              <div className="text-center space-y-1 border-b border-amber-500/30 pb-4">
+                <span className="text-[10px] sm:text-xs font-mono font-bold tracking-[0.25em] text-amber-400 uppercase block">
+                  SPECIAL FORENSIC DIVISION // INCIDENT ARCHIVE
+                </span>
+                <h3 className="text-xl sm:text-3xl font-black font-display tracking-tight text-white uppercase">
+                  CASE ZERO: THE VISUAL MYSTERY CHALLENGE
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-400 italic font-serif">
+                  Frostpeak Conservatory Homicide Investigation Inquiry
+                </p>
+              </div>
+
+              {/* Commendation Name & Body */}
+              <div className="text-center space-y-2 py-2">
+                <span className="text-[11px] sm:text-xs font-mono tracking-widest text-slate-300 uppercase font-semibold">
+                  THIS CERTIFIES THAT INVESTIGATING DETECTIVE
+                </span>
+                <div className="text-2xl sm:text-4xl lg:text-5xl font-black font-display text-amber-200 tracking-wide drop-shadow-[0_0_15px_rgba(245,158,11,0.5)]">
+                  {participant.participant_name.toUpperCase()}
+                </div>
+                <p className="text-xs sm:text-sm text-slate-300 font-sans max-w-xl mx-auto leading-relaxed pt-1">
+                  has completed the forensic review of surveillance reels, physical evidence, and suspect alibis, successfully filing their deduction into the incident archive.
+                </p>
+              </div>
+
+              {/* Key Details & Official Rubber Stamp Row */}
+              <div className="pt-2 grid grid-cols-1 sm:grid-cols-4 gap-4 items-center">
+                
+                {/* Time Taken Box */}
+                <div className="bg-slate-900/80 border border-slate-700/80 rounded-2xl p-3 text-center sm:text-left space-y-0.5">
+                  <span className="text-[10px] font-mono font-bold text-amber-400 uppercase tracking-wider block">
+                    TIME TAKEN
+                  </span>
+                  <span className="text-xl sm:text-2xl font-black font-mono text-white tracking-tight">
+                    {timeTakenFormatted}
+                  </span>
+                </div>
+
+                {/* Case Reference Box */}
+                <div className="bg-slate-900/80 border border-slate-700/80 rounded-2xl p-3 text-center sm:text-left space-y-0.5 sm:col-span-1">
+                  <span className="text-[10px] font-mono font-bold text-amber-400 uppercase tracking-wider block">
+                    CASE CODE
+                  </span>
+                  <span className="text-xs sm:text-sm font-bold font-mono text-white truncate block">
+                    {confirmationCode}
+                  </span>
+                </div>
+
+                {/* Filing Date Box */}
+                <div className="bg-slate-900/80 border border-slate-700/80 rounded-2xl p-3 text-center sm:text-left space-y-0.5">
+                  <span className="text-[10px] font-mono font-bold text-amber-400 uppercase tracking-wider block">
+                    RECORDED
+                  </span>
+                  <span className="text-xs sm:text-sm font-bold font-mono text-white block">
+                    {filingDate}
+                  </span>
+                </div>
+
+                {/* Official "CASE ZERO CERTIFIED" Stamp (Tilted Rubber Stamp) */}
+                <div className="flex justify-center sm:justify-end">
+                  <div className="transform -rotate-12 transition hover:rotate-0 duration-300 select-none">
+                    <div className="border-4 border-red-600 rounded-2xl p-2.5 px-4 text-center bg-red-950/40 backdrop-blur-sm border-dashed shadow-[0_0_20px_rgba(220,38,38,0.35)]">
+                      <span className="text-[9px] font-mono uppercase tracking-widest text-red-400 font-bold block">
+                        ★ FORENSIC SEAL ★
+                      </span>
+                      <span className="text-lg sm:text-xl font-black text-red-500 tracking-wider font-display block leading-none my-1">
+                        CASE ZERO
+                      </span>
+                      <span className="text-xs sm:text-sm font-black text-red-400 tracking-widest uppercase block leading-none">
+                        CERTIFIED
+                      </span>
+                      <span className="text-[8px] font-mono uppercase text-red-300 font-semibold block mt-0.5">
+                        OFFICIAL VERIFIED
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Card Footer Micro-text */}
+              <div className="pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-[10px] font-mono text-slate-500 gap-2">
+                <span>SECURITY DIGEST: #{session.id.substring(0, 16)}</span>
+                <span>CRYPTOGRAPHICALLY SEALED // FROSTPEAK JURY VERIFICATION</span>
+              </div>
+
+            </div>
+          </div>
+
+          {/* Action Download Buttons */}
+          <div className="flex flex-col sm:flex-row items-center gap-3 pt-1">
+            <button
+              onClick={() => {
+                soundFX.playClueFound();
+                downloadCertifiedCard({
+                  participantName: participant.participant_name,
+                  timeTaken: timeTakenFormatted,
+                  confirmationCode,
+                  submittedAt: filingDate,
+                });
+              }}
+              className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold font-mono text-xs uppercase tracking-wider flex items-center justify-center space-x-2.5 shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5"
+            >
+              <Download className="w-4 h-4 text-stone-950" />
+              <span>DOWNLOAD DETECTIVE CARD (PNG)</span>
+            </button>
+
+            <button
+              onClick={() => window.print()}
+              className="w-full sm:w-auto px-5 py-3.5 rounded-2xl bg-[#e6dfd2] hover:bg-[#ded6c7] border border-[#cfc7b7] text-stone-800 font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center space-x-2 transition shadow-sm"
+            >
+              <Printer className="w-4 h-4 text-stone-700" />
+              <span>PRINT RECEIPT</span>
+            </button>
           </div>
         </div>
 
