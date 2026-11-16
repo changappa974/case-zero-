@@ -125,6 +125,7 @@ export const AdminLeaderboard: React.FC<AdminLeaderboardProps> = ({ onExit }) =>
       'Score (out of 100)',
       'Time Taken',
       'Time Taken (Seconds)',
+      'Tab Switches',
       'Accused Suspect',
       'Correct Culprit?',
       'Critical Clues Found',
@@ -139,6 +140,7 @@ export const AdminLeaderboard: React.FC<AdminLeaderboardProps> = ({ onExit }) =>
       e.score,
       `"${e.timeTakenFormatted}"`,
       e.timeTakenSeconds,
+      e.tabSwitches || 0,
       `"${e.accusedSuspect.replace(/"/g, '""')}"`,
       e.isCorrectCulprit ? 'YES (Dr. Evelyn Hayes)' : 'NO',
       e.cluesCount,
@@ -687,7 +689,13 @@ export const AdminLeaderboard: React.FC<AdminLeaderboardProps> = ({ onExit }) =>
                 <span className="text-stone-500 block">TIME TAKEN</span>
                 <span className="text-lg font-black">{selectedEntry.timeTakenFormatted}</span>
               </div>
-              <div className="p-3 rounded-xl bg-stone-200/60 dark:bg-slate-800/60 border border-stone-300 dark:border-slate-700 col-span-2">
+              <div className="p-3 rounded-xl bg-stone-200/60 dark:bg-slate-800/60 border border-stone-300 dark:border-slate-700">
+                <span className="text-stone-500 block">TAB SWITCHES</span>
+                <span className={`text-lg font-black ${(selectedEntry.tabSwitches || 0) > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
+                  {selectedEntry.tabSwitches || 0}
+                </span>
+              </div>
+              <div className="p-3 rounded-xl bg-stone-200/60 dark:bg-slate-800/60 border border-stone-300 dark:border-slate-700">
                 <span className="text-stone-500 block">ACCUSED SUSPECT</span>
                 <div className="flex items-center space-x-1.5 mt-0.5">
                   {selectedEntry.isCorrectCulprit ? (

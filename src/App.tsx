@@ -32,6 +32,11 @@ export const App: React.FC = () => {
   const [draftExplanation, setDraftExplanation] = useState<string>('');
   const autoSubmitTriggeredRef = useRef<boolean>(false);
 
+  // Tab-Switch Monitoring
+  const [tabSwitchCount, setTabSwitchCount] = useState<number>(0);
+  const [showTabSwitchWarning, setShowTabSwitchWarning] = useState<boolean>(false);
+  const tabWarningTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const [isAdminView, setIsAdminView] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
     const path = window.location.pathname.toLowerCase();
@@ -136,6 +141,38 @@ export const App: React.FC = () => {
     return () => clearInterval(interval);
   }, [participant, session, draftSuspectId, draftEvidenceCodes, draftExplanation]);
 
+  // Tab-Switch Monitoring & Alert Badge
+  useEffect(() => {
+    if (!participant || !session || session.status === 'submitted') return;
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // User switched back to Case Zero window
+        setTabSwitchCount((prev) => {
+          const next = prev + 1;
+          setShowTabSwitchWarning(true);
+          soundFX.playAlertBeep();
+
+          if (tabWarningTimeoutRef.current) {
+            clearTimeout(tabWarningTimeoutRef.current);
+          }
+          // Auto-fade warning alert after 6 seconds
+          tabWarningTimeoutRef.current = setTimeout(() => {
+            setShowTabSwitchWarning(false);
+          }, 6000);
+
+          return next;
+        });
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (tabWarningTimeoutRef.current) clearTimeout(tabWarningTimeoutRef.current);
+    };
+  }, [participant, session]);
+
   const handleAutoSubmit = async () => {
     if (!participant || !session || session.status === 'submitted') return;
 
@@ -170,7 +207,8 @@ export const App: React.FC = () => {
         explanation,
         participant.participant_name,
         session.started_at,
-        true // isAutoSubmit = true
+        true, // isAutoSubmit = true
+        tabSwitchCount
       );
 
       setSubmissionReceipt(receipt);
@@ -203,6 +241,8 @@ export const App: React.FC = () => {
       setDraftEvidenceCodes([]);
       setDraftExplanation('');
       setTimeLeft(900);
+      setTabSwitchCount(0);
+      setShowTabSwitchWarning(false);
       autoSubmitTriggeredRef.current = false;
       setIsResetting(false);
       soundFX.playClueFound();
@@ -230,6 +270,8 @@ export const App: React.FC = () => {
     setCurrentStage(1);
     setMaxStageReached(1);
     setTimeLeft(900);
+    setTabSwitchCount(0);
+    setShowTabSwitchWarning(false);
     autoSubmitTriggeredRef.current = false;
     soundFX.startAmbientHum();
   };
@@ -317,7 +359,31 @@ export const App: React.FC = () => {
         isMuted={isMuted}
         onToggleMute={handleToggleMute}
         timeLeft={timeLeft}
+        tabSwitchCount={tabSwitchCount}
       />
+
+      {/* Friendly Tab-Switch Alert Banner */}
+      {showTabSwitchWarning && (
+        <div className="bg-amber-100 border-b border-amber-300 px-4 py-2.5 text-[#1c1917] font-mono text-xs flex items-center justify-between shadow-sm animate-fade-in sticky top-16 z-40">
+          <div className="flex items-center space-x-2.5 max-w-7xl mx-auto w-full">
+            <span className="px-2 py-0.5 rounded-md bg-amber-200 text-amber-950 font-bold border border-amber-300 text-[10px] uppercase">
+              ATTENTION
+            </span>
+            <span className="font-semibold text-stone-900">
+              Stay in the Case Zero window during your investigation.
+            </span>
+            <span className="text-stone-600 text-[11px] hidden sm:inline">
+              (Tab switch detected: #{tabSwitchCount})
+            </span>
+          </div>
+          <button
+            onClick={() => setShowTabSwitchWarning(false)}
+            className="text-stone-600 hover:text-stone-900 font-bold px-2 py-0.5 rounded text-xs"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* Main Investigation Stage Views */}
       <main className="flex-1 pb-16">
@@ -374,6 +440,7 @@ export const App: React.FC = () => {
             draftExplanation={draftExplanation}
             onDraftExplanationChange={setDraftExplanation}
             isAutoSubmitting={isAutoSubmitting}
+            tabSwitchCount={tabSwitchCount}
           />
         )}
       </main>

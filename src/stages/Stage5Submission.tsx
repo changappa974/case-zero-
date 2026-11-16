@@ -25,6 +25,7 @@ interface Stage5SubmissionProps {
   draftExplanation?: string;
   onDraftExplanationChange?: (text: string) => void;
   isAutoSubmitting?: boolean;
+  tabSwitchCount?: number;
 }
 
 export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
@@ -42,6 +43,7 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
   draftExplanation,
   onDraftExplanationChange,
   isAutoSubmitting = false,
+  tabSwitchCount = 0,
 }) => {
   // Initialize with drafted values or saved localStorage
   const [selectedSuspectId, setSelectedSuspectId] = useState<string>(() => {
@@ -77,10 +79,26 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showPasteWarning, setShowPasteWarning] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [receipt, setReceipt] = useState<SubmissionReceipt | null>(existingReceipt || null);
 
   const isLocked = session.status === 'submitted' || Boolean(receipt);
+
+  // Copy-Paste and Drag-and-Drop Blocking on Deduction Textarea
+  const handlePasteBlocked = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    e.preventDefault();
+    soundFX.playAlertBeep();
+    setShowPasteWarning(true);
+    setTimeout(() => setShowPasteWarning(false), 5000);
+  };
+
+  const handleDropBlocked = (e: React.DragEvent<HTMLTextAreaElement>) => {
+    e.preventDefault();
+    soundFX.playAlertBeep();
+    setShowPasteWarning(true);
+    setTimeout(() => setShowPasteWarning(false), 5000);
+  };
 
   // Sync draft changes to parent state and localStorage
   const handleSuspectSelect = (id: string) => {
@@ -151,7 +169,9 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
         selectedEvidenceCodes,
         explanation,
         participant.participant_name,
-        session.started_at
+        session.started_at,
+        false, // isAutoSubmit
+        tabSwitchCount
       );
 
       setReceipt(result);
@@ -506,12 +526,25 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
           <textarea
             value={explanation}
             onChange={(e) => handleExplanationChange(e.target.value)}
+            onPaste={handlePasteBlocked}
+            onDrop={handleDropBlocked}
             rows={6}
             placeholder="Type your complete investigative conclusion here: State who committed the murder, explain how the crime was executed, why their alibi fails against the physical evidence and CCTV timeline, and what motive drove them..."
             className="w-full bg-[#faf7f2] border-2 border-[#cfc7b7] focus:border-blue-800 focus:ring-2 focus:ring-blue-200 rounded-xl p-4 text-xs sm:text-sm text-[#1c1917] placeholder-stone-400 font-mono outline-none shadow-inner font-medium"
           />
-          <div className="flex justify-between text-[11px] font-mono text-stone-600 font-semibold">
-            <span>Minimum 30 characters</span>
+
+          {showPasteWarning && (
+            <div className="p-3 rounded-xl bg-amber-100 border border-amber-300 text-amber-950 text-xs font-mono flex items-center space-x-2 animate-fade-in shadow-sm font-semibold">
+              <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0" />
+              <span>Copy-paste is disabled in the explanation box. Please type your deduction manually to demonstrate your reasoning.</span>
+            </div>
+          )}
+
+          <div className="flex justify-between items-center text-[11px] font-mono text-stone-600 font-semibold">
+            <span className="flex items-center space-x-1.5 text-stone-500">
+              <Lock className="w-3 h-3 text-stone-400" />
+              <span>Minimum 30 characters (Manual typing required • Copy-paste blocked)</span>
+            </span>
             <span className={explanation.length < 30 ? 'text-red-700 font-bold' : 'text-emerald-800 font-bold'}>
               {explanation.length} characters entered
             </span>

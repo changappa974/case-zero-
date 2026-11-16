@@ -262,7 +262,8 @@ export async function submitInvestigation(
   incidentExplanation: string,
   participantName?: string,
   startedAt?: string,
-  isAutoSubmit?: boolean
+  isAutoSubmit?: boolean,
+  tabSwitches?: number
 ): Promise<SubmissionReceipt> {
   let suspectId = selectedSuspectId;
   let evidenceCodes = selectedEvidenceCodes && selectedEvidenceCodes.length > 0 ? selectedEvidenceCodes : ['EV-01'];
@@ -355,6 +356,7 @@ export async function submitInvestigation(
     evaluation_details: {
       participant_name: participantName || 'Agent',
       duration_seconds: durationSeconds,
+      tab_switches: tabSwitches !== undefined ? tabSwitches : 0,
       suspect_matched: isCulpritMatch,
       suspect_score: isCulpritMatch ? 40 : 0,
       evidence_score: evidenceScore,
@@ -530,6 +532,7 @@ export async function fetchLeaderboardEntries(): Promise<LeaderboardEntry[]> {
       explanation: sub.incident_explanation || '',
       submittedAt: sub.submitted_at || new Date().toISOString(),
       confirmationCode: 'CZ-' + sub.id.substring(0, 8).toUpperCase(),
+      tabSwitches: sub.evaluation_details?.tab_switches || 0,
     };
   });
 

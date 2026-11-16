@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Volume2, VolumeX, Lock, Clock } from 'lucide-react';
+import { Volume2, VolumeX, Lock, Clock, AlertTriangle } from 'lucide-react';
 import { InvestigationStage, Participant, InvestigationSession } from '../types';
 import { soundFX } from '../lib/audioService';
 
@@ -12,6 +12,7 @@ interface NavbarProps {
   isMuted: boolean;
   onToggleMute: () => void;
   timeLeft?: number;
+  tabSwitchCount?: number;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -22,6 +23,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   isMuted,
   onToggleMute,
   timeLeft: externalTimeLeft,
+  tabSwitchCount = 0,
 }) => {
   // 15-Minute Countdown Timer (900 seconds)
   const [localTimeLeft, setLocalTimeLeft] = useState<number>(900);
@@ -145,6 +147,17 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="text-[10px] text-stone-600 uppercase font-semibold hidden sm:inline">
                 {isSubmitted ? 'SEALED' : 'LEFT'}
               </span>
+            </div>
+          )}
+
+          {/* Friendly Tab-Switch Alert Badge */}
+          {participant && tabSwitchCount > 0 && !isSubmitted && (
+            <div
+              title="Stay in the Case Zero window during your investigation"
+              className="hidden md:flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg font-mono text-[11px] font-bold bg-amber-100 text-amber-950 border border-amber-300 shadow-sm animate-pulse"
+            >
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-700" />
+              <span>TAB SWITCH: {tabSwitchCount}</span>
             </div>
           )}
 

@@ -115,4 +115,28 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
     expect(localStorage.getItem('case_zero_timer_test')).toBeNull();
     expect(localStorage.getItem('case_zero_draft_test')).toBeNull();
   });
+
+  it('records tab switches accurately in submission audit records', async () => {
+    const { participant, session } = await registerParticipant('Morgan Lee');
+    const evelyn = INITIAL_SUSPECTS.find((s) => s.display_name === 'Dr. Evelyn Hayes');
+
+    const receipt = await submitInvestigation(
+      session.id,
+      participant.id,
+      evelyn!.id,
+      ['EV-01', 'EV-03', 'EV-04'],
+      'Dr. Evelyn Hayes poisoned the tea with cyanocryptin orchid toxin. CAM 3 and CAM 4 disprove her false alibi completely.',
+      participant.participant_name,
+      session.started_at,
+      false,
+      3 // 3 tab switches
+    );
+
+    expect(receipt.success).toBe(true);
+
+    const submissions = await getOrganizerSubmissions();
+    const saved = submissions.find((s) => s.session_id === session.id);
+    expect(saved).toBeDefined();
+    expect(saved!.evaluation_details?.tab_switches).toBe(3);
+  }, 15000);
 });

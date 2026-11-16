@@ -132,6 +132,7 @@ export interface LeaderboardEntry {
   explanation: string;
   submittedAt: string;
   confirmationCode?: string;
+  tabSwitches?: number;
 }
 
 export interface CCTVFeed {
