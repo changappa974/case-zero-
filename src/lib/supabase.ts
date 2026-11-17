@@ -30,20 +30,6 @@ export function lockStation(): void {
   } catch (e) {}
 }
 
-export function unlockStation(passcode: string): boolean {
-  const clean = passcode.trim().toLowerCase();
-  if (clean === 'frostpeak2026' || clean === 'admin2026' || clean === 'casezero2026') {
-    try {
-      localStorage.removeItem(STATION_LOCK_KEY);
-      resetForNextParticipant();
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-  return false;
-}
-
 // --------------------------------------------------------------------------
 // 0. Name Deduplication Verification
 // --------------------------------------------------------------------------

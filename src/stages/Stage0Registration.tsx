@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldAlert, ArrowRight, Video, Search, Users, Database, Fingerprint, Lock, KeyRound, AlertTriangle, CheckCircle2 } from 'lucide-react';
-import { registerParticipant, isStationLocked, unlockStation } from '../lib/supabase';
+import { ShieldAlert, ArrowRight, Video, Search, Users, Database, Fingerprint, Lock, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { registerParticipant, isStationLocked } from '../lib/supabase';
 import { Participant, InvestigationSession } from '../types';
 import { soundFX } from '../lib/audioService';
 
@@ -13,38 +13,10 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [stationLocked, setStationLocked] = useState<boolean>(false);
-  const [organizerPasscode, setOrganizerPasscode] = useState('');
-  const [passcodeError, setPasscodeError] = useState('');
-  const [passcodeSuccess, setPasscodeSuccess] = useState(false);
 
   useEffect(() => {
     setStationLocked(isStationLocked());
   }, []);
-
-  const handleUnlockStation = (e: React.FormEvent) => {
-    e.preventDefault();
-    setPasscodeError('');
-    if (!organizerPasscode.trim()) {
-      setPasscodeError('Please enter the organizer passcode.');
-      soundFX.playAlertBeep();
-      return;
-    }
-
-    const success = unlockStation(organizerPasscode);
-    if (success) {
-      soundFX.playClueFound();
-      setPasscodeSuccess(true);
-      setTimeout(() => {
-        setStationLocked(false);
-        setPasscodeSuccess(false);
-        setOrganizerPasscode('');
-        setErrorMessage('');
-      }, 700);
-    } else {
-      soundFX.playAlertBeep();
-      setPasscodeError('Invalid organizer passcode. Station remains locked.');
-    }
-  };
 
   const handleStart = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,61 +91,13 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
             </p>
           </div>
 
-          {/* Organizer Unlock Box */}
-          <div className="mt-8 bg-[#e6dfd2] border border-[#cfc7b7] rounded-xl p-5 shadow-inner">
-            <div className="flex items-center space-x-2 mb-3">
-              <KeyRound className="w-4 h-4 text-amber-900" />
-              <h3 className="font-mono text-xs uppercase tracking-wider font-bold text-amber-950">
-                Organizer / Proctor Unlock Gate
-              </h3>
-            </div>
-            <p className="text-xs text-stone-700 font-sans mb-4">
-              If you are an event judge or proctor preparing this PC station for the next participant, enter the organizer passcode below to unlock:
-            </p>
-
-            <form onSubmit={handleUnlockStation} className="space-y-3">
-              <div>
-                <input
-                  type="password"
-                  value={organizerPasscode}
-                  onChange={(e) => {
-                    setOrganizerPasscode(e.target.value);
-                    if (passcodeError) setPasscodeError('');
-                  }}
-                  placeholder="Enter organizer passcode"
-                  className="w-full bg-[#faf7f2] border-2 border-[#cfc7b7] focus:border-blue-800 focus:ring-2 focus:ring-blue-200 rounded-xl px-4 py-2.5 text-sm font-mono text-[#1c1917] placeholder-stone-400 font-semibold"
-                />
-              </div>
-
-              {passcodeError && (
-                <p className="text-xs font-mono text-red-700 font-bold flex items-center space-x-1.5">
-                  <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                  <span>{passcodeError}</span>
-                </p>
-              )}
-
-              {passcodeSuccess && (
-                <p className="text-xs font-mono text-emerald-800 font-bold flex items-center space-x-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                  <span>Station unlocked! Initializing clean registration terminal...</span>
-                </p>
-              )}
-
-              <button
-                type="submit"
-                className="w-full py-2.5 px-4 bg-amber-800 hover:bg-amber-900 text-white font-mono font-bold text-xs tracking-wider uppercase rounded-xl transition shadow-sm hover:shadow"
-              >
-                UNLOCK STATION FOR NEXT DETECTIVE
-              </button>
-            </form>
-          </div>
-
-          <div className="mt-6 text-center">
+          <div className="pt-4 border-t border-[#cfc7b7] text-center">
             <a
               href="/leaderboard"
-              className="text-xs font-mono text-blue-900 hover:text-blue-950 underline font-bold"
+              className="inline-flex items-center space-x-1.5 px-5 py-2.5 rounded-xl bg-blue-900 hover:bg-blue-950 text-white text-xs font-mono font-bold tracking-wider uppercase transition shadow-sm"
             >
-              Go to Live Event Leaderboard &rarr;
+              <span>VIEW EVENT LEADERBOARD</span>
+              <span>&rarr;</span>
             </a>
           </div>
         </div>
