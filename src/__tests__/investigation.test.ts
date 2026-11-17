@@ -1,5 +1,14 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { registerParticipant, submitInvestigation, getOrganizerSubmissions, resetForNextParticipant } from '../lib/supabase';
+import { 
+  registerParticipant, 
+  submitInvestigation, 
+  getOrganizerSubmissions, 
+  resetForNextParticipant,
+  checkParticipantHasSubmitted,
+  isStationLocked,
+  unlockStation,
+  STATION_LOCK_KEY
+} from '../lib/supabase';
 import { CASE_DATA, INITIAL_SUSPECTS, INITIAL_EVIDENCE } from '../lib/caseData';
 
 describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity', () => {
@@ -42,7 +51,7 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
   });
 
   it('submits investigation for Dr. Evelyn Hayes, calculates score securely, and seals answers', async () => {
-    const { participant, session } = await registerParticipant('Jordan Lee');
+    const { participant, session } = await registerParticipant('Jordan Lee ' + Date.now());
 
     // Dr. Evelyn Hayes ID
     const evelyn = INITIAL_SUSPECTS.find((s) => s.display_name === 'Dr. Evelyn Hayes');
@@ -76,7 +85,7 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
   }, 15000);
 
   it('rejects submissions with explanations that are too short', async () => {
-    const { participant, session } = await registerParticipant('Sam Vance');
+    const { participant, session } = await registerParticipant('Sam Vance ' + Date.now());
     const evelyn = INITIAL_SUSPECTS.find((s) => s.display_name === 'Dr. Evelyn Hayes');
 
     await expect(
@@ -85,7 +94,7 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
   }, 15000);
 
   it('safely auto-submits when 00:00 timer expires without losing partial work', async () => {
-    const { participant, session } = await registerParticipant('Taylor Quick');
+    const { participant, session } = await registerParticipant('Taylor Quick ' + Date.now());
     const evelyn = INITIAL_SUSPECTS.find((s) => s.display_name === 'Dr. Evelyn Hayes');
 
     // Auto submit with partial short explanation
@@ -117,7 +126,7 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
   });
 
   it('records tab switches accurately in submission audit records', async () => {
-    const { participant, session } = await registerParticipant('Morgan Lee');
+    const { participant, session } = await registerParticipant('Morgan Lee ' + Date.now());
     const evelyn = INITIAL_SUSPECTS.find((s) => s.display_name === 'Dr. Evelyn Hayes');
 
     const receipt = await submitInvestigation(
@@ -138,5 +147,72 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
     const saved = submissions.find((s) => s.session_id === session.id);
     expect(saved).toBeDefined();
     expect(saved!.evaluation_details?.tab_switches).toBe(3);
+  }, 15000);
+
+  it('enforces Name Deduplication Check: blocks registration when participant has already submitted', async () => {
+    const uniqueName = 'Robin Vance ' + Date.now();
+    const { participant, session } = await registerParticipant(uniqueName);
+    const evelyn = INITIAL_SUSPECTS.find((s) => s.display_name === 'Dr. Evelyn Hayes');
+
+    // Submit investigation for this participant
+    await submitInvestigation(
+      session.id,
+      participant.id,
+      evelyn!.id,
+      ['EV-01', 'EV-03', 'EV-04'],
+      'Dr. Evelyn Hayes committed the murder by poisoning Dr. Vance with orchid toxin. Alibi on CAM 3 contradicts her statement.',
+      participant.participant_name,
+      session.started_at,
+      false,
+      0
+    );
+
+    // Verify deduplication check returns true
+    const hasSubmitted = await checkParticipantHasSubmitted(uniqueName);
+    expect(hasSubmitted).toBe(true);
+
+    // Re-registration attempt with exact same name must throw exact error
+    await expect(registerParticipant(uniqueName)).rejects.toThrow(
+      'This participant has already submitted their Case Zero investigation. Retakes are not permitted.'
+    );
+
+    // Case-insensitive variation should also be blocked
+    await expect(registerParticipant(uniqueName.toLowerCase())).rejects.toThrow(
+      'This participant has already submitted their Case Zero investigation. Retakes are not permitted.'
+    );
+  }, 15000);
+
+  it('enforces Browser / Device Lockdown: sets permanent lock flag upon submission and requires passcode to unlock', async () => {
+    expect(isStationLocked()).toBe(false);
+
+    const { participant, session } = await registerParticipant('Lock Test User ' + Date.now());
+    const evelyn = INITIAL_SUSPECTS.find((s) => s.display_name === 'Dr. Evelyn Hayes');
+
+    await submitInvestigation(
+      session.id,
+      participant.id,
+      evelyn!.id,
+      ['EV-01'],
+      'Dr. Evelyn Hayes poisoned the tea with cyanocryptin orchid toxin. CAM 3 and CAM 4 disprove her false alibi completely.',
+      participant.participant_name,
+      session.started_at,
+      false,
+      0
+    );
+
+    // Station must be locked
+    expect(isStationLocked()).toBe(true);
+    expect(localStorage.getItem(STATION_LOCK_KEY)).toBe('true');
+
+    // Invalid passcode cannot unlock
+    const unlockFailed = unlockStation('wrongpass');
+    expect(unlockFailed).toBe(false);
+    expect(isStationLocked()).toBe(true);
+
+    // Organizer passcode successfully unlocks
+    const unlockSuccess = unlockStation('frostpeak2026');
+    expect(unlockSuccess).toBe(true);
+    expect(isStationLocked()).toBe(false);
+    expect(localStorage.getItem(STATION_LOCK_KEY)).toBeNull();
   }, 15000);
 });

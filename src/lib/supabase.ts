@@ -14,6 +14,104 @@ const SESSION_POINTER_KEY = 'cz_session_pointer';
 const LOCAL_PARTICIPANTS_KEY = 'cz_local_participants';
 const LOCAL_SESSIONS_KEY = 'cz_local_sessions';
 const LOCAL_SUBMISSIONS_KEY = 'cz_local_submissions';
+export const STATION_LOCK_KEY = 'cz_completed_lock';
+
+export function isStationLocked(): boolean {
+  try {
+    return localStorage.getItem(STATION_LOCK_KEY) === 'true';
+  } catch (e) {
+    return false;
+  }
+}
+
+export function lockStation(): void {
+  try {
+    localStorage.setItem(STATION_LOCK_KEY, 'true');
+  } catch (e) {}
+}
+
+export function unlockStation(passcode: string): boolean {
+  const clean = passcode.trim().toLowerCase();
+  if (clean === 'frostpeak2026' || clean === 'admin2026' || clean === 'casezero2026') {
+    try {
+      localStorage.removeItem(STATION_LOCK_KEY);
+      resetForNextParticipant();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+  return false;
+}
+
+// --------------------------------------------------------------------------
+// 0. Name Deduplication Verification
+// --------------------------------------------------------------------------
+export async function checkParticipantHasSubmitted(participantName: string): Promise<boolean> {
+  const cleanName = participantName.trim().toLowerCase();
+  if (!cleanName) return false;
+
+  // 1. Check local submissions cache
+  try {
+    const localSubmissions = getLocalStore<CaseZeroSubmission>(LOCAL_SUBMISSIONS_KEY);
+    const localHit = localSubmissions.some((s) => {
+      const pName = (s.evaluation_details?.participant_name || '').trim().toLowerCase();
+      return pName === cleanName;
+    });
+    if (localHit) return true;
+
+    // Check local participants and sessions
+    const localParticipants = getLocalStore<Participant>(LOCAL_PARTICIPANTS_KEY);
+    const matchingIds = localParticipants
+      .filter((p) => (p.participant_name || '').trim().toLowerCase() === cleanName)
+      .map((p) => p.id);
+
+    if (matchingIds.length > 0) {
+      const localSessions = getLocalStore<InvestigationSession>(LOCAL_SESSIONS_KEY);
+      const hasSubmitted = localSessions.some(
+        (s) => matchingIds.includes(s.participant_id) && s.status === 'submitted'
+      );
+      if (hasSubmitted) return true;
+    }
+  } catch (e) {}
+
+  // 2. Check Supabase participants and completed submissions/sessions
+  try {
+    const { data: pList, error: pErr } = await supabase
+      .from('participants')
+      .select('id, participant_name')
+      .ilike('participant_name', cleanName);
+
+    if (!pErr && pList && pList.length > 0) {
+      const pIds = pList.map((p) => p.id);
+
+      // Check if any of these participant IDs has a completed submission
+      const { data: subList } = await supabase
+        .from('case_zero_submissions')
+        .select('id, participant_id')
+        .in('participant_id', pIds);
+
+      if (subList && subList.length > 0) {
+        return true;
+      }
+
+      // Or check if any session has been submitted
+      const { data: sessList } = await supabase
+        .from('investigation_sessions')
+        .select('id, participant_id, status')
+        .in('participant_id', pIds)
+        .eq('status', 'submitted');
+
+      if (sessList && sessList.length > 0) {
+        return true;
+      }
+    }
+  } catch (err) {
+    console.warn('Supabase name deduplication check error:', err);
+  }
+
+  return false;
+}
 
 function generateUUID(): string {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
@@ -48,6 +146,12 @@ export async function registerParticipant(participantName: string): Promise<{ pa
   const cleanName = participantName.trim();
   if (!cleanName) {
     throw new Error('Please enter your full name to begin the investigation.');
+  }
+
+  // Deduplication Check: Block retakes if this name has already submitted
+  const alreadySubmitted = await checkParticipantHasSubmitted(cleanName);
+  if (alreadySubmitted) {
+    throw new Error('This participant has already submitted their Case Zero investigation. Retakes are not permitted.');
   }
 
   const clientToken = 'tok_' + Math.random().toString(36).substring(2, 12) + Date.now().toString(36);
@@ -303,6 +407,7 @@ export async function submitInvestigation(
     });
 
     if (!error && data) {
+      lockStation();
       return data as SubmissionReceipt;
     }
   } catch (err) {
@@ -391,6 +496,9 @@ export async function submitInvestigation(
     sessions[sIdx].stage_reached = 5;
     setLocalStore(LOCAL_SESSIONS_KEY, sessions);
   }
+
+  // Lock station device/browser against re-login
+  lockStation();
 
   return {
     success: true,
