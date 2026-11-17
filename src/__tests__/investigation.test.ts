@@ -3,6 +3,7 @@ import {
   registerParticipant, 
   submitInvestigation, 
   getOrganizerSubmissions, 
+  fetchLeaderboardEntries,
   resetForNextParticipant,
   checkParticipantHasSubmitted,
   isStationLocked,
@@ -214,5 +215,45 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
     expect(unlockSuccess).toBe(true);
     expect(isStationLocked()).toBe(false);
     expect(localStorage.getItem(STATION_LOCK_KEY)).toBeNull();
+  }, 15000);
+
+  it('enforces 3-strike disqualification and tags submission on the Leaderboard with FLAGGED: EXTERNAL BROWSING DETECTED for judges', async () => {
+    const studentName = 'Strike Disqualified User ' + Date.now();
+    const { participant, session } = await registerParticipant(studentName);
+    const evelyn = INITIAL_SUSPECTS.find((s) => s.display_name === 'Dr. Evelyn Hayes');
+
+    // Strike 3 auto-submit with flag
+    const receipt = await submitInvestigation(
+      session.id,
+      participant.id,
+      evelyn!.id,
+      ['EV-01', 'EV-03'],
+      'Partial deduction before 3 strikes',
+      participant.participant_name,
+      session.started_at,
+      true, // isAutoSubmit
+      3, // 3 tab switches
+      true, // isFlagged
+      'FLAGGED: EXTERNAL BROWSING DETECTED',
+      3 // strikes
+    );
+
+    expect(receipt.success).toBe(true);
+
+    // Verify stored submissions detail
+    const submissions = await getOrganizerSubmissions();
+    const saved = submissions.find((s) => s.session_id === session.id);
+    expect(saved).toBeDefined();
+    expect(saved!.evaluation_details?.flagged).toBe(true);
+    expect(saved!.evaluation_details?.strikes).toBe(3);
+    expect(saved!.evaluation_details?.flag_reason).toBe('FLAGGED: EXTERNAL BROWSING DETECTED');
+
+    // Verify live Leaderboard reflects the flag
+    const leaderboard = await fetchLeaderboardEntries();
+    const entry = leaderboard.find((e) => e.participantName === studentName);
+    expect(entry).toBeDefined();
+    expect(entry!.flagged).toBe(true);
+    expect(entry!.flagReason).toBe('FLAGGED: EXTERNAL BROWSING DETECTED');
+    expect(entry!.strikes).toBe(3);
   }, 15000);
 });

@@ -126,6 +126,8 @@ export const AdminLeaderboard: React.FC<AdminLeaderboardProps> = ({ onExit }) =>
       'Time Taken',
       'Time Taken (Seconds)',
       'Tab Switches',
+      'Strikes (Out of 3)',
+      'Integrity Status',
       'Accused Suspect',
       'Correct Culprit?',
       'Critical Clues Found',
@@ -141,6 +143,8 @@ export const AdminLeaderboard: React.FC<AdminLeaderboardProps> = ({ onExit }) =>
       `"${e.timeTakenFormatted}"`,
       e.timeTakenSeconds,
       e.tabSwitches || 0,
+      e.strikes || 0,
+      e.flagged ? '"FLAGGED: EXTERNAL BROWSING DETECTED"' : '"CLEAN"',
       `"${e.accusedSuspect.replace(/"/g, '""')}"`,
       e.isCorrectCulprit ? 'YES (Dr. Evelyn Hayes)' : 'NO',
       e.cluesCount,
@@ -581,9 +585,17 @@ export const AdminLeaderboard: React.FC<AdminLeaderboardProps> = ({ onExit }) =>
                             <span>{row.participantName}</span>
                             {isTop1 && <Sparkles className="w-3.5 h-3.5 text-amber-500" />}
                           </div>
-                          <span className="text-[10px] text-stone-500 dark:text-slate-500 font-mono">
-                            {row.confirmationCode}
-                          </span>
+                          <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
+                            <span className="text-[10px] text-stone-500 dark:text-slate-500 font-mono">
+                              {row.confirmationCode}
+                            </span>
+                            {row.flagged && (
+                              <span className="px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-800 text-[9px] font-bold uppercase tracking-wider flex items-center space-x-1 animate-pulse">
+                                <AlertTriangle className="w-3 h-3 text-red-600 dark:text-red-400" />
+                                <span>FLAGGED: EXTERNAL BROWSING DETECTED</span>
+                              </span>
+                            )}
+                          </div>
                         </td>
 
                         {/* Score */}
@@ -680,6 +692,13 @@ export const AdminLeaderboard: React.FC<AdminLeaderboardProps> = ({ onExit }) =>
             </div>
 
             {/* Quick Metrics Header inside modal */}
+            {selectedEntry.flagged && (
+              <div className="p-3.5 rounded-xl bg-red-100 dark:bg-red-950/80 border border-red-300 dark:border-red-800 text-red-900 dark:text-red-200 text-xs font-mono font-bold flex items-center space-x-2 animate-pulse">
+                <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />
+                <span>INTEGRITY AUDIT: FLAGGED: EXTERNAL BROWSING DETECTED ({selectedEntry.strikes || 3}/3 Strikes recorded)</span>
+              </div>
+            )}
+
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[11px]">
               <div className="p-3 rounded-xl bg-stone-200/60 dark:bg-slate-800/60 border border-stone-300 dark:border-slate-700">
                 <span className="text-stone-500 block">TOTAL SCORE</span>

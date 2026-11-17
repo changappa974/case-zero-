@@ -367,20 +367,27 @@ export async function submitInvestigation(
   participantName?: string,
   startedAt?: string,
   isAutoSubmit?: boolean,
-  tabSwitches?: number
+  tabSwitches?: number,
+  isFlagged?: boolean,
+  flagReason?: string,
+  strikes?: number
 ): Promise<SubmissionReceipt> {
   let suspectId = selectedSuspectId;
   let evidenceCodes = selectedEvidenceCodes && selectedEvidenceCodes.length > 0 ? selectedEvidenceCodes : ['EV-01'];
   let explanation = (incidentExplanation || '').trim();
 
+  const isDisqualifiedFlag = Boolean(isFlagged || (strikes !== undefined && strikes >= 3));
+  const effectiveFlagReason = flagReason || (isDisqualifiedFlag ? 'FLAGGED: EXTERNAL BROWSING DETECTED' : undefined);
+
   if (isAutoSubmit) {
     if (!suspectId) {
       suspectId = '11111111-2222-3333-4444-555555555501'; // Fallback if no suspect selected
     }
+    const prefix = isDisqualifiedFlag ? `[AUTO-SUBMITTED // ${effectiveFlagReason}] ` : '[Auto-submitted upon timer expiration] ';
     if (!explanation) {
-      explanation = '[Auto-submitted at 00:00 timer limit: no written deduction was provided]';
+      explanation = `${prefix}No written deduction was provided.`;
     } else if (explanation.length < 30) {
-      explanation = `${explanation} [Auto-submitted upon 15:00 timer expiration]`;
+      explanation = `${prefix}${explanation}`;
     }
   } else {
     if (explanation.length < 30) {
@@ -462,6 +469,9 @@ export async function submitInvestigation(
       participant_name: participantName || 'Agent',
       duration_seconds: durationSeconds,
       tab_switches: tabSwitches !== undefined ? tabSwitches : 0,
+      strikes: strikes !== undefined ? strikes : 0,
+      flagged: isDisqualifiedFlag,
+      flag_reason: effectiveFlagReason,
       suspect_matched: isCulpritMatch,
       suspect_score: isCulpritMatch ? 40 : 0,
       evidence_score: evidenceScore,
@@ -626,6 +636,12 @@ export async function fetchLeaderboardEntries(): Promise<LeaderboardEntry[]> {
       (sub.selected_suspect && sub.selected_suspect.toLowerCase().includes('evelyn'))
     );
 
+    const isFlagged = Boolean(
+      sub.evaluation_details?.flagged ||
+      (sub.evaluation_details?.strikes && sub.evaluation_details.strikes >= 3) ||
+      (sub.evaluation_details?.flag_reason && sub.evaluation_details.flag_reason.includes('FLAGGED'))
+    );
+
     return {
       id: sub.id,
       rank: 0,
@@ -641,6 +657,9 @@ export async function fetchLeaderboardEntries(): Promise<LeaderboardEntry[]> {
       submittedAt: sub.submitted_at || new Date().toISOString(),
       confirmationCode: 'CZ-' + sub.id.substring(0, 8).toUpperCase(),
       tabSwitches: sub.evaluation_details?.tab_switches || 0,
+      flagged: isFlagged,
+      flagReason: sub.evaluation_details?.flag_reason || sub.evaluation_details?.flagReason || (isFlagged ? 'FLAGGED: EXTERNAL BROWSING DETECTED' : undefined),
+      strikes: sub.evaluation_details?.strikes || 0,
     };
   });
 

@@ -69,6 +69,16 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
       const { participant, session } = await registerParticipant(trimmed);
       soundFX.playClueFound();
       soundFX.startAmbientHum();
+
+      // Forced Fullscreen Mode (Kiosk Mode) trigger on Start Investigation
+      try {
+        if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else if ((document.documentElement as any).webkitRequestFullscreen) {
+          (document.documentElement as any).webkitRequestFullscreen();
+        }
+      } catch (e) {}
+
       onStart(participant, session);
     } catch (err: any) {
       setErrorMessage(err.message || 'Registration failed. Please try again.');

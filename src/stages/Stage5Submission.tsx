@@ -27,6 +27,8 @@ interface Stage5SubmissionProps {
   onDraftExplanationChange?: (text: string) => void;
   isAutoSubmitting?: boolean;
   tabSwitchCount?: number;
+  strikeCount?: number;
+  isFlagged?: boolean;
 }
 
 export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
@@ -45,6 +47,8 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
   onDraftExplanationChange,
   isAutoSubmitting = false,
   tabSwitchCount = 0,
+  strikeCount = 0,
+  isFlagged = false,
 }) => {
   // Initialize with drafted values or saved localStorage
   const [selectedSuspectId, setSelectedSuspectId] = useState<string>(() => {
@@ -246,6 +250,20 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
 
         {/* STYLISH GRAPHIC CARD // CASE ZERO CERTIFIED */}
         <div className="space-y-4">
+          {(isFlagged || strikeCount >= 3) && (
+            <div className="p-4 rounded-2xl bg-red-100 border-2 border-red-400 text-red-950 font-mono text-xs flex items-center space-x-3 shadow-md animate-pulse">
+              <AlertTriangle className="w-5 h-5 text-red-700 shrink-0" />
+              <div>
+                <span className="font-black uppercase tracking-wider block text-red-800">
+                  ⚠️ FLAGGED: EXTERNAL BROWSING DETECTED ({strikeCount || 3}/3 Strikes)
+                </span>
+                <span className="font-sans text-[11px] text-stone-700">
+                  Multiple window exits were recorded during your examination. Your submission has been audited and tagged for judge review.
+                </span>
+              </div>
+            </div>
+          )}
+
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
             <div className="flex items-center space-x-2">
               <Award className="w-5 h-5 text-amber-600" />

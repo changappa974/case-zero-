@@ -156,6 +156,33 @@ class SoundFXService {
     } catch (e) {}
   }
 
+  // Window Exit / Anti-Cheat Warning Chime
+  public playWindowExitChime() {
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      [620, 440, 310].forEach((freq, idx) => {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.12);
+        gain.gain.setValueAtTime(0.12, now + idx * 0.12);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.12 + 0.28);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now + idx * 0.12);
+        osc.stop(now + idx * 0.12 + 0.28);
+      });
+    } catch (e) {}
+  }
+
   // Walkie-Talkie Radio Squelch & Static
   public playRadioSquelch(durationSec: number = 0.3) {
     if (this.isMuted) return;

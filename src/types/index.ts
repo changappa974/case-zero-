@@ -133,6 +133,9 @@ export interface LeaderboardEntry {
   submittedAt: string;
   confirmationCode?: string;
   tabSwitches?: number;
+  flagged?: boolean;
+  flagReason?: string;
+  strikes?: number;
 }
 
 export interface CCTVFeed {

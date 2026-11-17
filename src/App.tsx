@@ -10,7 +10,7 @@ import { InvestigationStage, Participant, InvestigationSession, SubmissionReceip
 import { restoreActiveSession, updateSessionProgress, submitInvestigation, resetForNextParticipant } from './lib/supabase';
 import { soundFX } from './lib/audioService';
 import { AdminLeaderboard } from './pages/AdminLeaderboard';
-import { RotateCcw } from 'lucide-react';
+import { RotateCcw, AlertTriangle, ShieldAlert, Maximize2, Lock, EyeOff } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [participant, setParticipant] = useState<Participant | null>(null);
@@ -32,10 +32,16 @@ export const App: React.FC = () => {
   const [draftExplanation, setDraftExplanation] = useState<string>('');
   const autoSubmitTriggeredRef = useRef<boolean>(false);
 
-  // Tab-Switch Monitoring
+  // Tab-Switch & Kiosk Anti-Cheat States
   const [tabSwitchCount, setTabSwitchCount] = useState<number>(0);
   const [showTabSwitchWarning, setShowTabSwitchWarning] = useState<boolean>(false);
   const tabWarningTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const [isFullscreenLost, setIsFullscreenLost] = useState<boolean>(false);
+  const [isWindowBlurred, setIsWindowBlurred] = useState<boolean>(false);
+  const [strikeCount, setStrikeCount] = useState<number>(0);
+  const [isDisqualified, setIsDisqualified] = useState<boolean>(false);
+  const lastStrikeTimeRef = useRef<number>(0);
 
   const [isAdminView, setIsAdminView] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
@@ -141,39 +147,183 @@ export const App: React.FC = () => {
     return () => clearInterval(interval);
   }, [participant, session, draftSuspectId, draftEvidenceCodes, draftExplanation]);
 
-  // Tab-Switch Monitoring & Alert Badge
+  // Request Fullscreen Helper (Kiosk Mode)
+  const handleResumeFullscreen = () => {
+    try {
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else if ((document.documentElement as any).webkitRequestFullscreen) {
+        (document.documentElement as any).webkitRequestFullscreen();
+      }
+    } catch (e) {}
+    setIsFullscreenLost(false);
+    setIsWindowBlurred(false);
+  };
+
+  // Register an Infraction Strike (Debounced 1.5s to avoid duplicate events on app-switch)
+  const registerStrike = (reason: 'window_exit' | 'fullscreen_exit') => {
+    if (isAdminView || !participant || !session || session.status === 'submitted') {
+      return;
+    }
+
+    const now = Date.now();
+    if (now - lastStrikeTimeRef.current < 1500) {
+      return;
+    }
+    lastStrikeTimeRef.current = now;
+
+    soundFX.playWindowExitChime();
+
+    setStrikeCount((prev) => {
+      const next = prev + 1;
+      setTabSwitchCount((tsc) => tsc + 1);
+      setShowTabSwitchWarning(true);
+
+      if (tabWarningTimeoutRef.current) {
+        clearTimeout(tabWarningTimeoutRef.current);
+      }
+      tabWarningTimeoutRef.current = setTimeout(() => {
+        setShowTabSwitchWarning(false);
+      }, 7000);
+
+      // On Strike 3: Disqualify and Auto-Submit immediately!
+      if (next >= 3) {
+        setIsDisqualified(true);
+        if (!autoSubmitTriggeredRef.current) {
+          autoSubmitTriggeredRef.current = true;
+          handleAutoSubmit(true, 'FLAGGED: EXTERNAL BROWSING DETECTED', 3);
+        }
+      }
+      return next;
+    });
+  };
+
+  // 1. Inspect, DevTools & Navigation Shortcut Blocking (F12, Ctrl+Shift+I/J/C, Ctrl+U, Right-Click, beforeunload)
   useEffect(() => {
-    if (!participant || !session || session.status === 'submitted') return;
+    if (isAdminView || !participant || !session || session.status === 'submitted') {
+      return;
+    }
 
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        // User switched back to Case Zero window
-        setTabSwitchCount((prev) => {
-          const next = prev + 1;
-          setShowTabSwitchWarning(true);
-          soundFX.playAlertBeep();
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Block F12 (DevTools)
+      if (e.key === 'F12' || e.keyCode === 123) {
+        e.preventDefault();
+        e.stopPropagation();
+        soundFX.playAlertBeep();
+        return false;
+      }
 
-          if (tabWarningTimeoutRef.current) {
-            clearTimeout(tabWarningTimeoutRef.current);
-          }
-          // Auto-fade warning alert after 6 seconds
-          tabWarningTimeoutRef.current = setTimeout(() => {
-            setShowTabSwitchWarning(false);
-          }, 6000);
+      // Block DevTools: Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C / Cmd+Option+I/J/C
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        e.shiftKey &&
+        (e.key === 'I' || e.key === 'i' ||
+         e.key === 'J' || e.key === 'j' ||
+         e.key === 'C' || e.key === 'c')
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        soundFX.playAlertBeep();
+        return false;
+      }
 
-          return next;
-        });
+      // Block View Source: Ctrl+U / Cmd+Option+U
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'U' || e.key === 'u')) {
+        e.preventDefault();
+        e.stopPropagation();
+        soundFX.playAlertBeep();
+        return false;
+      }
+
+      // Intercept F11 to maintain Kiosk Fullscreen
+      if (e.key === 'F11') {
+        e.preventDefault();
+        handleResumeFullscreen();
+        return false;
       }
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    // Block right-click context menu across the entire investigation
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      soundFX.playAlertBeep();
+      return false;
+    };
+
+    // Prompt user before closing or navigating away
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = 'You have an active Case Zero exam in progress. Leaving will forfeit or submit your work.';
+      return e.returnValue;
+    };
+
+    window.addEventListener('keydown', handleKeyDown, true);
+    window.addEventListener('contextmenu', handleContextMenu, true);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
     return () => {
+      window.removeEventListener('keydown', handleKeyDown, true);
+      window.removeEventListener('contextmenu', handleContextMenu, true);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isAdminView, participant, session]);
+
+  // 2. Fullscreen & Window Focus Lockout & Strike Monitor
+  useEffect(() => {
+    if (isAdminView || !participant || !session || session.status === 'submitted') {
+      return;
+    }
+
+    const handleFullscreenChange = () => {
+      const isFull = Boolean(document.fullscreenElement || (document as any).webkitFullscreenElement);
+      if (!isFull) {
+        setIsFullscreenLost(true);
+        registerStrike('fullscreen_exit');
+      } else {
+        setIsFullscreenLost(false);
+      }
+    };
+
+    const handleBlur = () => {
+      setIsWindowBlurred(true);
+      registerStrike('window_exit');
+    };
+
+    const handleFocus = () => {
+      setIsWindowBlurred(false);
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setIsWindowBlurred(true);
+        registerStrike('window_exit');
+      } else {
+        setIsWindowBlurred(false);
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    window.addEventListener('blur', handleBlur);
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('focus', handleFocus);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       if (tabWarningTimeoutRef.current) clearTimeout(tabWarningTimeoutRef.current);
     };
-  }, [participant, session]);
+  }, [isAdminView, participant, session, draftSuspectId, draftEvidenceCodes, draftExplanation]);
 
-  const handleAutoSubmit = async () => {
+  const handleAutoSubmit = async (
+    isFlagged: boolean = false,
+    flagReason: string = '',
+    strikes: number = 0
+  ) => {
     if (!participant || !session || session.status === 'submitted') return;
 
     setIsAutoSubmitting(true);
@@ -208,13 +358,18 @@ export const App: React.FC = () => {
         participant.participant_name,
         session.started_at,
         true, // isAutoSubmit = true
-        tabSwitchCount
+        tabSwitchCount,
+        isFlagged,
+        flagReason,
+        strikes
       );
 
       setSubmissionReceipt(receipt);
       setSession((prev) => (prev ? { ...prev, status: 'submitted' } : null));
       setCurrentStage(5);
       setMaxStageReached(5);
+      setIsFullscreenLost(false);
+      setIsWindowBlurred(false);
       soundFX.playClueFound();
     } catch (err) {
       console.error('Failed to auto-submit investigation:', err);
@@ -243,6 +398,10 @@ export const App: React.FC = () => {
       setTimeLeft(900);
       setTabSwitchCount(0);
       setShowTabSwitchWarning(false);
+      setIsFullscreenLost(false);
+      setIsWindowBlurred(false);
+      setStrikeCount(0);
+      setIsDisqualified(false);
       autoSubmitTriggeredRef.current = false;
       setIsResetting(false);
       soundFX.playClueFound();
@@ -272,6 +431,10 @@ export const App: React.FC = () => {
     setTimeLeft(900);
     setTabSwitchCount(0);
     setShowTabSwitchWarning(false);
+    setIsFullscreenLost(false);
+    setIsWindowBlurred(false);
+    setStrikeCount(0);
+    setIsDisqualified(false);
     autoSubmitTriggeredRef.current = false;
     soundFX.startAmbientHum();
   };
@@ -441,9 +604,83 @@ export const App: React.FC = () => {
             onDraftExplanationChange={setDraftExplanation}
             isAutoSubmitting={isAutoSubmitting}
             tabSwitchCount={tabSwitchCount}
+            strikeCount={strikeCount}
+            isFlagged={isDisqualified || strikeCount >= 3}
           />
         )}
       </main>
+
+      {/* Forced Fullscreen Mode (Kiosk Mode) & Focus Lockout Overlay */}
+      {(isFullscreenLost || isWindowBlurred) && !isAdminView && participant && session && session.status !== 'submitted' && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-xl p-4 sm:p-6 animate-fade-in text-[#1c1917]">
+          <div className="relative w-full max-w-lg bg-[#f5f0e6] border-2 border-red-500 rounded-3xl p-6 sm:p-8 shadow-2xl text-center space-y-6">
+            
+            {/* Top Warning Banner */}
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-red-100 border border-red-300 text-red-900 font-mono text-xs font-bold uppercase tracking-wider">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-ping"></span>
+              <span>SECURITY EXAM LOCKOUT</span>
+            </div>
+
+            {/* Icon */}
+            <div className="w-16 h-16 mx-auto rounded-2xl bg-red-100 border border-red-300 flex items-center justify-center text-red-600 shadow-inner">
+              <AlertTriangle className="w-8 h-8 animate-bounce" />
+            </div>
+
+            {/* Exact Required Lockout Messages */}
+            <div className="space-y-2">
+              <h2 className="text-xl sm:text-2xl font-black font-display text-[#1c1917] tracking-tight">
+                {isWindowBlurred
+                  ? "PAUSED: Window exit detected. Return to Case Zero immediately."
+                  : "⚠️ FULLSCREEN REQUIRED: You cannot leave the Case Zero exam window."}
+              </h2>
+              <p className="text-xs sm:text-sm text-stone-700 font-sans max-w-sm mx-auto leading-relaxed">
+                Case Zero runs under locked kiosk conditions. All tab-switches, window blurs, and fullscreen exits are logged and audited.
+              </p>
+            </div>
+
+            {/* 3-Strike Warning Meter */}
+            <div className="p-4 rounded-2xl bg-[#e6dfd2] border border-[#cfc7b7] space-y-2 text-xs font-mono">
+              <div className="flex justify-between items-center font-bold">
+                <span className="text-stone-800">INFRACTION AUDIT:</span>
+                <span className={`px-2.5 py-0.5 rounded-full ${
+                  strikeCount >= 2 ? 'bg-red-200 text-red-950 font-black' : 'bg-amber-200 text-amber-950'
+                }`}>
+                  Strike {strikeCount} of 3
+                </span>
+              </div>
+              <div className="w-full bg-[#d6cdbd] h-2.5 rounded-full overflow-hidden">
+                <div 
+                  className={`h-full transition-all duration-300 ${
+                    strikeCount === 1 ? 'w-1/3 bg-amber-500' :
+                    strikeCount === 2 ? 'w-2/3 bg-orange-600' :
+                    strikeCount >= 3 ? 'w-full bg-red-600 animate-pulse' : 'w-0'
+                  }`}
+                />
+              </div>
+              <p className="text-[11px] text-red-800 font-bold font-sans text-left pt-1">
+                {strikeCount === 1 && "⚠️ Strike 1/3: Stay focused on Case Zero. Do not switch tabs or open external windows."}
+                {strikeCount === 2 && "🚨 Strike 2/3 (FINAL WARNING): One more window exit will immediately disqualify and auto-submit your exam."}
+                {strikeCount >= 3 && "⛔ Strike 3/3: Auto-submitting and tagging score with FLAGGED: EXTERNAL BROWSING DETECTED for judges."}
+              </p>
+            </div>
+
+            {/* Action Button */}
+            {strikeCount < 3 ? (
+              <button
+                onClick={handleResumeFullscreen}
+                className="w-full py-3.5 px-6 rounded-2xl bg-blue-900 hover:bg-blue-950 text-white font-mono font-bold text-xs sm:text-sm uppercase tracking-wider shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5"
+              >
+                {isFullscreenLost ? "RETURN TO FULLSCREEN" : "RESUME INVESTIGATION"}
+              </button>
+            ) : (
+              <div className="text-xs font-mono text-red-700 font-bold animate-pulse">
+                Auto-submitting disqualified session... Please wait.
+              </div>
+            )}
+
+          </div>
+        </div>
+      )}
 
       {/* 1-Second Lab PC Reset Transition Overlay */}
       {isResetting && (
