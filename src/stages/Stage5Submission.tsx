@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Lock, CheckCircle2, AlertTriangle, ShieldCheck, FileCheck, 
-  Send, Sparkles, Printer, User, FileText, CornerDownRight,
+  Send, Sparkles, User, FileText, CornerDownRight,
   RotateCcw, UserPlus, Clock, Download, Award
 } from 'lucide-react';
 import { INITIAL_SUSPECTS, INITIAL_EVIDENCE } from '../lib/caseData';
@@ -403,14 +403,6 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
               <Download className="w-4 h-4 text-stone-950" />
               <span>DOWNLOAD DETECTIVE CARD (PNG)</span>
             </button>
-
-            <button
-              onClick={() => window.print()}
-              className="w-full sm:w-auto px-5 py-3.5 rounded-2xl bg-[#e6dfd2] hover:bg-[#ded6c7] border border-[#cfc7b7] text-stone-800 font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center space-x-2 transition shadow-sm"
-            >
-              <Printer className="w-4 h-4 text-stone-700" />
-              <span>PRINT RECEIPT</span>
-            </button>
           </div>
         </div>
 
@@ -447,17 +439,10 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
             </div>
           </div>
 
-          <div className="pt-3 border-t border-[#cfc7b7] flex flex-col sm:flex-row items-center justify-between gap-3">
-            <span className="text-[11px] text-stone-600 font-medium">
+          <div className="pt-3 border-t border-[#cfc7b7]">
+            <span className="text-[11px] text-stone-600 font-medium block">
               Evaluation & final scores are reviewed confidentially by the challenge organizers.
             </span>
-            <button
-              onClick={() => window.print()}
-              className="px-4 py-2 rounded-xl bg-[#e6dfd2] hover:bg-[#ded6c7] border border-[#cfc7b7] text-stone-800 font-mono text-xs font-bold flex items-center space-x-1.5 transition shadow-sm"
-            >
-              <Printer className="w-3.5 h-3.5 text-stone-700" />
-              <span>PRINT RECEIPT</span>
-            </button>
           </div>
 
           {/* NEXT PARTICIPANT / LAB PC RESET BUTTON */}

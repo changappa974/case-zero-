@@ -143,9 +143,15 @@ function setLocalStore<T>(key: string, data: T[]): void {
 // 1. Participant Registration (Supabase with Resilient Local Fallback)
 // --------------------------------------------------------------------------
 export async function registerParticipant(participantName: string): Promise<{ participant: Participant; session: InvestigationSession }> {
-  const cleanName = participantName.trim();
+  // Sanitize and validate name: letters (A-Z, a-z) and single spaces between words only
+  let cleanName = (participantName || '')
+    .replace(/[^a-zA-Z ]/g, '')
+    .replace(/^ +/, '')
+    .replace(/ {2,}/g, ' ')
+    .trim();
+
   if (!cleanName) {
-    throw new Error('Please enter your full name to begin the investigation.');
+    throw new Error('Please enter your full name (letters only) to begin the investigation.');
   }
 
   // Deduplication Check: Block retakes if this name has already submitted

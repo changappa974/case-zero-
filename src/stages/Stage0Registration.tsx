@@ -47,11 +47,34 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
     }
   };
 
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let raw = e.target.value;
+
+    // 1. Remove all characters that are NOT letters (A-Z, a-z) or space
+    let sanitized = raw.replace(/[^a-zA-Z ]/g, '');
+
+    // 2. Cannot start with space (first character must be a letter)
+    sanitized = sanitized.replace(/^ +/, '');
+
+    // 3. Only one space allowed at a time (no consecutive spaces)
+    sanitized = sanitized.replace(/ {2,}/g, ' ');
+
+    setFullName(sanitized);
+    if (errorMessage) setErrorMessage('');
+  };
+
   const handleStart = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = fullName.trim();
     if (!trimmed) {
-      setErrorMessage('Please enter your full name to proceed with authorization.');
+      setErrorMessage('Please enter your full name (letters only).');
+      soundFX.playAlertBeep();
+      return;
+    }
+
+    // Must strictly be letters with single spaces between words (no numbers, no symbols)
+    if (!/^[a-zA-Z]+( [a-zA-Z]+)*$/.test(trimmed)) {
+      setErrorMessage('Name may only contain letters with a single space between words (no numbers, symbols, or consecutive spaces).');
       soundFX.playAlertBeep();
       return;
     }
@@ -247,10 +270,7 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
                 id="fullName"
                 type="text"
                 value={fullName}
-                onChange={(e) => {
-                  setFullName(e.target.value);
-                  if (errorMessage) setErrorMessage('');
-                }}
+                onChange={handleNameChange}
                 placeholder="e.g., Detective Alex Mercer"
                 maxLength={60}
                 disabled={loading}
@@ -268,7 +288,7 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
               </div>
             )}
             <p className="mt-2 text-[11px] font-mono text-stone-600">
-              Your name links to your secure investigation session and final submission receipt. No email, phone, or password required.
+              Only letters (A–Z) and single spaces are allowed (e.g. <code>admin a a</code>). Numbers, symbols, and leading spaces are blocked.
             </p>
           </div>
 

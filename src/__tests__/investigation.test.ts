@@ -12,6 +12,11 @@ import {
 } from '../lib/supabase';
 import { CASE_DATA, INITIAL_SUSPECTS, INITIAL_EVIDENCE } from '../lib/caseData';
 
+function randomLetters(length = 8): string {
+  const letters = 'abcdefghijklmnopqrstuvwxyz';
+  return Array.from({ length }, () => letters[Math.floor(Math.random() * letters.length)]).join('');
+}
+
 describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity', () => {
   beforeEach(() => {
     localStorage.clear();
@@ -52,7 +57,7 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
   });
 
   it('submits investigation for Dr. Evelyn Hayes, calculates score securely, and seals answers', async () => {
-    const { participant, session } = await registerParticipant('Jordan Lee ' + Date.now());
+    const { participant, session } = await registerParticipant('Jordan Lee ' + randomLetters());
 
     // Dr. Evelyn Hayes ID
     const evelyn = INITIAL_SUSPECTS.find((s) => s.display_name === 'Dr. Evelyn Hayes');
@@ -86,7 +91,7 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
   }, 15000);
 
   it('rejects submissions with explanations that are too short', async () => {
-    const { participant, session } = await registerParticipant('Sam Vance ' + Date.now());
+    const { participant, session } = await registerParticipant('Sam Vance ' + randomLetters());
     const evelyn = INITIAL_SUSPECTS.find((s) => s.display_name === 'Dr. Evelyn Hayes');
 
     await expect(
@@ -95,7 +100,7 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
   }, 15000);
 
   it('safely auto-submits when 00:00 timer expires without losing partial work', async () => {
-    const { participant, session } = await registerParticipant('Taylor Quick ' + Date.now());
+    const { participant, session } = await registerParticipant('Taylor Quick ' + randomLetters());
     const evelyn = INITIAL_SUSPECTS.find((s) => s.display_name === 'Dr. Evelyn Hayes');
 
     // Auto submit with partial short explanation
@@ -127,7 +132,7 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
   });
 
   it('records tab switches accurately in submission audit records', async () => {
-    const { participant, session } = await registerParticipant('Morgan Lee ' + Date.now());
+    const { participant, session } = await registerParticipant('Morgan Lee ' + randomLetters());
     const evelyn = INITIAL_SUSPECTS.find((s) => s.display_name === 'Dr. Evelyn Hayes');
 
     const receipt = await submitInvestigation(
@@ -151,7 +156,7 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
   }, 15000);
 
   it('enforces Name Deduplication Check: blocks registration when participant has already submitted', async () => {
-    const uniqueName = 'Robin Vance ' + Date.now();
+    const uniqueName = 'Robin Vance ' + randomLetters();
     const { participant, session } = await registerParticipant(uniqueName);
     const evelyn = INITIAL_SUSPECTS.find((s) => s.display_name === 'Dr. Evelyn Hayes');
 
@@ -186,7 +191,7 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
   it('enforces Browser / Device Lockdown: sets permanent lock flag upon submission and requires organizer passcode to unlock', async () => {
     expect(isStationLocked()).toBe(false);
 
-    const { participant, session } = await registerParticipant('Lock Test User ' + Date.now());
+    const { participant, session } = await registerParticipant('Lock Test User ' + randomLetters());
     const evelyn = INITIAL_SUSPECTS.find((s) => s.display_name === 'Dr. Evelyn Hayes');
 
     await submitInvestigation(
@@ -218,7 +223,7 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
   }, 15000);
 
   it('enforces 3-strike disqualification and tags submission on the Leaderboard with FLAGGED: EXTERNAL BROWSING DETECTED for judges', async () => {
-    const studentName = 'Strike Disqualified User ' + Date.now();
+    const studentName = 'Strike Disqualified User ' + randomLetters();
     const { participant, session } = await registerParticipant(studentName);
     const evelyn = INITIAL_SUSPECTS.find((s) => s.display_name === 'Dr. Evelyn Hayes');
 
@@ -255,5 +260,21 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
     expect(entry!.flagged).toBe(true);
     expect(entry!.flagReason).toBe('FLAGGED: EXTERNAL BROWSING DETECTED');
     expect(entry!.strikes).toBe(3);
+  }, 15000);
+
+  it('enforces Name input rules: allows only letters and single spaces (e.g. admin a a) and strips/rejects numbers and symbols', async () => {
+    // 1. Valid names with letters and single space: e.g. admin a a
+    const validExample = 'admin a a ' + randomLetters();
+    const { participant } = await registerParticipant(validExample);
+    expect(participant.participant_name).toBe(validExample);
+
+    // 2. Name with numbers and symbols: sanitized to letters only
+    const rawWithSymbols = '  Detective #123 Alex @Mercer!  ';
+    const { participant: pSanitized } = await registerParticipant(rawWithSymbols);
+    expect(pSanitized.participant_name).toBe('Detective Alex Mercer');
+
+    // 3. Name with only numbers/symbols is rejected
+    await expect(registerParticipant('12345!@#$%')).rejects.toThrow('Please enter your full name');
+    await expect(registerParticipant('   ')).rejects.toThrow('Please enter your full name');
   }, 15000);
 });
