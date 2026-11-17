@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldAlert, ArrowRight, Video, Search, Users, Database, Fingerprint, Lock, AlertTriangle, CheckCircle2 } from 'lucide-react';
-import { registerParticipant, isStationLocked } from '../lib/supabase';
+import { ShieldAlert, ArrowRight, Video, Search, Users, Database, Fingerprint, Lock, KeyRound, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { registerParticipant, isStationLocked, unlockStation } from '../lib/supabase';
 import { Participant, InvestigationSession } from '../types';
 import { soundFX } from '../lib/audioService';
 
@@ -13,10 +13,39 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [stationLocked, setStationLocked] = useState<boolean>(false);
+  const [organizerPasscode, setOrganizerPasscode] = useState('');
+  const [passcodeError, setPasscodeError] = useState('');
+  const [passcodeSuccess, setPasscodeSuccess] = useState(false);
 
   useEffect(() => {
     setStationLocked(isStationLocked());
   }, []);
+
+  const handleUnlockStation = (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasscodeError('');
+    if (!organizerPasscode.trim()) {
+      setPasscodeError('Please enter the organizer master passcode.');
+      soundFX.playAlertBeep();
+      return;
+    }
+
+    const success = unlockStation(organizerPasscode);
+    if (success) {
+      soundFX.playClueFound();
+      setPasscodeSuccess(true);
+      setTimeout(() => {
+        setStationLocked(false);
+        setPasscodeSuccess(false);
+        setOrganizerPasscode('');
+        setFullName('');
+        setErrorMessage('');
+      }, 600);
+    } else {
+      soundFX.playAlertBeep();
+      setPasscodeError('Invalid organizer passcode. Station remains locked.');
+    }
+  };
 
   const handleStart = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,14 +120,54 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
             </p>
           </div>
 
-          <div className="pt-4 border-t border-[#cfc7b7] text-center">
-            <a
-              href="/leaderboard"
-              className="inline-flex items-center space-x-1.5 px-5 py-2.5 rounded-xl bg-blue-900 hover:bg-blue-950 text-white text-xs font-mono font-bold tracking-wider uppercase transition shadow-sm"
-            >
-              <span>VIEW EVENT LEADERBOARD</span>
-              <span>&rarr;</span>
-            </a>
+          {/* Organizer / Proctor Unlock Gate */}
+          <div className="mt-6 bg-[#e6dfd2] border border-[#cfc7b7] rounded-2xl p-5 sm:p-6 shadow-inner space-y-4">
+            <div className="flex items-center space-x-2 text-amber-950">
+              <KeyRound className="w-4 h-4 text-amber-900" />
+              <h3 className="font-mono text-xs uppercase tracking-wider font-bold text-amber-950">
+                ORGANIZER / PROCTOR UNLOCK GATE
+              </h3>
+            </div>
+            <p className="text-xs text-stone-700 font-sans leading-relaxed">
+              For lab PCs and shared laptops being reused across rounds, event organizers can enter the master passcode (<code className="font-mono font-bold text-amber-900 bg-amber-200/60 px-1.5 py-0.5 rounded">frostpeak2026</code> or <code className="font-mono font-bold text-amber-900 bg-amber-200/60 px-1.5 py-0.5 rounded">admin2026</code>) below to unlock this station and reset fresh from the start for the next student.
+            </p>
+
+            <form onSubmit={handleUnlockStation} className="space-y-3">
+              <div>
+                <input
+                  type="password"
+                  value={organizerPasscode}
+                  onChange={(e) => {
+                    setOrganizerPasscode(e.target.value);
+                    if (passcodeError) setPasscodeError('');
+                  }}
+                  placeholder="Enter organizer passcode (frostpeak2026 / admin2026)"
+                  className="w-full bg-[#faf7f2] border-2 border-[#cfc7b7] focus:border-blue-800 focus:ring-2 focus:ring-blue-200 rounded-xl px-4 py-2.5 text-sm font-mono text-[#1c1917] placeholder-stone-400 font-semibold"
+                />
+              </div>
+
+              {passcodeError && (
+                <p className="text-xs font-mono text-red-700 font-bold flex items-center space-x-1.5">
+                  <AlertTriangle className="w-4 h-4 shrink-0" />
+                  <span>{passcodeError}</span>
+                </p>
+              )}
+
+              {passcodeSuccess && (
+                <p className="text-xs font-mono text-emerald-800 font-bold flex items-center space-x-1.5">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-700" />
+                  <span>Station unlocked! Initializing clean registration terminal...</span>
+                </p>
+              )}
+
+              <button
+                type="submit"
+                className="w-full py-3 px-4 bg-amber-800 hover:bg-amber-900 text-white font-mono font-bold text-xs tracking-wider uppercase rounded-xl transition shadow-sm hover:shadow flex items-center justify-center space-x-2"
+              >
+                <KeyRound className="w-4 h-4 text-amber-300" />
+                <span>UNLOCK STATION FOR NEXT DETECTIVE</span>
+              </button>
+            </form>
           </div>
         </div>
       </div>

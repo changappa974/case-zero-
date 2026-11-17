@@ -7,6 +7,7 @@ import {
   resetForNextParticipant,
   checkParticipantHasSubmitted,
   isStationLocked,
+  unlockStation,
   STATION_LOCK_KEY
 } from '../lib/supabase';
 import { CASE_DATA, INITIAL_SUSPECTS, INITIAL_EVIDENCE } from '../lib/caseData';
@@ -182,7 +183,7 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
     );
   }, 15000);
 
-  it('enforces Browser / Device Lockdown: sets permanent lock flag upon submission to prevent station re-takes', async () => {
+  it('enforces Browser / Device Lockdown: sets permanent lock flag upon submission and requires organizer passcode to unlock', async () => {
     expect(isStationLocked()).toBe(false);
 
     const { participant, session } = await registerParticipant('Lock Test User ' + Date.now());
@@ -203,6 +204,17 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
     // Station must be locked permanently on this device
     expect(isStationLocked()).toBe(true);
     expect(localStorage.getItem(STATION_LOCK_KEY)).toBe('true');
+
+    // Invalid passcode cannot unlock
+    const unlockFailed = unlockStation('wrongpass');
+    expect(unlockFailed).toBe(false);
+    expect(isStationLocked()).toBe(true);
+
+    // Organizer master passcode unlocks and resets station
+    const unlockSuccess = unlockStation('frostpeak2026');
+    expect(unlockSuccess).toBe(true);
+    expect(isStationLocked()).toBe(false);
+    expect(localStorage.getItem(STATION_LOCK_KEY)).toBeNull();
   }, 15000);
 
   it('enforces 3-strike disqualification and tags submission on the Leaderboard with FLAGGED: EXTERNAL BROWSING DETECTED for judges', async () => {
