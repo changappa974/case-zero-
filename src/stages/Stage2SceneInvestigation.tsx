@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { 
-  Camera, Volume2, VolumeX, ArrowRight, CheckCircle2, 
-  Radio, Clock, Eye, Sparkles, Activity 
+  Camera, ArrowRight, CheckCircle2, 
+  Clock, Eye, Sparkles 
 } from 'lucide-react';
-import { CCTV_FEEDS, AUDIO_LOGS } from '../lib/caseData';
-import { CCTVFeed, AudioLog } from '../types';
+import { CCTV_FEEDS } from '../lib/caseData';
+import { CCTVFeed } from '../types';
 import { soundFX } from '../lib/audioService';
 import { CinematicVideoPlayer, VideoHotspot } from '../components/CinematicVideoPlayer';
 
@@ -21,27 +21,11 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
 }) => {
   const [selectedCam, setSelectedCam] = useState<CCTVFeed>(CCTV_FEEDS[0]);
   const [activeHotspot, setActiveHotspot] = useState<VideoHotspot | null>(null);
-  
-  // Audio logs player state
-  const [playingAudioId, setPlayingAudioId] = useState<string | null>(null);
 
   const handleSelectCam = (cam: CCTVFeed) => {
     soundFX.playCameraSwitch();
     setSelectedCam(cam);
     setActiveHotspot(null);
-  };
-
-  const handlePlayAudio = (log: AudioLog) => {
-    if (playingAudioId === log.id) {
-      soundFX.stopAudioPlayback();
-      setPlayingAudioId(null);
-    } else {
-      soundFX.stopAudioPlayback();
-      setPlayingAudioId(log.id);
-      soundFX.playVoiceLog(log, () => {
-        setPlayingAudioId(null);
-      });
-    }
   };
 
   const handleCollectClue = (code: string) => {
@@ -70,10 +54,10 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
             <span>SURVEILLANCE & RECONSTRUCTION</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-black font-display text-[#1c1917] mt-1">
-            INVESTIGATE THE CCTV RECORDINGS & AUDIO REELS
+            INVESTIGATE THE ESTATE CCTV SURVEILLANCE
           </h2>
           <p className="text-xs sm:text-sm text-stone-700 mt-1 font-sans">
-            Review 5 synchronized estate surveillance camera feeds. Switch angles, scrub the timeline, inspect suspicious reflections with the magnify lens, and listen to intercepted audio recordings.
+            Review 5 synchronized estate surveillance camera feeds. Switch angles, scrub the timeline, and inspect suspicious forensic details with the interactive canvas markers.
           </p>
         </div>
 
@@ -178,75 +162,43 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
 
         </div>
 
-        {/* Right Column: Audio Intercepts & Hotspot Inspector (Span 1) */}
-        <div className="space-y-6">
+        {/* Right Column: Feed Details & Hotspot Inspector (Span 1) */}
+        <div className="space-y-5">
           
-          {/* Acoustic & Audio Logs Panel */}
-          <div className="p-5 rounded-2xl bg-[#f5f0e6] border border-[#cfc7b7] space-y-4 shadow-sm">
+          {/* Surveillance Camera Intelligence Panel */}
+          <div className="p-5 rounded-2xl bg-[#f5f0e6] border border-[#cfc7b7] space-y-3.5 shadow-sm font-mono text-xs">
             <div className="flex items-center justify-between border-b border-[#cfc7b7] pb-3">
-              <div className="flex items-center space-x-2 text-blue-950 font-mono text-xs font-bold">
-                <Radio className="w-4 h-4 text-blue-800" />
-                <span>AUDIO INTERCEPT REELS</span>
+              <div className="flex items-center space-x-2 text-blue-950 font-bold">
+                <Camera className="w-4 h-4 text-blue-800" />
+                <span>SURVEILLANCE INTEL</span>
               </div>
-              <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-[#e6dfd2] border border-[#cfc7b7] text-stone-800 font-bold">
-                {AUDIO_LOGS.length} TAPES
+              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-950 border border-emerald-300 font-bold flex items-center space-x-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+                <span>FEED LIVE</span>
               </span>
             </div>
 
-            <div className="space-y-3">
-              {AUDIO_LOGS.map((log) => {
-                const isPlayingThis = playingAudioId === log.id;
+            <div className="space-y-2">
+              <div>
+                <span className="text-stone-500 text-[10px] uppercase font-bold block">ACTIVE ANGLE:</span>
+                <h4 className="font-bold text-sm text-[#1c1917] font-display">{selectedCam.camCode} // {selectedCam.title}</h4>
+              </div>
 
-                return (
-                  <div
-                    key={log.id}
-                    className={`p-3.5 rounded-xl border transition-all ${
-                      isPlayingThis
-                        ? 'bg-amber-100 border-2 border-amber-500 shadow-sm'
-                        : 'bg-[#e6dfd2] border-[#cfc7b7] hover:border-[#b8b09f]'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-1 text-[11px] font-mono">
-                      <span className="text-amber-950 font-bold">{log.code}</span>
-                      <span className="text-stone-600 font-semibold">{log.timestamp}</span>
-                    </div>
-                    <p className="text-xs font-bold text-[#1c1917] mb-1">
-                      {log.title}
-                    </p>
-                    <div className="text-xs text-stone-900 font-sans mb-3 leading-relaxed bg-[#fbf9f5] p-3 rounded-xl border border-[#cfc7b7] space-y-2">
-                      <p className="font-medium text-stone-900 leading-relaxed">{log.transcript}</p>
-                      {log.clueMeaning && (
-                        <div className="pt-2 border-t border-[#e2dbce] flex items-start space-x-1.5 text-[11px]">
-                          <span className="text-amber-900 font-bold shrink-0">💡 What it means:</span>
-                          <span className="text-stone-700 font-semibold">{log.clueMeaning}</span>
-                        </div>
-                      )}
-                    </div>
+              <div className="flex items-center space-x-1.5 text-stone-700 text-[11px] bg-[#e6dfd2] p-2 rounded-lg border border-[#cfc7b7]">
+                <Clock className="w-3.5 h-3.5 text-blue-900 shrink-0" />
+                <span>TIMECODE: <strong>{selectedCam.timestamp}</strong></span>
+              </div>
 
-                    {/* Interactive Playable Button */}
-                    <button
-                      onClick={() => handlePlayAudio(log)}
-                      className={`w-full py-2 rounded-lg font-mono text-xs font-bold flex items-center justify-center space-x-2 transition ${
-                        isPlayingThis
-                          ? 'bg-amber-500 text-stone-950 shadow-md animate-pulse'
-                          : 'bg-blue-800 hover:bg-blue-900 text-white shadow-sm'
-                      }`}
-                    >
-                      {isPlayingThis ? (
-                        <>
-                          <Activity className="w-3.5 h-3.5 animate-spin text-stone-950" />
-                          <span>TRANSMITTING... (STOP)</span>
-                        </>
-                      ) : (
-                        <>
-                          <Volume2 className="w-3.5 h-3.5 text-white" />
-                          <span>PLAY AUDIO REEL</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                );
-              })}
+              {selectedCam.location && (
+                <div className="text-stone-700 text-[11px]">
+                  <span className="text-stone-500 font-bold block text-[10px]">ZONE:</span>
+                  <span>{selectedCam.location}</span>
+                </div>
+              )}
+
+              <p className="text-stone-600 font-sans text-xs pt-1 leading-relaxed border-t border-[#cfc7b7]">
+                Click on the interactive markers on the feed to zoom in and log critical evidence into your case file.
+              </p>
             </div>
           </div>
 
@@ -260,7 +212,7 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
                 </span>
                 <button
                   onClick={() => setActiveHotspot(null)}
-                  className="text-stone-500 hover:text-stone-900 p-1"
+                  className="text-stone-500 hover:text-stone-900 p-1 font-bold text-sm"
                 >
                   ✕
                 </button>
@@ -295,9 +247,12 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
               )}
             </div>
           ) : (
-            <div className="p-5 rounded-2xl bg-[#f5f0e6] border border-[#cfc7b7] text-center py-6 text-xs text-stone-600 font-mono space-y-2 shadow-sm">
-              <Eye className="w-6 h-6 mx-auto text-stone-500" />
-              <p>Click any pulsing amber marker on the footage to inspect suspicious objects.</p>
+            <div className="p-5 rounded-2xl bg-[#f5f0e6] border border-[#cfc7b7] text-center py-8 text-xs text-stone-600 font-mono space-y-2 shadow-sm">
+              <Eye className="w-6 h-6 mx-auto text-blue-900/60" />
+              <p className="font-bold text-stone-800">INTERACTIVE INSPECTOR</p>
+              <p className="text-[11px] text-stone-600 font-sans">
+                Click any pulsing amber marker on the footage to inspect suspicious objects and log clues.
+              </p>
             </div>
           )}
 
@@ -308,11 +263,10 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
       {/* Navigation footer */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-[#cfc7b7] bg-[#f5f0e6] p-6 rounded-2xl shadow-sm">
         <p className="text-xs font-mono text-stone-700 font-medium">
-          Make sure to review all 5 cameras and listen to the audio logs before questioning the suspects.
+          Make sure to review all 5 cameras and collect forensic clues before questioning the suspects.
         </p>
         <button
           onClick={() => {
-            soundFX.stopAudioPlayback();
             soundFX.playCameraSwitch();
             onProceed();
           }}
