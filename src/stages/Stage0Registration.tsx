@@ -152,7 +152,7 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
               </h3>
             </div>
             <p className="text-xs text-stone-700 font-sans leading-relaxed">
-              For lab PCs and shared laptops being reused across rounds, event organizers can enter the master passcode (<code className="font-mono font-bold text-amber-900 bg-amber-200/60 px-1.5 py-0.5 rounded">frostpeak2026</code> or <code className="font-mono font-bold text-amber-900 bg-amber-200/60 px-1.5 py-0.5 rounded">admin2026</code>) below to unlock this station and reset fresh from the start for the next student.
+              For lab PCs and shared laptops being reused across rounds, event organizers can enter the master passcode below to unlock this station and reset fresh from the start for the next student.
             </p>
 
             <form onSubmit={handleUnlockStation} className="space-y-3">
@@ -164,7 +164,7 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
                     setOrganizerPasscode(e.target.value);
                     if (passcodeError) setPasscodeError('');
                   }}
-                  placeholder="Enter organizer passcode (frostpeak2026 / admin2026)"
+                  placeholder="Enter organizer passcode"
                   className="w-full bg-[#faf7f2] border-2 border-[#cfc7b7] focus:border-blue-800 focus:ring-2 focus:ring-blue-200 rounded-xl px-4 py-2.5 text-sm font-mono text-[#1c1917] placeholder-stone-400 font-semibold"
                 />
               </div>

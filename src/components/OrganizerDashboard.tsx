@@ -176,9 +176,6 @@ export const OrganizerDashboard: React.FC<OrganizerDashboardProps> = ({ onClose 
                     className="w-full bg-charcoal-950 border border-charcoal-700 focus:border-amber-500 rounded-lg p-3 text-sm text-white font-mono outline-none"
                     autoFocus
                   />
-                  <p className="text-[11px] text-gray-500 mt-1 font-mono">
-                    (Default authorized key: <code className="text-amber-400">meridian-zero-2026</code>)
-                  </p>
                 </div>
 
                 {authError && (

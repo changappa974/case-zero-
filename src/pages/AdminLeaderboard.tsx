@@ -205,7 +205,7 @@ export const AdminLeaderboard: React.FC<AdminLeaderboardProps> = ({ onExit }) =>
                   setPasscode(e.target.value);
                   if (authError) setAuthError('');
                 }}
-                placeholder="Enter passcode (e.g. frostpeak2026)"
+                placeholder="Enter organizer passcode"
                 className="w-full bg-[#fbf9f5] border-2 border-[#cfc7b7] focus:border-blue-800 focus:ring-2 focus:ring-blue-200 rounded-xl px-4 py-3 text-sm font-mono text-[#1c1917] font-semibold outline-none transition"
                 autoFocus
               />
