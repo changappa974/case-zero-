@@ -448,12 +448,11 @@ export async function submitInvestigation(
   let score = isCulpritMatch ? 40 : 0;
 
   // Evidence Scoring (up to 30 pts)
-  let evidenceScore = 0;
-  if (evidenceCodes.includes('EV-01')) evidenceScore += 8;
-  if (evidenceCodes.includes('EV-03')) evidenceScore += 8;
-  if (evidenceCodes.includes('EV-04')) evidenceScore += 7;
-  if (evidenceCodes.includes('EV-05')) evidenceScore += 7;
-  if (evidenceScore > 30) evidenceScore = 30;
+  // Detectives select exactly 3 pieces of evidence.
+  // Critical clues: EV-01, EV-03, EV-04, EV-05 (10 pts each, up to 30 pts total for 3 correct)
+  const validEvidenceCodes = ['EV-01', 'EV-03', 'EV-04', 'EV-05'];
+  const matchedEvidenceCount = evidenceCodes.filter((c) => validEvidenceCodes.includes(c)).length;
+  let evidenceScore = Math.min(30, matchedEvidenceCount * 10);
   score += evidenceScore;
 
   // Explanation Analysis (up to 30 pts)
@@ -679,15 +678,11 @@ export async function fetchLeaderboardEntries(): Promise<LeaderboardEntry[]> {
       : (isCorrectCulprit ? 40 : 0);
 
     // 2. Which pieces of evidence prove your conclusion?
-    // Correct critical evidence: EV-01, EV-03, EV-04, EV-05
+    // Correct critical evidence: EV-01, EV-03, EV-04, EV-05 (10 pts each, up to 30)
     const selectedEv = sub.selected_evidence || [];
     const validEvidenceCodes = ['EV-01', 'EV-03', 'EV-04', 'EV-05'];
     const matchedEvidenceCount = selectedEv.filter((c: string) => validEvidenceCodes.includes(c)).length;
-    let fallbackEvidenceScore = 0;
-    if (selectedEv.includes('EV-01')) fallbackEvidenceScore += 8;
-    if (selectedEv.includes('EV-03')) fallbackEvidenceScore += 8;
-    if (selectedEv.includes('EV-04')) fallbackEvidenceScore += 7;
-    if (selectedEv.includes('EV-05')) fallbackEvidenceScore += 7;
+    const fallbackEvidenceScore = Math.min(30, matchedEvidenceCount * 10);
     const evidenceScore = sub.evaluation_details?.evidence_score !== undefined
       ? sub.evaluation_details.evidence_score
       : fallbackEvidenceScore;

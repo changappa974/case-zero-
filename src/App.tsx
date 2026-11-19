@@ -350,6 +350,8 @@ export const App: React.FC = () => {
       } catch (e) {}
     }
 
+    evidenceCodes = (evidenceCodes || []).slice(0, 3);
+
     try {
       const receipt = await submitInvestigation(
         session.id,

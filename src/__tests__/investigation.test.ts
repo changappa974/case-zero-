@@ -64,7 +64,7 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
     const evelyn = INITIAL_SUSPECTS.find((s) => s.display_name === 'Dr. Evelyn Hayes');
     expect(evelyn).toBeDefined();
 
-    const supportingEvidence = ['EV-01', 'EV-03', 'EV-04', 'EV-05'];
+    const supportingEvidence = ['EV-01', 'EV-03', 'EV-04'];
     const explanation =
       'Dr. Evelyn Hayes murdered Dr. Arthur Vance by poisoning his Earl Grey tea with toxic Midnight Orchid compound (Cyanocryptin) to conceal her research grant funding fraud. CCTV on CAM 3 and CAM 4 disproves her alibi, showing her walking down the corridor at 11:12 PM and returning at 11:18 PM with blue orchid cloth. A left-handed pollen smudge on the lab sink faucet and discarded glowing gloves in the bin confirm her direct guilt.';
 
@@ -290,7 +290,7 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
       s1.id,
       p1.id,
       evelyn.id,
-      ['EV-01', 'EV-03', 'EV-04', 'EV-05'],
+      ['EV-01', 'EV-03', 'EV-04'],
       'Dr. Evelyn poisoned the tea with blue orchid aconite and washed hands at the sink faucet. CCTV corridor alibi contradicted.',
       name1,
       new Date(Date.now() - 300000).toISOString()
@@ -303,13 +303,13 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
       s2.id,
       p2.id,
       evelyn.id,
-      ['EV-01', 'EV-03', 'EV-04', 'EV-05'],
+      ['EV-01', 'EV-03', 'EV-04'],
       'Dr. Evelyn poisoned the tea with blue orchid aconite and washed hands at the sink faucet. CCTV corridor alibi contradicted.',
       name2,
       new Date(Date.now() - 600000).toISOString()
     );
 
-    // Candidate 3: Correct murderer (Evelyn), partial evidence (16 pts), full text, 100s (faster, but lower evidence)
+    // Candidate 3: Correct murderer (Evelyn), partial evidence (20 pts), full text, 100s (faster, but lower evidence)
     const name3 = 'Gamma Detective ' + randomLetters();
     const { participant: p3, session: s3 } = await registerParticipant(name3);
     await submitInvestigation(
@@ -329,7 +329,7 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
       s4.id,
       p4.id,
       chefMarco.id,
-      ['EV-01', 'EV-03', 'EV-04', 'EV-05'],
+      ['EV-01', 'EV-03', 'EV-04'],
       'Chef Marco alibi contradicted by orchid pollen on tea cup.',
       name4,
       new Date(Date.now() - 50000).toISOString()
@@ -414,4 +414,39 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
     expect(reSession.status).toBe('in_progress');
     expect(isStationLocked()).toBe(false);
   }, 25000);
+
+  it('calculates evidence score correctly based on 10 pts per critical clue up to 30 pts for 3 items', async () => {
+    const evelyn = INITIAL_SUSPECTS.find((s) => s.display_name === 'Dr. Evelyn Hayes')!;
+
+    // Case A: 3 valid clues -> exactly 30 points
+    const { participant: pA, session: sA } = await registerParticipant('Trio Clues ' + randomLetters());
+    const receiptA = await submitInvestigation(
+      sA.id,
+      pA.id,
+      evelyn.id,
+      ['EV-01', 'EV-03', 'EV-04'],
+      'Dr. Evelyn poisoned the tea with cyanocryptin orchid toxin. Alibi on CAM 3 and CAM 4 contradicts her statement.'
+    );
+    expect(receiptA.success).toBe(true);
+
+    const submissions = await getOrganizerSubmissions();
+    const savedA = submissions.find((s) => s.session_id === sA.id);
+    expect(savedA).toBeDefined();
+    expect(savedA!.evaluation_details?.evidence_score).toBe(30);
+
+    // Case B: 2 valid clues + 1 distractor clue -> 20 points
+    const { participant: pB, session: sB } = await registerParticipant('Duo Clues ' + randomLetters());
+    const receiptB = await submitInvestigation(
+      sB.id,
+      pB.id,
+      evelyn.id,
+      ['EV-01', 'EV-04', 'EV-02'], // EV-02 is a distractor
+      'Dr. Evelyn poisoned the tea with cyanocryptin orchid toxin. Alibi on CAM 3 and CAM 4 contradicts her statement.'
+    );
+    expect(receiptB.success).toBe(true);
+
+    const savedB = (await getOrganizerSubmissions()).find((s) => s.session_id === sB.id);
+    expect(savedB).toBeDefined();
+    expect(savedB!.evaluation_details?.evidence_score).toBe(20);
+  }, 20000);
 });

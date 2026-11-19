@@ -66,11 +66,11 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
   });
 
   const [selectedEvidenceCodes, setSelectedEvidenceCodes] = useState<string[]>(() => {
-    if (draftEvidenceCodes && draftEvidenceCodes.length > 0) return draftEvidenceCodes;
+    if (draftEvidenceCodes && draftEvidenceCodes.length > 0) return draftEvidenceCodes.slice(0, 3);
     try {
       const raw = localStorage.getItem(`case_zero_draft_${participant.id}`);
       if (raw && JSON.parse(raw).selectedEvidenceCodes?.length) {
-        return JSON.parse(raw).selectedEvidenceCodes;
+        return JSON.parse(raw).selectedEvidenceCodes.slice(0, 3);
       }
     } catch (e) {}
     return [];
@@ -123,12 +123,24 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
 
   const toggleEvidence = (code: string) => {
     if (isLocked) return;
-    soundFX.playCameraSwitch();
     let updated: string[];
     if (selectedEvidenceCodes.includes(code)) {
+      soundFX.playCameraSwitch();
       updated = selectedEvidenceCodes.filter((c) => c !== code);
+      setErrorMsg('');
     } else {
+      if (selectedEvidenceCodes.length >= 3) {
+        soundFX.playAlertBeep();
+        setErrorMsg(
+          isKannada
+            ? 'ನೀವು ಗರಿಷ್ಠ ೩ ಸಾಕ್ಷ್ಯಗಳನ್ನು ಮಾತ್ರ ಆಯ್ಕೆಮಾಡಬಹುದು. ಇನ್ನೊಂದು ಸಾಕ್ಷ್ಯವನ್ನು ಆಯ್ಕೆಮಾಡಲು ಮೊದಲು ಒಂದನ್ನು ಅನ್‌ಸೆಲೆಕ್ಟ್ ಮಾಡಿ.'
+            : 'You can only select a maximum of 3 pieces of evidence. Deselect an item first to select another.'
+        );
+        return;
+      }
+      soundFX.playCameraSwitch();
       updated = [...selectedEvidenceCodes, code];
+      setErrorMsg('');
     }
     setSelectedEvidenceCodes(updated);
     if (onDraftEvidenceChange) onDraftEvidenceChange(updated);
@@ -150,17 +162,29 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
 
   const handleSubmit = async () => {
     if (!selectedSuspectId) {
-      setErrorMsg('Please select the individual you believe is responsible for the incident.');
+      setErrorMsg(
+        isKannada
+          ? 'ದಯವಿಟ್ಟು ಘಟನೆಗೆ ಕಾರಣರಾದ ಶಂಕಿತ ವ್ಯಕ್ತಿಯನ್ನು ಆಯ್ಕೆಮಾಡಿ (ಹಂತ ೧).'
+          : 'Please select the individual you believe is responsible for the incident (Question 1).'
+      );
       soundFX.playAlertBeep();
       return;
     }
-    if (selectedEvidenceCodes.length === 0) {
-      setErrorMsg('Please select at least one supporting piece of evidence.');
+    if (selectedEvidenceCodes.length !== 3) {
+      setErrorMsg(
+        isKannada
+          ? `ದಯವಿಟ್ಟು ನಿಮ್ಮ ತೀರ್ಮಾನವನ್ನು ಸಾಬೀತುಪಡಿಸಲು ನಿಖರವಾಗಿ ೩ ಸಾಕ್ಷ್ಯಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ (ಪ್ರಸ್ತುತ ${selectedEvidenceCodes.length}/೩ ಆಯ್ಕೆಯಾಗಿದೆ).`
+          : `Please select exactly 3 pieces of evidence to substantiate your conclusion (currently ${selectedEvidenceCodes.length}/3 selected).`
+      );
       soundFX.playAlertBeep();
       return;
     }
     if (explanation.trim().length < 30) {
-      setErrorMsg('Please provide a substantive explanation of how it happened (at least 30 characters).');
+      setErrorMsg(
+        isKannada
+          ? 'ದಯವಿಟ್ಟು ಘಟನೆ ಹೇಗೆ ಸಂಭವಿಸಿತು ಎಂಬುದನ್ನು ಕನಿಷ್ಠ ೩೦ ಅಕ್ಷರಗಳಲ್ಲಿ ಸ್ಪಷ್ಟವಾಗಿ ವಿವರಿಸಿ (ಹಂತ ೩).'
+          : 'Please provide a substantive explanation of how it happened (at least 30 characters in Question 3).'
+      );
       soundFX.playAlertBeep();
       return;
     }
@@ -635,27 +659,55 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
 
       {/* QUESTION 2: WHICH PIECES OF EVIDENCE PROVE YOUR CONCLUSION? */}
       <div className="p-6 rounded-2xl bg-[#f5f0e6] border border-[#cfc7b7] space-y-4 shadow-sm">
-        <div className="flex items-center space-x-2 text-blue-950 font-mono text-sm font-bold">
-          <span className="w-6 h-6 rounded-full bg-blue-100 border border-blue-300 text-blue-950 flex items-center justify-center text-xs font-black">
-            2
-          </span>
-          <h3 className="text-base text-[#1c1917] font-black">{t('step_2_title', 'WHICH PIECES OF EVIDENCE PROVE YOUR CONCLUSION?')}</h3>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#cfc7b7] pb-3">
+          <div className="flex items-center space-x-2 text-blue-950 font-mono text-sm font-bold">
+            <span className="w-6 h-6 rounded-full bg-blue-100 border border-blue-300 text-blue-950 flex items-center justify-center text-xs font-black">
+              2
+            </span>
+            <h3 className="text-base text-[#1c1917] font-black">
+              {t('step_2_title', 'WHICH PIECES OF EVIDENCE PROVE YOUR CONCLUSION?')}
+            </h3>
+          </div>
+          <div className="flex items-center space-x-2 font-mono text-xs">
+            <span
+              className={`px-3 py-1 rounded-full font-bold border transition-colors shadow-sm ${
+                selectedEvidenceCodes.length === 3
+                  ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
+                  : 'bg-amber-100 text-amber-900 border-amber-300'
+              }`}
+            >
+              {selectedEvidenceCodes.length} / 3 {isKannada ? 'ಆಯ್ಕೆಮಾಡಲಾಗಿದೆ' : 'SELECTED'}
+              {selectedEvidenceCodes.length === 3
+                ? (isKannada ? ' (ಪೂರ್ಣ)' : ' (COMPLETE)')
+                : (isKannada ? ' (೩ ಕಡ್ಡಾಯ)' : ' (EXACTLY 3 REQUIRED)')}
+            </span>
+          </div>
         </div>
         <p className="text-xs text-stone-700 font-sans">
-          Select all critical clues that substantiate the murder method, false alibi, and forensic link to the culprit (select at least 2).
+          {t('step_2_desc', 'Select exactly 3 critical clues that substantiate the murder method, false alibi, and forensic link to the culprit (select exactly 3).')}
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2">
           {evidenceList.map((ev) => {
             const isSelected = selectedEvidenceCodes.includes(ev.code);
+            const isLimitReached = selectedEvidenceCodes.length >= 3 && !isSelected;
 
             return (
               <div
                 key={ev.id}
                 onClick={() => toggleEvidence(ev.code)}
+                title={
+                  isLimitReached
+                    ? (isKannada
+                        ? 'ಗರಿಷ್ಠ ೩ ಸಾಕ್ಷ್ಯಗಳನ್ನು ಈಗಾಗಲೇ ಆಯ್ಕೆಮಾಡಲಾಗಿದೆ. ಬೇರೆ ಸಾಕ್ಷ್ಯ ಆಯ್ಕೆಮಾಡಲು ಒಂದನ್ನು ಅನ್‌ಸೆಲೆಕ್ಟ್ ಮಾಡಿ.'
+                        : '3 items already selected. Deselect one first to choose this clue.')
+                    : undefined
+                }
                 className={`p-3 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between ${
                   isSelected
-                    ? 'bg-blue-800 text-white border-2 border-blue-900 shadow-sm'
+                    ? 'bg-blue-800 text-white border-2 border-blue-900 shadow-md ring-2 ring-blue-300'
+                    : isLimitReached
+                    ? 'bg-[#f5f0e6] border-2 border-[#d5cdbd] opacity-60 text-stone-600 hover:border-amber-400'
                     : 'bg-[#fbf9f5] border-2 border-[#cfc7b7] hover:border-[#9e9484] text-stone-800 shadow-sm'
                 }`}
               >
@@ -672,9 +724,16 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
                     {ev.title}
                   </p>
                 </div>
-                <span className={`text-[10px] uppercase font-mono mt-2 font-semibold ${isSelected ? 'text-blue-200' : 'text-stone-600'}`}>
-                  {ev.evidence_type}
-                </span>
+                <div className="flex items-center justify-between mt-2 pt-1 border-t border-black/5">
+                  <span className={`text-[10px] uppercase font-mono font-semibold ${isSelected ? 'text-blue-200' : 'text-stone-600'}`}>
+                    {ev.evidence_type}
+                  </span>
+                  {isSelected && (
+                    <span className="text-[9px] font-mono bg-blue-950 text-amber-300 px-1.5 py-0.5 rounded font-bold">
+                      {isKannada ? 'ಆಯ್ಕೆಯಾಗಿದೆ' : 'SELECTED'}
+                    </span>
+                  )}
+                </div>
               </div>
             );
           })}
@@ -732,6 +791,34 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
 
         <button
           onClick={() => {
+            if (!selectedSuspectId) {
+              setErrorMsg(
+                isKannada
+                  ? 'ದಯವಿಟ್ಟು ಘಟನೆಗೆ ಕಾರಣರಾದ ಶಂಕಿತ ವ್ಯಕ್ತಿಯನ್ನು ಆಯ್ಕೆಮಾಡಿ (ಹಂತ ೧).'
+                  : 'Please select the individual you believe is responsible for the incident (Question 1).'
+              );
+              soundFX.playAlertBeep();
+              return;
+            }
+            if (selectedEvidenceCodes.length !== 3) {
+              setErrorMsg(
+                isKannada
+                  ? `ದಯವಿಟ್ಟು ನಿಮ್ಮ ತೀರ್ಮಾನವನ್ನು ಸಾಬೀತುಪಡಿಸಲು ನಿಖರವಾಗಿ ೩ ಸಾಕ್ಷ್ಯಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ (ಪ್ರಸ್ತುತ ${selectedEvidenceCodes.length}/೩ ಆಯ್ಕೆಯಾಗಿದೆ).`
+                  : `Please select exactly 3 pieces of evidence to substantiate your conclusion (currently ${selectedEvidenceCodes.length}/3 selected).`
+              );
+              soundFX.playAlertBeep();
+              return;
+            }
+            if (explanation.trim().length < 30) {
+              setErrorMsg(
+                isKannada
+                  ? 'ದಯವಿಟ್ಟು ಘಟನೆ ಹೇಗೆ ಸಂಭವಿಸಿತು ಎಂಬುದನ್ನು ಕನಿಷ್ಠ ೩೦ ಅಕ್ಷರಗಳಲ್ಲಿ ಸ್ಪಷ್ಟವಾಗಿ ವಿವರಿಸಿ (ಹಂತ ೩).'
+                  : 'Please provide a substantive explanation of how it happened (at least 30 characters in Question 3).'
+              );
+              soundFX.playAlertBeep();
+              return;
+            }
+            setErrorMsg('');
             soundFX.playCameraSwitch();
             setShowConfirmModal(true);
           }}
@@ -770,7 +857,7 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
               </div>
               <div>
                 <span className="text-stone-600 font-semibold">{t('confirm_clues_label', 'SUPPORTING CLUES:')}</span>{' '}
-                <strong className="text-[#1c1917] font-bold">{selectedEvidenceCodes.length} attached</strong>
+                <strong className="text-[#1c1917] font-bold">{selectedEvidenceCodes.length} / 3 {isKannada ? 'ಲಗತ್ತಿಸಲಾಗಿದೆ' : 'attached'}</strong>
               </div>
             </div>
 
