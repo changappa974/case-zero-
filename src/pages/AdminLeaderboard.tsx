@@ -7,12 +7,15 @@ import {
 import { fetchLeaderboardEntries, clearAllSubmissions } from '../lib/supabase';
 import { LeaderboardEntry } from '../types';
 import { soundFX } from '../lib/audioService';
+import { useLanguage } from '../lib/i18n';
 
 interface AdminLeaderboardProps {
   onExit: () => void;
 }
 
 export const AdminLeaderboard: React.FC<AdminLeaderboardProps> = ({ onExit }) => {
+  const { t, language, setLanguage } = useLanguage();
+
   // Passcode gate state
   const [passcode, setPasscode] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
@@ -322,6 +325,29 @@ export const AdminLeaderboard: React.FC<AdminLeaderboardProps> = ({ onExit }) =>
           >
             {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
+
+          {/* Language Toggle: EN / ಕನ್ನಡ */}
+          <div 
+            title={t('lang_toggle_title', 'Switch Language / ಭಾಷೆಯನ್ನು ಬದಲಿಸಿ (English / ಕನ್ನಡ)')}
+            className={`flex items-center p-0.5 rounded-lg border text-[11px] font-mono font-bold shadow-sm ${
+              isDark ? 'bg-slate-800 border-slate-700' : 'bg-[#ded6c7] border-[#cfc7b7]'
+            }`}
+          >
+            <button
+              type="button"
+              onClick={() => { setLanguage('en'); soundFX.playCameraSwitch(); }}
+              className={`px-2 py-1 rounded-md transition-all ${language === 'en' ? 'bg-blue-800 text-white shadow-sm' : isDark ? 'text-slate-400 hover:text-white' : 'text-stone-700 hover:text-stone-950'}`}
+            >
+              EN
+            </button>
+            <button
+              type="button"
+              onClick={() => { setLanguage('kn'); soundFX.playCameraSwitch(); }}
+              className={`px-2 py-1 rounded-md transition-all ${language === 'kn' ? 'bg-blue-800 text-white shadow-sm' : isDark ? 'text-slate-400 hover:text-white' : 'text-stone-700 hover:text-stone-950'}`}
+            >
+              ಕನ್ನಡ
+            </button>
+          </div>
 
           {/* Logout & Exit */}
           <button

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Volume2, VolumeX, Lock, Clock, AlertTriangle } from 'lucide-react';
+import { Volume2, VolumeX, Lock, Clock, AlertTriangle, Languages } from 'lucide-react';
 import { InvestigationStage, Participant, InvestigationSession } from '../types';
 import { soundFX } from '../lib/audioService';
+import { useLanguage } from '../lib/i18n';
 
 interface NavbarProps {
   currentStage: InvestigationStage;
@@ -27,6 +28,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   // 15-Minute Countdown Timer (900 seconds)
   const [localTimeLeft, setLocalTimeLeft] = useState<number>(900);
+  const { language, setLanguage, t } = useLanguage();
 
   useEffect(() => {
     if (!participant || externalTimeLeft !== undefined) return;
@@ -62,11 +64,11 @@ export const Navbar: React.FC<NavbarProps> = ({
   const isSubmitted = session?.status === 'submitted';
 
   const stages: { stage: InvestigationStage; label: string; short: string }[] = [
-    { stage: 1, label: 'Stage 1: The Crime Scene', short: '01 Scene' },
-    { stage: 2, label: 'Stage 2: CCTV Recordings', short: '02 CCTV' },
-    { stage: 3, label: 'Stage 3: Suspect Files', short: '03 Suspects' },
-    { stage: 4, label: 'Stage 4: Evidence Board', short: '04 Evidence' },
-    { stage: 5, label: 'Stage 5: Final Verdict', short: '05 Verdict' },
+    { stage: 1, label: t('stage_1_label', 'Stage 1: The Crime Scene'), short: t('stage_1_short', '01 Scene') },
+    { stage: 2, label: t('stage_2_label', 'Stage 2: CCTV Recordings'), short: t('stage_2_short', '02 CCTV') },
+    { stage: 3, label: t('stage_3_label', 'Stage 3: Suspect Files'), short: t('stage_3_short', '03 Suspects') },
+    { stage: 4, label: t('stage_4_label', 'Stage 4: Evidence Board'), short: t('stage_4_short', '04 Evidence') },
+    { stage: 5, label: t('stage_5_label', 'Stage 5: Final Verdict'), short: t('stage_5_short', '05 Verdict') },
   ];
 
   return (
@@ -81,14 +83,14 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div>
             <div className="flex items-center space-x-2">
               <span className="font-display font-black tracking-wide text-[#1c1917] text-xl group-hover:text-blue-900 transition">
-                CASE ZERO
+                {t('brand_title', 'CASE ZERO')}
               </span>
               <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-amber-200/90 text-amber-900 border border-amber-300 font-bold">
-                FORENSIC HUD
+                {t('forensic_hud', 'FORENSIC HUD')}
               </span>
             </div>
             <p className="text-[11px] text-stone-600 hidden lg:block tracking-wide font-medium">
-              Frostpeak Conservatory Murder Investigation
+              {t('brand_subtitle', 'Frostpeak Conservatory Murder Investigation')}
             </p>
           </div>
         </div>
@@ -129,7 +131,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* 15-Minute Countdown Timer */}
           {participant && (
             <div
-              title="15-Minute Investigation Time Limit"
+              title={t('time_limit_tooltip', '15-Minute Investigation Time Limit')}
               className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg font-mono text-xs font-bold border transition-all shadow-sm ${
                 isSubmitted
                   ? 'bg-emerald-100 text-emerald-950 border-emerald-300'
@@ -142,10 +144,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <Clock className={`w-3.5 h-3.5 ${!isSubmitted && timeLeft <= 120 ? 'text-red-700 animate-spin' : 'text-stone-700'}`} />
               <span className="font-mono text-sm tracking-wide">
-                {isSubmitted ? 'SUBMITTED' : formatTimer(timeLeft)}
+                {isSubmitted ? t('time_submitted_label', 'SUBMITTED') : formatTimer(timeLeft)}
               </span>
               <span className="text-[10px] text-stone-600 uppercase font-semibold hidden sm:inline">
-                {isSubmitted ? 'SEALED' : 'LEFT'}
+                {isSubmitted ? t('time_sealed_label', 'SEALED') : t('time_left_label', 'LEFT')}
               </span>
             </div>
           )}
@@ -157,7 +159,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="hidden md:flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg font-mono text-[11px] font-bold bg-amber-100 text-amber-950 border border-amber-300 shadow-sm animate-pulse"
             >
               <AlertTriangle className="w-3.5 h-3.5 text-amber-700" />
-              <span>TAB SWITCH: {tabSwitchCount}</span>
+              <span>{t('tab_switch_count_label', 'TAB SWITCH:')} {tabSwitchCount}</span>
             </div>
           )}
 
@@ -165,12 +167,33 @@ export const Navbar: React.FC<NavbarProps> = ({
           {participant && (
             <div className="hidden sm:flex items-center space-x-2 text-xs font-mono bg-[#e6dfd2] px-3 py-1.5 rounded-lg border border-[#cfc7b7] shadow-inner">
               <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
-              <span className="text-stone-600 font-semibold">AGENT:</span>
+              <span className="text-stone-600 font-semibold">{t('agent_label', 'AGENT:')}</span>
               <span className="text-blue-900 font-bold truncate max-w-[100px] lg:max-w-[130px]">
                 {participant.participant_name}
               </span>
             </div>
           )}
+
+          {/* Language Toggle: EN / ಕನ್ನಡ */}
+          <div 
+            title={t('lang_toggle_title', 'Switch Language / ಭಾಷೆಯನ್ನು ಬದಲಿಸಿ (English / ಕನ್ನಡ)')}
+            className="flex items-center bg-[#ded6c7] p-0.5 rounded-lg border border-[#cfc7b7] text-[11px] font-mono font-bold shadow-sm"
+          >
+            <button
+              type="button"
+              onClick={() => { setLanguage('en'); soundFX.playCameraSwitch(); }}
+              className={`px-2 py-1 rounded-md transition-all ${language === 'en' ? 'bg-blue-800 text-white shadow-sm' : 'text-stone-700 hover:text-stone-950'}`}
+            >
+              EN
+            </button>
+            <button
+              type="button"
+              onClick={() => { setLanguage('kn'); soundFX.playCameraSwitch(); }}
+              className={`px-2 py-1 rounded-md transition-all ${language === 'kn' ? 'bg-blue-800 text-white shadow-sm' : 'text-stone-700 hover:text-stone-950'}`}
+            >
+              ಕನ್ನಡ
+            </button>
+          </div>
 
           {/* Sound Mute / Unmute Toggle */}
           <button
@@ -178,8 +201,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               onToggleMute();
               soundFX.playCameraSwitch();
             }}
-            title={isMuted ? 'Unmute Sound FX' : 'Mute Sound FX'}
-            className="p-2 rounded-lg bg-[#e6dfd2] hover:bg-[#ded6c7] border border-[#cfc7b7] text-stone-700 hover:text-stone-900 transition shadow-sm"
+            title={isMuted ? t('unmute_fx', 'Unmute Sound FX') : t('mute_fx', 'Mute Sound FX')}
+            className="p-2 rounded-lg bg-[#e6dfd2] hover:bg-[#ded6c7] border border-[#cfc7b7] text-stone-700 hover:text-stone-950 transition shadow-sm"
           >
             {isMuted ? <VolumeX className="w-4 h-4 text-red-600" /> : <Volume2 className="w-4 h-4 text-stone-800" />}
           </button>

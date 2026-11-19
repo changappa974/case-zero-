@@ -3,10 +3,10 @@ import {
   Camera, ArrowRight, CheckCircle2, 
   Clock, Eye, Sparkles 
 } from 'lucide-react';
-import { CCTV_FEEDS } from '../lib/caseData';
 import { CCTVFeed } from '../types';
 import { soundFX } from '../lib/audioService';
 import { CinematicVideoPlayer, VideoHotspot } from '../components/CinematicVideoPlayer';
+import { useLanguage } from '../lib/i18n';
 
 interface Stage2SceneInvestigationProps {
   collectedEvidence: string[];
@@ -19,12 +19,16 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
   onCollectEvidence,
   onProceed,
 }) => {
-  const [selectedCam, setSelectedCam] = useState<CCTVFeed>(CCTV_FEEDS[0]);
+  const { t, getTranslatedCCTV } = useLanguage();
+  const cctvFeeds = getTranslatedCCTV();
+  const [selectedCamId, setSelectedCamId] = useState<string>(cctvFeeds[0].id);
   const [activeHotspot, setActiveHotspot] = useState<VideoHotspot | null>(null);
+
+  const selectedCam = cctvFeeds.find((c) => c.id === selectedCamId) || cctvFeeds[0];
 
   const handleSelectCam = (cam: CCTVFeed) => {
     soundFX.playCameraSwitch();
-    setSelectedCam(cam);
+    setSelectedCamId(cam.id);
     setActiveHotspot(null);
   };
 
@@ -49,21 +53,19 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#cfc7b7] pb-5">
         <div>
           <div className="flex items-center space-x-2 text-amber-900 font-mono text-xs tracking-wider font-bold">
-            <span>STAGE 02 OF 05</span>
-            <span>//</span>
-            <span>SURVEILLANCE & RECONSTRUCTION</span>
+            <span>{t('stage_2_badge_text', 'STAGE 02 OF 05 // SURVEILLANCE & RECONSTRUCTION')}</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-black font-display text-[#1c1917] mt-1">
-            INVESTIGATE THE ESTATE CCTV SURVEILLANCE
+            {t('stage_2_heading', 'INVESTIGATE THE ESTATE CCTV SURVEILLANCE')}
           </h2>
           <p className="text-xs sm:text-sm text-stone-700 mt-1 font-sans">
-            Review 5 synchronized estate surveillance camera feeds. Switch angles, scrub the timeline, and inspect suspicious forensic details with the interactive canvas markers.
+            {t('stage_2_desc', 'Review 5 synchronized estate surveillance camera feeds. Switch angles, scrub the timeline, and inspect suspicious forensic details with the interactive canvas markers.')}
           </p>
         </div>
 
         <div className="flex items-center space-x-2 font-mono text-xs">
           <span className="px-3.5 py-1.5 rounded-xl bg-[#f5f0e6] border border-[#cfc7b7] text-stone-800 shadow-sm font-semibold">
-            CLUES LOGGED: <strong className="text-blue-900 font-bold">{collectedEvidence.length} / 8</strong>
+            {t('clues_logged_stat', 'CLUES LOGGED:')} <strong className="text-blue-900 font-bold">{collectedEvidence.length} / 8</strong>
           </span>
         </div>
       </div>
@@ -73,33 +75,33 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
         <div className="flex items-center justify-between border-b border-[#cfc7b7] pb-2">
           <span className="text-blue-950 font-bold flex items-center space-x-1.5">
             <Clock className="w-4 h-4 text-blue-800" />
-            <span>ESTATE SURVEILLANCE TIMELINE RECONSTRUCTION (11:00 PM – 11:24 PM)</span>
+            <span>{t('cctv_timeline_title', 'ESTATE SURVEILLANCE TIMELINE RECONSTRUCTION (11:00 PM – 11:24 PM)')}</span>
           </span>
           <span className="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-950 border border-blue-300 font-bold text-[10px]">
-            KEY FORENSIC SEQUENCE
+            {t('cctv_key_sequence', 'KEY FORENSIC SEQUENCE')}
           </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-5 gap-2 text-[11px] pt-1">
           <div className="p-2.5 rounded-lg bg-[#e6dfd2] border border-[#cfc7b7]">
             <span className="text-stone-600 font-bold block">11:00 PM (CAM 1)</span>
-            <span className="text-stone-900 font-medium">Chef Marco delivers tea tray to conservatory. Victor Thorne seen at Lobby Bar.</span>
+            <span className="text-stone-900 font-medium">{t('timeline_1100', 'Chef Marco delivers tea tray to conservatory. Victor Thorne seen at Lobby Bar.')}</span>
           </div>
           <div className="p-2.5 rounded-lg bg-[#e6dfd2] border border-[#cfc7b7]">
             <span className="text-stone-600 font-bold block">11:05 PM (CAM 2)</span>
-            <span className="text-stone-900 font-medium">Clara Sterling enters to calibrate radiator; departs at 11:08 PM.</span>
+            <span className="text-stone-900 font-medium">{t('timeline_1105', 'Clara Sterling enters to calibrate radiator; departs at 11:08 PM.')}</span>
           </div>
           <div className="p-2.5 rounded-lg bg-[#e6dfd2] border border-[#cfc7b7]">
             <span className="text-stone-600 font-bold block">11:12 PM (CAM 3)</span>
-            <span className="text-stone-900 font-medium">Individual in yellow cardigan and apron walks toward service passage.</span>
+            <span className="text-stone-900 font-medium">{t('timeline_1112', 'Individual in yellow cardigan and apron walks toward service passage.')}</span>
           </div>
           <div className="p-2.5 rounded-lg bg-[#e6dfd2] border border-[#cfc7b7]">
             <span className="text-stone-600 font-bold block">11:18 PM (CAM 4)</span>
-            <span className="text-stone-900 font-medium">Individual in yellow cardigan returns through B-Wing holding a cloth.</span>
+            <span className="text-stone-900 font-medium">{t('timeline_1118', 'Individual in yellow cardigan returns through B-Wing holding a cloth.')}</span>
           </div>
           <div className="p-2.5 rounded-lg bg-[#e6dfd2] border border-[#cfc7b7]">
-            <span className="text-stone-600 font-bold block">11:24 PM (CAM 1)</span>
-            <span className="text-stone-900 font-medium">Dr. Vance collapses at table; orchid pollen jar and teacup strike floor.</span>
+            <span className="text-stone-600 font-bold block">11:24 PM (CAM 5)</span>
+            <span className="text-stone-900 font-medium">{t('timeline_1124', 'Deadbolt locked from inside. Dr. Vance collapses; clock freezes at 11:24.')}</span>
           </div>
         </div>
       </div>
@@ -130,7 +132,7 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
 
           {/* Camera Selector Tabs */}
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 pt-1">
-            {CCTV_FEEDS.map((cam) => {
+            {cctvFeeds.map((cam) => {
               const isSelected = selectedCam.id === cam.id;
 
               return (
@@ -272,7 +274,7 @@ export const Stage2SceneInvestigation: React.FC<Stage2SceneInvestigationProps> =
           }}
           className="px-6 py-3.5 rounded-xl bg-blue-800 hover:bg-blue-900 text-white font-bold font-mono text-xs tracking-wider flex items-center space-x-2 transition shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
         >
-          <span>PROCEED TO STAGE 03: EXAMINE SUSPECTS</span>
+          <span>{t('proceed_suspects_btn', 'PROCEED TO STAGE 03: EXAMINE SUSPECTS')}</span>
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>

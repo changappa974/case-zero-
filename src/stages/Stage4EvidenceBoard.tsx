@@ -3,9 +3,9 @@ import {
   FolderLock, CheckCircle2, ZoomIn, AlertTriangle, 
   ArrowRight, Filter, ChevronRight, X, ShieldAlert, Sparkles, Eye, Search 
 } from 'lucide-react';
-import { INITIAL_EVIDENCE } from '../lib/caseData';
 import { Evidence } from '../types';
 import { soundFX } from '../lib/audioService';
+import { useLanguage } from '../lib/i18n';
 
 interface Stage4EvidenceBoardProps {
   collectedEvidence: string[];
@@ -34,6 +34,8 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
   onToggleLink,
   onProceed,
 }) => {
+  const { t, getTranslatedEvidence, isKannada } = useLanguage();
+  const evidenceList = getTranslatedEvidence();
   const [selectedType, setSelectedType] = useState<string>('all');
   const [modalEvidence, setModalEvidence] = useState<Evidence | null>(null);
   const [activeTab, setActiveTab] = useState<'visual_sheets' | 'board'>('visual_sheets');
@@ -108,13 +110,67 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
     }
   ];
 
+  const getTranslatedVisualHotspots = (): VisualEvidenceHotspot[] => {
+    if (!isKannada) return visualHotspots;
+    return visualHotspots.map(h => {
+      switch (h.id) {
+        case 'keycard':
+          return {
+            ...h,
+            title: 'ಲ್ಯಾಬ್ ಕೀಕಾರ್ಡ್ ಟರ್ಮಿನಲ್ ಮತ್ತು ನಿಷ್ಕ್ರಿಯತೆಯ ಲಾಗ್',
+            notes: 'ರಾತ್ರಿ ೧೦:೫೮ ಕ್ಕೆ ಕೊನೆಯ ಕೀಕಾರ್ಡ್ ಸ್ವೈಪ್. ೧೧:೦೦ ರಿಂದ ೧೧:೨೨ ರವರೆಗೆ ಯಾವುದೇ ಕೀಬೋರ್ಡ್ ಚಟುವಟಿಕೆ ಇಲ್ಲ.',
+            details: 'ಡಾ. ಎವೆಲಿನ್ ಹೇಯ್ಸ್ ರಾತ್ರಿ ೧೦:೫೮ ಕ್ಕೆ ಟರ್ಮಿನಲ್‌ಗೆ ಲಾಗಿನ್ ಆಗಿದ್ದಾರೆ. ಆದರೆ ಲಾಗ್‌ಗಳು ೧೧:೦೦ ರಿಂದ ೧೧:೨೨ ರ ನಡುವೆ ಸಂಪೂರ್ಣ ನಿಷ್ಕ್ರಿಯತೆಯನ್ನು ತೋರಿಸುತ್ತವೆ.'
+          };
+        case 'faucet':
+          return {
+            ...h,
+            title: 'ಸಿಂಕ್ ನಲ್ಲಿ ಎಡಗೈ ಬೆರಳಚ್ಚಿನ ನೀಲಿ ಪರಾಗದ ಕಲೆ',
+            notes: 'ಎಡಭಾಗದ ಹ್ಯಾಂಡಲ್ ಮೇಲೆ ನೀಲಿ ಹೊಳೆಯುವ ಆರ್ಕಿಡ್ ಪರಾಗದ ಕಲೆ ಪತ್ತೆಯಾಗಿದೆ.',
+            details: 'ಫ್ಲೋರೊಸೆನ್ಸ್ ಸ್ಪೆಕ್ಟ್ರೋಸ್ಕೋಪಿ ಪರೀಕ್ಷೆಯು ಇದು ಮಿಡ್‌ನೈಟ್ ಆರ್ಕಿಡ್ ಪರಾಗ ಎಂದು ಖಚಿತಪಡಿಸುತ್ತದೆ. ಕಲೆಯು ಎಡಗೈ ಹೆಬ್ಬೆರಳಿನ ಗುರುತಾಗಿದೆ.'
+          };
+        case 'gloves':
+          return {
+            ...h,
+            title: 'ಕಸದ ಬುಟ್ಟಿಯಲ್ಲಿ ಸಿಕ್ಕ ಕೈಗವಸುಗಳು ಮತ್ತು ಕಲೆಯಾದ ಟಿಶ್ಯೂ',
+            notes: 'ಕಸದ ಬುಟ್ಟಿಯಲ್ಲಿ ಹೊಳೆಯುವ ಪರಾಗ ಮತ್ತು ವಿಷದ ಕಲೆಯಿರುವ ಕೈಗವಸುಗಳು ಪತ್ತೆಯಾಗಿವೆ.',
+            details: 'ರಾತ್ರಿ ೧೧:೩೫ ಕ್ಕೆ ಬಿ-ವಿಂಗ್ ಲ್ಯಾಬ್‌ನ ಕಸದ ಬುಟ್ಟಿಯಿಂದ ವಶಪಡಿಸಿಕೊಳ್ಳಲಾಗಿದೆ. ಲ್ಯಾಟೆಕ್ಸ್ ಪರೀಕ್ಷಾ ಕೈಗವಸುಗಳು (ಸೈಜ್ ಸ್ಮಾಲ್) ಮತ್ತು ಟಿಶ್ಯೂ ವಿಷದ ಅವಶೇಷಗಳನ್ನು ಹೊಂದಿವೆ.'
+          };
+        case 'deadbolt':
+          return {
+            ...h,
+            title: 'ಒಳಗಿನಿಂದ ಲಾಕ್ ಆಗಿದ್ದ ಹಿತ್ತಾಳೆಯ ಡೆಡ್‌ಬೋಲ್ಟ್',
+            notes: 'ಡೆಡ್‌ಬೋಲ್ಟ್ ಒಳಗಿನಿಂದ ಲಾಕ್ ಆಗಿದೆ. ಕೆಳಗಿನ ಮಂಜು ಸಂಪೂರ್ಣವಾಗಿ ಅಖಂಡವಾಗಿದೆ.',
+            details: 'ಬದಿಯ ಬಾಗಿಲು ಒಳಗಿನಿಂದ ಲಾಕ್ ಆಗಿದ್ದು, ಹೊರಗಿನಿಂದ ತೆರೆಯಲು ಸಾಧ್ಯವಿಲ್ಲ. ಕರಗದ ಮಂಜು ರಾತ್ರಿ ಯಾರೂ ಈ ಬಾಗಿಲು ತೆರೆದಿಲ್ಲ ಎಂದು ಸಾಬೀತುಪಡಿಸುತ್ತದೆ.'
+          };
+        case 'tartan':
+          return {
+            ...h,
+            title: 'ಹೊರಗಿನ ಹಿಡಿಕೆಗೆ ಸಿಲುಕಿದ್ದ ಹಸಿರು ಟಾರ್ಟನ್ ಬಟ್ಟೆಯ ತುಂಡು',
+            notes: 'ವಿಕ್ಟರ್ ಥೋರ್ನ್ ೧೦:೫೦ ಕ್ಕೆ ಬಾಗಿಲು ತೆರೆಯಲು ಪ್ರಯತ್ನಿಸಿದಾಗ ಸಿಲುಕಿಕೊಂಡ ಬಟ್ಟೆಯ ತುಂಡು.',
+            details: 'ವಿಕ್ಟರ್ ಥೋರ್ನ್ ಅವರ ಬ್ಲೇಜರ್‌ಗೆ ಹೊಂದಿಕೆಯಾಗುತ್ತದೆ. ಹೊರಗಿನಿಂದ ಬಾಗಿಲು ತೆರೆಯಲು ಪ್ರಯತ್ನಿಸಿದಾಗ ಸಿಲುಕಿಕೊಂಡಿದೆ. ಆದರೆ ಬಾಗಿಲು ಒಳಗಿನಿಂದ ಲಾಕ್ ಆಗಿತ್ತು.'
+          };
+        case 'footprints':
+          return {
+            ...h,
+            title: 'ಹೀಟರ್ ಬಳಿ ಕರಗಿ ಒಣಗಿದ್ದ ಬೂಟುಗಳ ಹೆಜ್ಜೆಗುರುತುಗಳು',
+            notes: 'ಹೆಜ್ಜೆಗುರುತುಗಳು ಸಂಪೂರ್ಣವಾಗಿ ಒಣಗಿ ಆವಿಯಾಗಿವೆ (೧೧:೩೦ ಕ್ಕಿಂತ ೨೦ ನಿಮಿಷಗಳ ಮುಂಚಿನವು).',
+            details: 'ಕ್ಲಾರಾ ಸ್ಟರ್ಲಿಂಗ್ ೧೧:೦೫ ಕ್ಕೆ ಹೀಟರ್ ಪರಿಶೀಲಿಸಿದಾಗ ಉಂಟಾದ ಗುರುತುಗಳಾಗಿವೆ. ಒಣಗಿದ ಅಂಚುಗಳು ಶವ ಸಿಗುವ ೨೦ ನಿಮಿಷಗಳ ಮುಂಚೆಯೇ ಮೂಡಿದವು ಎಂದು ದೃಢೀಕರಿಸುತ್ತವೆ.'
+          };
+        default:
+          return h;
+      }
+    });
+  };
+
+  const activeVisualHotspots = getTranslatedVisualHotspots();
+
   const filterTypes = [
-    { id: 'all', label: 'ALL EVIDENCE (8)' },
-    { id: 'physical_trace', label: 'PHYSICAL TRACES' },
-    { id: 'access_log', label: 'ACCESS LOGS' },
+    { id: 'all', label: t('filter_all', 'ALL EVIDENCE') + ` (${evidenceList.length})` },
+    { id: 'physical_trace', label: t('filter_physical', 'PHYSICAL TRACES') },
+    { id: 'access_log', label: t('filter_logs', 'ACCESS LOGS') },
   ];
 
-  const filteredEvidence = INITIAL_EVIDENCE.filter((ev) => {
+  const filteredEvidence = evidenceList.filter((ev) => {
     if (selectedType === 'all') return true;
     return ev.evidence_type === selectedType;
   });
@@ -126,15 +182,13 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#cfc7b7] pb-4">
         <div>
           <div className="flex items-center space-x-2 text-amber-900 font-mono text-xs tracking-wider font-bold">
-            <span>STAGE 04 OF 05</span>
-            <span>//</span>
-            <span>CORRELATION MATRIX</span>
+            <span>{t('stage_4_badge_text', 'STAGE 04 OF 05 // CORRELATION MATRIX')}</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-black font-display text-[#1c1917] mt-1">
-            INTERACTIVE EVIDENCE BOARD
+            {t('stage_4_heading', 'INTERACTIVE EVIDENCE BOARD')}
           </h2>
           <p className="text-xs sm:text-sm text-stone-700 mt-1">
-            Inspect B-Wing Lab & Side Door forensic panels and examine collected evidence dossiers.
+            {t('stage_4_desc', 'Inspect B-Wing Lab & Side Door forensic panels and examine collected evidence dossiers.')}
           </p>
         </div>
 
@@ -151,7 +205,7 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
                 : 'text-stone-800 hover:text-stone-950 hover:bg-[#d6cebf]'
             }`}
           >
-            VISUAL EVIDENCE SHEET (IMG 3)
+            {t('view_visual_board', 'VISUAL EVIDENCE SHEET (IMG 3)')}
           </button>
           <button
             onClick={() => {
@@ -164,7 +218,7 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
                 : 'text-stone-800 hover:text-stone-950 hover:bg-[#d6cebf]'
             }`}
           >
-            EVIDENCE DOSSIER ({INITIAL_EVIDENCE.length})
+            {t('filter_all', 'EVIDENCE DOSSIER')} ({evidenceList.length})
           </button>
         </div>
       </div>
@@ -194,7 +248,7 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
               />
 
               {/* Interactive Hotspot Buttons */}
-              {visualHotspots.map((spot) => {
+              {activeVisualHotspots.map((spot) => {
                 const isCollected = collectedEvidence.includes(spot.evidenceCode);
                 const isSelected = activeVisualHotspot?.id === spot.id;
 
@@ -391,7 +445,7 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
                       }`}
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>{isCollected ? 'LOGGED' : 'COLLECT'}</span>
+                      <span>{isCollected ? t('clue_logged_badge', 'LOGGED') : t('log_clue_btn', 'COLLECT')}</span>
                     </button>
 
                     <button
@@ -401,7 +455,7 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
                       }}
                       className="text-stone-700 hover:text-blue-900 font-semibold transition flex items-center space-x-1"
                     >
-                      <span>INSPECT</span>
+                      <span>{t('view_transcript_btn', 'INSPECT')}</span>
                       <ChevronRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -464,7 +518,7 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
                 }}
                 className="px-5 py-2.5 rounded-xl bg-blue-800 hover:bg-blue-900 text-white font-bold uppercase transition shadow-md"
               >
-                {collectedEvidence.includes(modalEvidence.code) ? 'ALREADY LOGGED' : 'ADD TO EVIDENCE DOSSIER'}
+                {collectedEvidence.includes(modalEvidence.code) ? t('clue_logged_badge', 'ALREADY LOGGED') : t('log_clue_btn', 'ADD TO EVIDENCE DOSSIER')}
               </button>
             </div>
           </div>
@@ -483,7 +537,7 @@ export const Stage4EvidenceBoard: React.FC<Stage4EvidenceBoardProps> = ({
           }}
           className="px-6 py-3.5 rounded-xl bg-blue-800 hover:bg-blue-900 text-white font-bold font-mono text-xs tracking-wider flex items-center space-x-2 transition shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
         >
-          <span>PROCEED TO STAGE 05: FINAL SUBMISSION</span>
+          <span>{t('proceed_verdict_btn', 'PROCEED TO STAGE 05: FINAL SUBMISSION')}</span>
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>

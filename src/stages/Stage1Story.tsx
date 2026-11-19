@@ -4,6 +4,7 @@ import {
 } from 'lucide-react';
 import { CinematicVideoPlayer } from '../components/CinematicVideoPlayer';
 import { soundFX } from '../lib/audioService';
+import { useLanguage } from '../lib/i18n';
 
 interface Stage1StoryProps {
   onProceed: () => void;
@@ -29,6 +30,8 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
   collectedEvidence = [],
   onCollectEvidence 
 }) => {
+  const { t, isKannada } = useLanguage();
+
   // Crime Scene Interactive View State
   const [sceneZoom, setSceneZoom] = useState(1);
   const [selectedHotspot, setSelectedHotspot] = useState<CrimeSceneHotspot | null>(null);
@@ -177,12 +180,150 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
     }
   ];
 
-  const subtitles = [
+  const getTranslatedHotspots = (): CrimeSceneHotspot[] => {
+    if (!isKannada) return crimeSceneHotspots;
+    return crimeSceneHotspots.map(h => {
+      switch (h.id) {
+        case 'victim':
+          return {
+            ...h,
+            name: 'ಮೃತ ವ್ಯಕ್ತಿ: ಡಾ. ಆರ್ಥರ್ ವ್ಯಾನ್ಸ್',
+            category: 'ಮುಖ್ಯ ವಿಧಿವಿಜ್ಞಾನ ವಿಷಯ',
+            shortDesc: 'ಬರ್ಗಂಡಿ ಗೌನ್ ಧರಿಸಿದ ಹಿರಿಯ ಸಸ್ಯಶಾಸ್ತ್ರಜ್ಞ ಶವವಾಗಿ ನೆಲದ ಮೇಲೆ ಪತ್ತೆಯಾಗಿದ್ದಾರೆ.',
+            detailedAnalysis: 'ಡಾ. ಆರ್ಥರ್ ವ್ಯಾನ್ಸ್ (೬೮ ವರ್ಷ) ನೆಲದ ಮೇಲೆ ಬಿದ್ದಿದ್ದಾರೆ. ಯಾವುದೇ ಬಾಹ್ಯ ಗಾಯಗಳಿಲ್ಲ. ಕಣ್ಣುಗಳು ಮತ್ತು ನೀಲಿ ತುಟಿಗಳು ತೀವ್ರ ನರವಿಷ ಉಸಿರಾಟದ ವೈಫಲ್ಯವನ್ನು ಸೂಚಿಸುತ್ತವೆ.',
+            forensicPoints: [
+              'ಸಾವಿನ ಅಂದಾಜು ಸಮಯ ರಾತ್ರಿ ೧೧:೨೦ ರಿಂದ ೧೧:೨೮ ರ ನಡುವೆ.',
+              'ಬಲಗೈ ಬಿದ್ದಿರುವ ಚಹಾ ಕಪ್‌ನಿಂದ ಕೆಲವೇ ಇಂಚುಗಳ ದೂರದಲ್ಲಿದೆ.',
+              'ಒಡೆದ ಕನ್ನಡಕ ಮತ್ತು ಕೈಗಡಿಯಾರ ದೇಹದ ಪಕ್ಕದಲ್ಲಿ ಪತ್ತೆಯಾಗಿದೆ.',
+              'ಯಾವುದೇ ರಕ್ಷಣಾತ್ಮಕ ಗಾಯಗಳಿಲ್ಲ.'
+            ]
+          };
+        case 'pollen':
+          return {
+            ...h,
+            name: 'ನೆಲಕ್ಕೆ ಬಿದ್ದಿರುವ ಹೊಳೆಯುವ ಆರ್ಕಿಡ್ ಪರಾಗದ ಜಾರ್',
+            category: 'ಜೈವಿಕ ಅಪಾಯ / ಲ್ಯಾಬ್ ಮಾದರಿ',
+            shortDesc: 'ನೆಲದ ಮೇಲೆ ಒಡೆದು ಬಿದ್ದಿರುವ ಗಾಜಿನ ಜಾರ್, ತೀವ್ರವಾದ ೪೭೦nm ನೀಲಿ ಬೆಳಕನ್ನು ಹೊರಸೂಸುತ್ತದೆ.',
+            detailedAnalysis: 'ನೆಲಕ್ಕೆ ಬಿದ್ದು ಒಡೆದ ಬೊರೊಸಿಲಿಕೇಟ್ ಜಾರ್. ನೀಲಿ ಪುಡಿ ಕಣಗಳು ಶುದ್ಧ ಮಿಡ್‌ನೈಟ್ ಆರ್ಕಿಡ್ ಪರಾಗವಾಗಿದ್ದು, ಮಾರಕ ನರವಿಷ ಗ್ಲೈಕೋಸೈಡ್‌ಗಳನ್ನು ಒಳಗೊಂಡಿದೆ.',
+            forensicPoints: [
+              'ಸರಣಿ ಸಂಖ್ಯೆಯು ಇದನ್ನು ಬಿ-ವಿಂಗ್ ಲ್ಯಾಬ್ ಬೆಂಚ್ #೨ ಗೆ ಲಿಂಕ್ ಮಾಡುತ್ತದೆ.',
+              'ಈ ಜಾರ್ ಅನ್ನು ಲಾಕ್ ಆಗಿದ್ದ ಬಿ-ವಿಂಗ್ ಲ್ಯಾಬ್‌ನಿಂದ ಉದ್ದೇಶಪೂರ್ವಕವಾಗಿ ತರಲಾಗಿದೆ.',
+              'ನೆಲಕ್ಕೆ ನೇರವಾಗಿ ಬಿದ್ದಿರುವ ಮಾದರಿಯು ಹಠಾತ್ ಹೋರಾಟ ಅಥವಾ ಕುಸಿತದ ವೇಳೆ ಬಿದ್ದಿದ್ದನ್ನು ಸೂಚಿಸುತ್ತದೆ.'
+            ]
+          };
+        case 'teacup':
+          return {
+            ...h,
+            name: 'ವಿಷಪೂರಿತ ಚಹಾ ಕಪ್ ಮತ್ತು ಸಾಸರ್',
+            category: 'ಟಾಕ್ಸಿಕಾಲಾಜಿಕಲ್ ಪುರಾವೆ',
+            shortDesc: 'ಸಾಂದ್ರೀಕೃತ ವಿಷಕಾರಿ ನೀಲಿ ಸಂಯುಕ್ತದೊಂದಿಗೆ ಬೆರೆತ ಅರ್ಲ್ ಗ್ರೇ ಚಹಾದ ಅವಶೇಷಗಳು.',
+            detailedAnalysis: 'ಫೀಲ್ಡ್ ಸ್ಪೆಕ್ಟ್ರೋಸ್ಕೋಪಿ ಪರೀಕ್ಷೆಯಲ್ಲಿ ಮಿಡ್‌ನೈಟ್ ಆರ್ಕಿಡ್‌ನಿಂದ ತಯಾರಿಸಲಾದ ಸೈನೋಕ್ರಿಪ್ಟಿನ್ ವಿಷ ಪತ್ತೆಯಾಗಿದೆ. ಅಡುಗೆಮನೆಯ ಟೀಪಾಟ್ ಸಂಪೂರ್ಣ ಶುದ್ಧವಾಗಿದ್ದು, ವಿಷವನ್ನು ಇಲ್ಲಿಯೇ ಕಪ್‌ಗೆ ಬೆರೆಸಲಾಗಿದೆ.',
+            forensicPoints: [
+              'ರಾತ್ರಿ ೧೧:೦೦ ಕ್ಕೆ ಚೆಫ್ ಮಾರ್ಕೊ ತಂದಿದ್ದ ಚಹಾ ಮೂಲತಃ ಶುದ್ಧವಾಗಿತ್ತು.',
+              'ಕಪ್‌ನಲ್ಲಿರುವ ಸೈನೋಕ್ರಿಪ್ಟಿನ್ ಸಾಂದ್ರತೆಯು ಮಾರಕ ಮಿತಿಗಿಂತ ೪೦೦% ಹೆಚ್ಚಾಗಿದೆ.',
+              'ಕಪ್‌ನ ಅಂಚಿನಲ್ಲಿ ನೀಲಿ ಹೊಳಪು ಗೋಚರಿಸುತ್ತದೆ.'
+            ]
+          };
+        case 'watch':
+          return {
+            ...h,
+            name: 'ಒಡೆದ ಕೈಗಡಿಯಾರ ಮತ್ತು ಕನ್ನಡಕ',
+            category: 'ಸಮಯದ ದಾಖಲೆ / ಇಂಪ್ಯಾಕ್ಟ್ ಕಾಲಾನುಕ್ರಮ',
+            shortDesc: 'ಸರಿಯಾಗಿ ರಾತ್ರಿ ೧೧:೨೪ ಕ್ಕೆ ನಿಂತಿರುವ ಮೆಕ್ಯಾನಿಕಲ್ ವಾಚ್ ಮತ್ತು ವ್ಯಾನ್ಸ್ ಅವರ ಕನ್ನಡಕ.',
+            detailedAnalysis: 'ನೆಲಕ್ಕೆ ಅಪ್ಪಳಿಸಿದ ರಭಸಕ್ಕೆ ಡಾ. ವ್ಯಾನ್ಸ್ ಅವರ ವಾಚ್‌ನ ಆಂತರಿಕ ಬ್ಯಾಲೆನ್ಸ್ ವ್ಹೀಲ್ ಮುರಿದು, ಸರಿಯಾಗಿ ರಾತ್ರಿ ೨೩:೨೪:೧೮ (೧೧:೨೪) ಕ್ಕೆ ಮುಳ್ಳುಗಳು ನಿಂತಿವೆ.',
+            forensicPoints: [
+              'ವಾಚ್‌ನ ಮುಳ್ಳುಗಳು ರಾತ್ರಿ ೧೧:೨೪ ಕ್ಕೆ ನಿಂತಿವೆ.',
+              'ಕನ್ನಡಕದ ಒಂದು ಹಿಂಜ್ ಪಿನ್ ಕಳಚಿದೆ.',
+              'ಧ್ವನಿ ಸಂವೇದಕ LOG-04 ನಲ್ಲಿ ರಾತ್ರಿ ೧೧:೨೪ ಕ್ಕೆ ನೆಲಕ್ಕೆ ಬಿದ್ದ ಸದ್ದು ದಾಖಲಾಗಿದೆ.'
+            ]
+          };
+        case 'clock':
+          return {
+            ...h,
+            name: 'ಕನ್ಸರ್ವೇಟರಿ ಗೋಡೆ ಗಡಿಯಾರ',
+            category: 'ಪರಿಸರ ಕಾಲಮಾಪಕ',
+            shortDesc: 'ಇಟ್ಟಿಗೆಯ ಕಂಬದ ಮೇಲಿನ ಗಡಿಯಾರವು ಶವ ಪತ್ತೆಯಾದ ಸಮಯವಾದ ೧೧:೩೦ ಅನ್ನು ತೋರಿಸುತ್ತಿದೆ.',
+            detailedAnalysis: '೧೧:೩೦ ಕ್ಕೆ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತಿರುವ ಗೋಡೆ ಗಡಿಯಾರ, ಭದ್ರತಾ ಸಿಬ್ಬಂದಿ ಆಗಮಿಸಿ ತುರ್ತು ಅಲಾರಂ ಬಾರಿಸಿದ ಕ್ಷಣವನ್ನು ಹೊಂದಿಕೆಯಾಗುತ್ತದೆ.',
+            forensicPoints: [
+              'ಎಸ್ಟೇಟ್‌ನ ಮಾಸ್ಟರ್ ಎಲೆಕ್ಟ್ರಿಕಲ್ ಕ್ಲಾಕ್ ಗ್ರಿಡ್‌ಗೆ ಸಿಂಕ್ ಆಗಿದೆ.',
+              'ಸಿಬ್ಬಂದಿ ರಾತ್ರಿ ಸರಿಯಾಗಿ ೧೧:೩೦ ಕ್ಕೆ ಶವವನ್ನು ಪತ್ತೆಹಚ್ಚಿದ್ದಾರೆ.'
+            ]
+          };
+        case 'door':
+          return {
+            ...h,
+            name: 'ಬದಿಯ ಸರ್ವಿಸ್ ಬಾಗಿಲು ಮತ್ತು ಡೆಡ್‌ಬೋಲ್ಟ್',
+            category: 'ಪ್ರವೇಶ ನಿರ್ಬಂಧ ಪುರಾವೆ',
+            shortDesc: 'ಒಳಗಿನಿಂದ ಗಟ್ಟಿಯಾಗಿ ಲಾಕ್ ಆಗಿದ್ದ ಹಿತ್ತಾಳೆಯ ಡೆಡ್‌ಬೋಲ್ಟ್ ಮತ್ತು ಕರಗದ ಮಂಜು.',
+            detailedAnalysis: 'ಬದಿಯ ಬಾಗಿಲು ಒಳಗಿನಿಂದ ಲಾಕ್ ಆಗಿದ್ದು, ಕೆಳಗಿನ ಮಂಜು ಅಖಂಡವಾಗಿದೆ. ರಾತ್ರಿ ಯಾರೂ ಈ ಬಾಗಿಲಿನ ಮೂಲಕ ಪ್ರವೇಶಿಸಿಲ್ಲ ಅಥವಾ ಪರಾರಿಯಾಗಿಲ್ಲ ಎಂಬುದನ್ನು ಇದು ದೃಢೀಕರಿಸುತ್ತದೆ.',
+            forensicPoints: [
+              'ಡೆಡ್‌ಬೋಲ್ಟ್ ಒಳಗಿನಿಂದ ಲಾಕ್ ಆಗಿದೆ: ಹೊರಗಿನಿಂದ ತೆರೆಯಲು ಸಾಧ್ಯವಿಲ್ಲ.',
+              'ಕರಗದ ಮಂಜು ಬಾಗಿಲು ತೆರೆಯಲಾಗಿಲ್ಲ ಎಂದು ಸಾಬೀತುಪಡಿಸುತ್ತದೆ.',
+              'ಹೊರಗಿನಿಂದ ಯಾರೂ ಪ್ರವೇಶಿಸಿಲ್ಲ ಎಂದು ಖಚಿತಪಡಿಸುತ್ತದೆ.'
+            ]
+          };
+        case 'tartan':
+          return {
+            ...h,
+            name: 'ಹಸಿರು ಟಾರ್ಟನ್ ಬಟ್ಟೆಯ ತುಂಡು',
+            category: 'ಭೌತಿಕ ಕುರುಹು / ತಪ್ಪು ದಾರಿಯ ಸುಳಿವು',
+            shortDesc: 'ಬದಿಯ ಸರ್ವಿಸ್ ಬಾಗಿಲಿನ ಹೊರ ಹಿಡಿಕೆಗೆ ಸಿಲುಕಿದ್ದ ಗಾಢ ಹಸಿರು ಉಣ್ಣೆಯ ಬಟ್ಟೆಯ ತುಂಡು.',
+            detailedAnalysis: 'ವಿಕ್ಟರ್ ಥೋರ್ನ್ ಧರಿಸಿದ್ದ ಬ್ಲೇಜರ್‌ಗೆ ಬಟ್ಟೆಯ ಎಳೆಗಳು ಹೊಂದಾಣಿಕೆಯಾಗುತ್ತವೆ. ಬಾಗಿಲು ಒಳಗಿನಿಂದ ಲಾಕ್ ಆಗಿದ್ದರಿಂದ, ರಾತ್ರಿ ೧೦:೫೦ ಕ್ಕೆ ವಿಕ್ಟರ್ ಬಾಗಿಲು ತೆರೆಯಲು ವಿಫಲ ಪ್ರಯತ್ನ ನಡೆಸಿದ್ದರ ಪರಿಣಾಮವಿದು.',
+            forensicPoints: [
+              'ವಿಕ್ಟರ್ ಥೋರ್ನ್ ಅವರ ಹಸಿರು ಟಾರ್ಟನ್ ಬ್ಲೇಜರ್‌ಗೆ ಹೊಂದಿಕೆಯಾಗುತ್ತದೆ.',
+              'ರಾತ್ರಿ ೧೦:೫೦ ಕ್ಕೆ ಹೊರಗಿನ ಹಿಡಿಕೆಗೆ ಸಿಲುಕಿಕೊಂಡಿದೆ.',
+              'ಬಾಗಿಲು ಲಾಕ್ ಆಗಿತ್ತು; ವಿಕ್ಟರ್ ಒಳಗೆ ಪ್ರವೇಶಿಸಲಿಲ್ಲ.'
+            ]
+          };
+        case 'onlookers':
+          return {
+            ...h,
+            name: 'ಪ್ರವೇಶ ದ್ವಾರದಲ್ಲಿ ನಾಲ್ವರು ಶಂಕಿತರು',
+            category: 'ಸಾಕ್ಷಿಗಳು ಮತ್ತು ಶಂಕಿತರ ಗುಂಪು',
+            shortDesc: 'ಎಸ್ಟೇಟ್‌ನಲ್ಲಿ ಉಪಸ್ಥಿತರಿದ್ದ ನಾಲ್ವರು: ಕ್ಲಾರಾ ಸ್ಟರ್ಲಿಂಗ್, ವಿಕ್ಟರ್ ಥೋರ್ನ್, ಡಾ. ಎವೆಲಿನ್ ಹೇಯ್ಸ್, ಮತ್ತು ಚೆಫ್ ಮಾರ್ಕೊ.',
+            detailedAnalysis: 'ಅಲಾರಂ ಮೊಳಗಿದ ನಂತರ ನಾಲ್ವರು ಕಮಾನು ಬಾಗಿಲ ಬಳಿ ನಿಂತಿದ್ದಾರೆ. ಪ್ರತಿಯೊಬ್ಬರೂ ರಾತ್ರಿ ೧೦:೫೦ ರಿಂದ ೧೧:೩೦ ರ ನಡುವೆ ಸ್ಥಳದಲ್ಲಿದ್ದರು.',
+            forensicPoints: [
+              'ಕ್ಲಾರಾ ಸ್ಟರ್ಲಿಂಗ್: ೧೧:೦೫ ಕ್ಕೆ ಹೀಟರ್ ಪರಿಶೀಲಿಸಿದ್ದಾರೆ.',
+              'ವಿಕ್ಟರ್ ಥೋರ್ನ್: ೧೧:೦೦–೧೧:೨೫ ರವರೆಗೆ ಲಾಬಿ ಬಾರ್‌ನಲ್ಲಿದ್ದರು.',
+              'ಡಾ. ಎವೆಲಿನ್ ಹೇಯ್ಸ್: ೧೧:೦೦–೧೧:೨೫ ರವರೆಗೆ ಬಿ-ವಿಂಗ್ ಲ್ಯಾಬ್‌ನಲ್ಲಿದ್ದೆ ಎಂದು ಹೇಳುತ್ತಾರೆ.',
+              'ಚೆಫ್ ಮಾರ್ಕೊ: ೧೧:೦೦ ಕ್ಕೆ ಡಾ. ವ್ಯಾನ್ಸ್‌ಗೆ ಚಹಾ ತಲುಪಿಸಿದ್ದಾರೆ.'
+            ]
+          };
+        case 'puddle':
+          return {
+            ...h,
+            name: 'ಕರಗಿದ ಹಿಮದ ನೀರು ಮತ್ತು ಡ್ರೈನೇಜ್ ಗ್ರೇಟ್',
+            category: 'ಪರಿಸರ ಕುರುಹು',
+            shortDesc: 'ಮುಖ್ಯ ಗಾಜಿನ ಕಮಾನಿನ ಬಳಿ ಕರಗಿದ ಹಿಮದ ನೀರು ಮತ್ತು ಬೂಟುಗಳ ಹೆಜ್ಜೆಗುರುತುಗಳು.',
+            detailedAnalysis: 'ಬೂಟುಗಳಿಂದ ಬಂದ ಹಿಮ ಕರಗಿ ಉಂಟಾದ ನೀರು. ಇದು ೨೫ ನಿಮಿಷಗಳ ಅವಧಿಯಲ್ಲಿ ಕರಗಿ ನೆಲೆಗೊಂಡಿದೆ.',
+            forensicPoints: [
+              'ರಾತ್ರಿ ೧೧:೧೦ ಕ್ಕಿಂತ ಮುಂಚಿನ ಹೆಜ್ಜೆಗುರುತುಗಳಿಗೆ ಹೊಂದಿಕೆಯಾಗುತ್ತದೆ.',
+              'ಡ್ರೈನೇಜ್ ಗ್ರೇಟ್ ಮೂಲಕ ನೀರು ಹೊರಹೋಗುತ್ತದೆ.'
+            ]
+          };
+        default:
+          return h;
+      }
+    });
+  };
+
+  const activeHotspots = getTranslatedHotspots();
+
+  const englishSubtitles = [
     { start: 0, end: 3, text: '23:24:00 — Frostpeak Conservatory. Founding botanist Dr. Arthur Vance is found dead on the stone tiles.' },
     { start: 3, end: 6, text: 'Spilled glowing blue bioluminescent orchid pollen and an overturned cup of Earl Grey tea surround the victim.' },
     { start: 6, end: 9, text: 'A shattered wristwatch freezes the moment of collapse at 11:24 PM. Four individuals were present on the estate grounds.' },
     { start: 9, end: 12, text: 'Every detail tells a story. Inspect the crime scene, examine the CCTV recordings, and discover what truly happened.' }
   ];
+
+  const kannadaSubtitles = [
+    { start: 0, end: 3, text: '೨೩:೨೪:೦೦ — ಫ್ರಾಸ್ಟ್‌ಪೀಕ್ ಕನ್ಸರ್ವೇಟರಿ. ಮುಖ್ಯ ಸಸ್ಯಶಾಸ್ತ್ರಜ್ಞ ಡಾ. ಆರ್ಥರ್ ವ್ಯಾನ್ಸ್ ನೆಲದ ಮೇಲೆ ಶವವಾಗಿ ಪತ್ತೆಯಾಗಿದ್ದಾರೆ.' },
+    { start: 3, end: 6, text: 'ಚೆಲ್ಲಾಪಿಲ್ಲಿಯಾದ ಹೊಳೆಯುವ ನೀಲಿ ಆರ್ಕಿಡ್ ಪರಾಗ ಮತ್ತು ಬಿದ್ದಿರುವ ಅರ್ಲ್ ಗ್ರೇ ಚಹಾ ಕಪ್ ದೇಹದ ಸುತ್ತಲೂ ಕಂಡುಬಂದಿದೆ.' },
+    { start: 6, end: 9, text: 'ಒಡೆದ ಕೈಗಡಿಯಾರವು ರಾತ್ರಿ ೧೧:೨೪ ಕ್ಕೆ ಸಾವು ಸಂಭವಿಸಿದ್ದನ್ನು ದೃಢೀಕರಿಸುತ್ತದೆ. ಎಸ್ಟೇಟ್‌ನಲ್ಲಿ ನಾಲ್ಕು ವ್ಯಕ್ತಿಗಳು ಉಪಸ್ಥಿತರಿದ್ದರು.' },
+    { start: 9, end: 12, text: 'ಪ್ರತಿಯೊಂದು ವಿವರವೂ ಒಂದು ಕಥೆ ಹೇಳುತ್ತದೆ. ಅಪರಾಧ ಸ್ಥಳ ಪರಿಶೀಲಿಸಿ, ಸಿಸಿಟಿವಿ ದೃಶ್ಯಗಳನ್ನು ವೀಕ್ಷಿಸಿ ನಿಜವಾದ ಕೊಲೆಗಾರನನ್ನು ಪತ್ತೆಹಚ್ಚಿ.' }
+  ];
+
+  const subtitles = isKannada ? kannadaSubtitles : englishSubtitles;
 
   const handleSelectHotspot = (hotspot: CrimeSceneHotspot) => {
     soundFX.playCameraSwitch();
@@ -206,22 +347,20 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#cfc7b7] pb-5">
         <div>
           <div className="flex items-center space-x-2 text-amber-900 font-mono text-xs tracking-wider font-bold">
-            <span>STAGE 01 OF 05</span>
-            <span>//</span>
-            <span>THE CRIME SCENE</span>
+            <span>{t('stage_1_badge_text', 'STAGE 01 OF 05 // THE CRIME SCENE')}</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-black font-display text-[#1c1917] mt-1">
-            CASE ZERO: MURDER AT FROSTPEAK CONSERVATORY
+            {t('stage_1_heading', 'CASE ZERO: MURDER AT FROSTPEAK CONSERVATORY')}
           </h2>
           <p className="text-xs sm:text-sm text-stone-700 mt-1 max-w-3xl font-sans">
-            Explore Frostpeak Conservatory and inspect the victim’s surroundings. Click on suspicious objects, fallen pollen, teacups, door locks, and environmental traces to uncover forensic leads.
+            {t('stage_1_desc', 'Explore Frostpeak Conservatory and inspect the victim’s surroundings. Click on suspicious objects, fallen pollen, teacups, door locks, and environmental traces to uncover forensic leads.')}
           </p>
         </div>
 
         <div className="flex items-center space-x-2">
           <span className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-red-100/90 border border-red-300 text-red-900 font-mono text-xs font-bold shadow-sm">
             <span className="w-2 h-2 rounded-full bg-red-600 animate-ping"></span>
-            <span>CRIME SCENE SEALED</span>
+            <span>{t('crime_scene_sealed', 'CRIME SCENE SEALED')}</span>
           </span>
         </div>
       </div>
@@ -231,7 +370,7 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
         <div className="flex items-center justify-between text-xs font-mono text-stone-700">
           <span className="flex items-center space-x-2 text-blue-900 font-bold">
             <Film className="w-4 h-4 text-blue-800" />
-            <span>INCIDENT OVERVIEW CINEMATIC RECORDING</span>
+            <span>{t('cinematic_overview', 'INCIDENT OVERVIEW CINEMATIC RECORDING')}</span>
           </span>
           <span className="text-[11px] text-stone-500 font-semibold">FORMAT: 1080P IR SURVEILLANCE</span>
         </div>
@@ -239,7 +378,7 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
         <CinematicVideoPlayer
           posterUrl="/reference/crime-scene.jpg"
           camCode="INCIDENT ARCHIVE"
-          title="Frostpeak Conservatory Crime Scene"
+          title={isKannada ? 'ಫ್ರಾಸ್ಟ್‌ಪೀಕ್ ಕನ್ಸರ್ವೇಟರಿ ಅಪರಾಧ ಸ್ಥಳ' : 'Frostpeak Conservatory Crime Scene'}
           timestamp="23:24:00"
           duration={12}
           panMode="pan_right"
@@ -254,16 +393,16 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
           <div>
             <h3 className="text-lg font-display font-bold text-[#1c1917] flex items-center space-x-2">
               <Eye className="w-5 h-5 text-blue-800" />
-              <span>EXPLORE THE CRIME SCENE: INTERACTIVE INVESTIGATION</span>
+              <span>{t('explore_scene', 'EXPLORE THE CRIME SCENE: INTERACTIVE INVESTIGATION')}</span>
             </h3>
             <p className="text-xs text-stone-600 font-sans">
-              Click on the glowing forensic markers to inspect individual objects, zoom into suspicious items, and extract evidence.
+              {t('explore_scene_desc', 'Click on the glowing forensic markers to inspect individual objects, zoom into suspicious items, and extract evidence.')}
             </p>
           </div>
 
           <div className="flex items-center space-x-3 text-xs font-mono">
             <span className="text-stone-700 font-medium">
-              INSPECTED: <span className="text-blue-900 font-bold">{inspectedHotspots.length}</span> / {crimeSceneHotspots.length}
+              {t('inspected_label', 'INSPECTED:')} <span className="text-blue-900 font-bold">{inspectedHotspots.length}</span> / {activeHotspots.length}
             </span>
             <div className="flex items-center space-x-1">
               <button
@@ -307,7 +446,7 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20 pointer-events-none"></div>
 
             {/* Hotspot Markers */}
-            {crimeSceneHotspots.map((spot) => {
+            {activeHotspots.map((spot) => {
               const isInspected = inspectedHotspots.includes(spot.id);
               const isSelected = selectedHotspot?.id === spot.id;
 
@@ -361,15 +500,15 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
           <div className="flex items-center justify-between text-xs font-mono">
             <span className="text-amber-950 font-bold flex items-center space-x-1.5">
               <Sparkles className="w-3.5 h-3.5 text-amber-800" />
-              <span>QUICK EVIDENCE SHORTCUTS (1-CLICK INSPECT):</span>
+              <span>{t('quick_shortcuts', 'QUICK EVIDENCE SHORTCUTS (1-CLICK INSPECT):')}</span>
             </span>
             <span className="text-stone-600 text-[11px] font-semibold">
-              6 SCENE OBJECTS
+              {activeHotspots.length} {t('scene_objects_count', 'SCENE OBJECTS')}
             </span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 pt-1 font-mono text-xs">
-            {crimeSceneHotspots.map((spot) => {
+            {activeHotspots.map((spot) => {
               const isInspected = inspectedHotspots.includes(spot.id);
               const isSelected = selectedHotspot?.id === spot.id;
 
@@ -405,15 +544,15 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
             <div className="flex items-center space-x-4">
               <span className="flex items-center space-x-1.5 font-semibold">
                 <span className="w-2.5 h-2.5 rounded-full bg-red-600"></span>
-                <span>Unexamined Object</span>
+                <span>{t('unexamined_obj', 'Unexamined Object')}</span>
               </span>
               <span className="flex items-center space-x-1.5 font-semibold">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
-                <span>Inspected Trace</span>
+                <span>{t('inspected_trace', 'Inspected Trace')}</span>
               </span>
               <span className="flex items-center space-x-1.5 font-semibold">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                <span>Active Target</span>
+                <span>{t('active_target', 'Active Target')}</span>
               </span>
             </div>
             <span className="text-[11px] text-stone-600 font-semibold">
@@ -458,7 +597,7 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
 
                 <div className="bg-[#e6dfd2] p-3.5 rounded-xl border border-[#cfc7b7] space-y-1.5">
                   <span className="text-amber-900 font-bold block text-[11px]">
-                    CRITICAL FORENSIC OBSERVATIONS:
+                    {t('critical_obs', 'CRITICAL FORENSIC OBSERVATIONS:')}
                   </span>
                   <ul className="space-y-1 text-stone-800 list-disc list-inside font-sans text-xs">
                     {selectedHotspot.forensicPoints.map((pt, i) => (
@@ -470,13 +609,13 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
                 {selectedHotspot.evidenceCode && (
                   <div className="pt-2 flex items-center justify-between">
                     <span className="text-[11px] text-stone-700 font-semibold">
-                      IDENTIFIED EVIDENCE CODE: <span className="text-blue-900 font-bold">{selectedHotspot.evidenceCode}</span>
+                      {t('identified_code', 'IDENTIFIED EVIDENCE CODE:')} <span className="text-blue-900 font-bold">{selectedHotspot.evidenceCode}</span>
                     </span>
 
                     {collectedEvidence.includes(selectedHotspot.evidenceCode) ? (
                       <span className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-100 border border-emerald-300 text-emerald-900 font-bold">
                         <CheckCircle2 className="w-4 h-4 text-emerald-700" />
-                        <span>ADDED TO EVIDENCE DOSSIER</span>
+                        <span>{t('added_to_dossier', 'ADDED TO EVIDENCE DOSSIER')}</span>
                       </span>
                     ) : (
                       <button
@@ -484,7 +623,7 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
                         className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-lg bg-blue-800 hover:bg-blue-900 text-white font-bold transition shadow-md"
                       >
                         <Sparkles className="w-4 h-4" />
-                        <span>ADD TO EVIDENCE INVENTORY</span>
+                        <span>{t('add_to_inventory', 'ADD TO EVIDENCE INVENTORY')}</span>
                       </button>
                     )}
                   </div>
@@ -500,10 +639,10 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
       <div className="bg-[#f5f0e6] border border-[#cfc7b7] rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h4 className="text-base font-display font-bold text-[#1c1917] flex items-center space-x-2">
-            <span>READY TO ADVANCE INVESTIGATION</span>
+            <span>{t('ready_to_advance', 'READY TO ADVANCE INVESTIGATION')}</span>
           </h4>
           <p className="text-xs text-stone-600 mt-0.5 font-sans">
-            You have surveyed the crime scene. Next, analyze the multi-camera CCTV recordings and cross-examine the surveillance timeline.
+            {t('ready_to_advance_desc', 'You have surveyed the crime scene. Next, analyze the multi-camera CCTV recordings and cross-examine the surveillance timeline.')}
           </p>
         </div>
 
@@ -514,7 +653,7 @@ export const Stage1Story: React.FC<Stage1StoryProps> = ({
           }}
           className="inline-flex items-center justify-center space-x-2 px-6 py-3.5 rounded-xl bg-blue-800 hover:bg-blue-900 text-white font-mono font-bold text-sm tracking-wider uppercase transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
         >
-          <span>PROCEED TO STAGE 02: CCTV RECORDINGS</span>
+          <span>{t('proceed_cctv_btn', 'PROCEED TO STAGE 02: CCTV RECORDINGS')}</span>
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>

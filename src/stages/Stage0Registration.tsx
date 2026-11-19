@@ -3,12 +3,14 @@ import { ShieldAlert, ArrowRight, Video, Search, Users, Database, Fingerprint, L
 import { registerParticipant, isStationLocked, unlockStation } from '../lib/supabase';
 import { Participant, InvestigationSession } from '../types';
 import { soundFX } from '../lib/audioService';
+import { useLanguage } from '../lib/i18n';
 
 interface Stage0RegistrationProps {
   onStart: (participant: Participant, session: InvestigationSession) => void;
 }
 
 export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart }) => {
+  const { t } = useLanguage();
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -25,7 +27,7 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
     e.preventDefault();
     setPasscodeError('');
     if (!organizerPasscode.trim()) {
-      setPasscodeError('Please enter the organizer master passcode.');
+      setPasscodeError(t('enter_passcode_prompt', 'Please enter the organizer master passcode.'));
       soundFX.playAlertBeep();
       return;
     }
@@ -43,15 +45,15 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
       }, 600);
     } else {
       soundFX.playAlertBeep();
-      setPasscodeError('Invalid organizer passcode. Station remains locked.');
+      setPasscodeError(t('invalid_passcode_error', 'Invalid organizer passcode. Station remains locked.'));
     }
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let raw = e.target.value;
 
-    // 1. Remove all characters that are NOT letters (A-Z, a-z) or space
-    let sanitized = raw.replace(/[^a-zA-Z ]/g, '');
+    // 1. Remove all characters that are NOT letters (English or Kannada) or space
+    let sanitized = raw.replace(/[^a-zA-Z\u0C80-\u0CFF ]/g, '');
 
     // 2. Cannot start with space (first character must be a letter)
     sanitized = sanitized.replace(/^ +/, '');
@@ -67,14 +69,14 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
     e.preventDefault();
     const trimmed = fullName.trim();
     if (!trimmed) {
-      setErrorMessage('Please enter your full name (letters only).');
+      setErrorMessage(t('name_required_error', 'Please enter your full name to begin the investigation.'));
       soundFX.playAlertBeep();
       return;
     }
 
     // Must strictly be letters with single spaces between words (no numbers, no symbols)
-    if (!/^[a-zA-Z]+( [a-zA-Z]+)*$/.test(trimmed)) {
-      setErrorMessage('Name may only contain letters with a single space between words (no numbers, symbols, or consecutive spaces).');
+    if (!/^[a-zA-Z\u0C80-\u0CFF]+( [a-zA-Z\u0C80-\u0CFF]+)*$/.test(trimmed)) {
+      setErrorMessage(t('name_rules', 'Name may only contain letters with a single space between words (no numbers, symbols, or consecutive spaces).'));
       soundFX.playAlertBeep();
       return;
     }
@@ -124,7 +126,7 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
             <div className="flex items-center space-x-2">
               <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-ping"></span>
               <span className="text-xs font-mono uppercase tracking-widest text-red-900 font-bold bg-red-100 px-3 py-1 rounded-full border border-red-300">
-                STATION LOCKED // SUBMISSION RECORDED
+                {t('station_locked_badge', 'STATION LOCKED // SUBMISSION RECORDED')}
               </span>
             </div>
             <Lock className="w-5 h-5 text-red-700" />
@@ -136,10 +138,10 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
               <Lock className="w-8 h-8 text-red-700 animate-pulse" />
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[#1c1917] font-display">
-              Investigation already completed on this station.
+              {t('station_locked_title', 'Investigation already completed on this station.')}
             </h1>
             <p className="text-sm text-stone-700 font-sans leading-relaxed max-w-md mx-auto">
-              A Case Zero investigation submission has already been recorded and sealed on this browser terminal. To prevent retakes and preserve competition integrity, access is restricted.
+              {t('station_locked_desc', 'A Case Zero investigation submission has already been recorded and sealed on this browser terminal. To prevent retakes and preserve competition integrity, access is restricted.')}
             </p>
           </div>
 
@@ -148,11 +150,11 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
             <div className="flex items-center space-x-2 text-amber-950">
               <KeyRound className="w-4 h-4 text-amber-900" />
               <h3 className="font-mono text-xs uppercase tracking-wider font-bold text-amber-950">
-                ORGANIZER / PROCTOR UNLOCK GATE
+                {t('proctor_gate_title', 'ORGANIZER / PROCTOR UNLOCK GATE')}
               </h3>
             </div>
             <p className="text-xs text-stone-700 font-sans leading-relaxed">
-              For lab PCs and shared laptops being reused across rounds, event organizers can enter the master passcode below to unlock this station and reset fresh from the start for the next student.
+              {t('proctor_gate_desc', 'For lab PCs and shared laptops being reused across rounds, event organizers can enter the master passcode below to unlock this station and reset fresh from the start for the next student.')}
             </p>
 
             <form onSubmit={handleUnlockStation} className="space-y-3">
@@ -164,7 +166,7 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
                     setOrganizerPasscode(e.target.value);
                     if (passcodeError) setPasscodeError('');
                   }}
-                  placeholder="Enter organizer passcode"
+                  placeholder={t('enter_passcode_placeholder', 'Enter organizer passcode')}
                   className="w-full bg-[#faf7f2] border-2 border-[#cfc7b7] focus:border-blue-800 focus:ring-2 focus:ring-blue-200 rounded-xl px-4 py-2.5 text-sm font-mono text-[#1c1917] placeholder-stone-400 font-semibold"
                 />
               </div>
@@ -179,7 +181,7 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
               {passcodeSuccess && (
                 <p className="text-xs font-mono text-emerald-800 font-bold flex items-center space-x-1.5">
                   <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-700" />
-                  <span>Station unlocked! Initializing clean registration terminal...</span>
+                  <span>{t('station_unlocked_success', 'Station unlocked! Initializing clean registration terminal...')}</span>
                 </p>
               )}
 
@@ -188,7 +190,7 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
                 className="w-full py-3 px-4 bg-amber-800 hover:bg-amber-900 text-white font-mono font-bold text-xs tracking-wider uppercase rounded-xl transition shadow-sm hover:shadow flex items-center justify-center space-x-2"
               >
                 <KeyRound className="w-4 h-4 text-amber-300" />
-                <span>UNLOCK STATION FOR NEXT DETECTIVE</span>
+                <span>{t('unlock_station_btn', 'UNLOCK STATION FOR NEXT DETECTIVE')}</span>
               </button>
             </form>
           </div>
@@ -209,53 +211,53 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
           <div className="flex items-center space-x-2">
             <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-ping"></span>
             <span className="text-xs font-mono uppercase tracking-widest text-red-800 font-bold bg-red-100/80 px-2.5 py-1 rounded-full border border-red-300">
-              CLASSIFIED DOSSIER // RESTRICTED ACCESS
+              {t('dossier_badge', 'CLASSIFIED DOSSIER // RESTRICTED ACCESS')}
             </span>
           </div>
           <span className="text-[11px] font-mono text-stone-600 font-semibold">
-            REF: FROSTPEAK-2026-CASE-0
+            {t('dossier_ref', 'REF: FROSTPEAK-2026-CASE-0')}
           </span>
         </div>
 
         {/* Title & Tagline */}
         <div className="text-center space-y-3 mb-8">
           <div className="inline-block px-3 py-1 rounded-full bg-amber-200/90 border border-amber-400 text-amber-950 font-mono text-xs tracking-widest uppercase font-bold">
-            THE VISUAL MYSTERY CHALLENGE
+            {t('challenge_badge', 'THE VISUAL MYSTERY CHALLENGE')}
           </div>
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-[#1c1917] font-display">
-            CASE ZERO
+            {t('brand_title', 'CASE ZERO')}
           </h1>
           <p className="text-base sm:text-lg font-semibold text-amber-900 tracking-wide font-sans italic">
-            “Every Detail Tells a Story. Can You Find the Truth?”
+            {t('tagline', '“Every Detail Tells a Story. Can You Find the Truth?”')}
           </p>
           <p className="text-sm text-stone-700 max-w-md mx-auto pt-1 font-medium">
-            An incident has occurred. The truth is hidden in what you see.
+            {t('incident_teaser', 'An incident has occurred. The truth is hidden in what you see.')}
           </p>
         </div>
 
         {/* Incident Summary Card */}
         <div className="bg-[#e6dfd2] border border-[#cfc7b7] rounded-xl p-4 mb-8 text-xs font-mono text-stone-800 space-y-2.5">
           <div className="flex justify-between pb-2 border-b border-[#cfc7b7]">
-            <span className="text-amber-900 font-bold">CASE FILE:</span>
-            <span className="text-[#1c1917] font-bold">MURDER AT FROSTPEAK CONSERVATORY</span>
+            <span className="text-amber-900 font-bold">{t('case_file_label', 'CASE FILE:')}</span>
+            <span className="text-[#1c1917] font-bold">{t('case_file_val', 'MURDER AT FROSTPEAK CONSERVATORY')}</span>
           </div>
           <div className="flex justify-between pb-2 border-b border-[#cfc7b7]">
-            <span className="text-amber-900 font-bold">LOCATION:</span>
-            <span className="font-semibold text-stone-800">Frostpeak Conservatory & B-Wing Laboratory</span>
+            <span className="text-amber-900 font-bold">{t('location_label', 'LOCATION:')}</span>
+            <span className="font-semibold text-stone-800">{t('location_val', 'Frostpeak Conservatory & B-Wing Laboratory')}</span>
           </div>
           <div className="flex justify-between pb-2 border-b border-[#cfc7b7]">
-            <span className="text-amber-900 font-bold">INCIDENT TIME:</span>
-            <span className="font-semibold text-stone-800">23:24:00 (Surveillance Window: 22:50 – 23:30)</span>
+            <span className="text-amber-900 font-bold">{t('incident_time_label', 'INCIDENT TIME:')}</span>
+            <span className="font-semibold text-stone-800">{t('incident_time_val', '23:24:00 (Surveillance Window: 22:50 – 23:30)')}</span>
           </div>
           <div className="flex justify-between pb-2 border-b border-[#cfc7b7] bg-amber-100/70 -mx-4 px-4 py-1.5 rounded-lg">
             <span className="text-amber-950 font-bold flex items-center space-x-1">
-              <span>⏱️ TIME LIMIT:</span>
+              <span>⏱️ {t('time_limit_label', 'TIME LIMIT:')}</span>
             </span>
-            <span className="text-amber-950 font-black">15 MINUTES (Live countdown begins on start)</span>
+            <span className="text-amber-950 font-black">{t('time_limit_val', '15 MINUTES (Live countdown begins on start)')}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-amber-900 font-bold">INCIDENT:</span>
-            <span className="text-red-800 font-bold">Dr. Arthur Vance found deceased with poisoned tea & glowing blue orchid pollen</span>
+            <span className="text-amber-900 font-bold">{t('incident_label', 'INCIDENT:')}</span>
+            <span className="text-red-800 font-bold">{t('incident_desc', 'Dr. Arthur Vance found deceased with poisoned tea & glowing blue orchid pollen')}</span>
           </div>
         </div>
 
@@ -263,7 +265,7 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
         <form onSubmit={handleStart} className="space-y-5">
           <div>
             <label htmlFor="fullName" className="block text-xs font-mono tracking-wider uppercase text-stone-900 font-bold mb-2">
-              Participant Full Name <span className="text-red-700">*</span>
+              {t('name_label', 'Participant Full Name')} <span className="text-red-700">*</span>
             </label>
             <div className="relative">
               <input
@@ -271,7 +273,7 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
                 type="text"
                 value={fullName}
                 onChange={handleNameChange}
-                placeholder="e.g., Detective Alex Mercer"
+                placeholder={t('name_placeholder', 'e.g., Detective Alex Mercer')}
                 maxLength={60}
                 disabled={loading}
                 className="w-full bg-[#faf7f2] border-2 border-[#cfc7b7] focus:border-blue-800 focus:ring-2 focus:ring-blue-200 rounded-xl px-4 py-3 text-base font-mono text-[#1c1917] placeholder-stone-400 font-semibold shadow-inner transition"
@@ -282,13 +284,13 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
               <div className="mt-3 p-3.5 rounded-xl bg-red-100 border border-red-300 text-red-900 font-mono text-xs font-bold flex items-start space-x-2.5 shadow-sm animate-pulse">
                 <AlertTriangle className="w-4 h-4 text-red-700 shrink-0 mt-0.5" />
                 <div className="space-y-0.5">
-                  <span className="block uppercase tracking-wider text-[10px] text-red-700">AUTHORIZATION DENIED</span>
+                  <span className="block uppercase tracking-wider text-[10px] text-red-700">{t('auth_denied', 'AUTHORIZATION DENIED')}</span>
                   <span className="leading-relaxed">{errorMessage}</span>
                 </div>
               </div>
             )}
             <p className="mt-2 text-[11px] font-mono text-stone-600">
-              Only letters (A–Z) and single spaces are allowed (e.g. <code>admin a a</code>). Numbers, symbols, and leading spaces are blocked.
+              {t('name_rules', 'Only letters (A–Z) and single spaces are allowed (e.g. Detective Alex). Numbers, symbols, and leading spaces are blocked.')}
             </p>
           </div>
 
@@ -297,7 +299,7 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
             disabled={loading}
             className="w-full group relative flex items-center justify-center space-x-2 bg-blue-800 hover:bg-blue-900 text-white font-mono font-bold text-sm tracking-wider uppercase py-3.5 px-6 rounded-xl shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:pointer-events-none"
           >
-            <span>{loading ? 'INITIALIZING INVESTIGATION...' : 'START INVESTIGATION'}</span>
+            <span>{loading ? t('initializing_btn', 'INITIALIZING INVESTIGATION...') : t('start_btn', 'START INVESTIGATION')}</span>
             <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition" />
           </button>
         </form>
@@ -306,15 +308,15 @@ export const Stage0Registration: React.FC<Stage0RegistrationProps> = ({ onStart 
         <div className="grid grid-cols-3 gap-3 pt-6 mt-6 border-t border-[#cfc7b7] text-center font-mono text-xs text-stone-700">
           <div className="p-3 rounded-xl bg-[#e6dfd2] border border-[#cfc7b7]">
             <Video className="w-4 h-4 mx-auto mb-1 text-blue-800" />
-            <span className="font-semibold text-stone-900">Cinematic Scene</span>
+            <span className="font-semibold text-stone-900">{t('pillar_scene', 'Cinematic Scene')}</span>
           </div>
           <div className="p-3 rounded-xl bg-[#e6dfd2] border border-[#cfc7b7]">
             <Search className="w-4 h-4 mx-auto mb-1 text-amber-800" />
-            <span className="font-semibold text-stone-900">Forensic Clues</span>
+            <span className="font-semibold text-stone-900">{t('pillar_clues', 'Forensic Clues')}</span>
           </div>
           <div className="p-3 rounded-xl bg-[#e6dfd2] border border-[#cfc7b7]">
             <Users className="w-4 h-4 mx-auto mb-1 text-emerald-800" />
-            <span className="font-semibold text-stone-900">4 Real Suspects</span>
+            <span className="font-semibold text-stone-900">{t('pillar_suspects', '4 Real Suspects')}</span>
           </div>
         </div>
 

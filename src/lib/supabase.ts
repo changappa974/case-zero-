@@ -143,9 +143,9 @@ function setLocalStore<T>(key: string, data: T[]): void {
 // 1. Participant Registration (Supabase with Resilient Local Fallback)
 // --------------------------------------------------------------------------
 export async function registerParticipant(participantName: string): Promise<{ participant: Participant; session: InvestigationSession }> {
-  // Sanitize and validate name: letters (A-Z, a-z) and single spaces between words only
+  // Sanitize and validate name: letters (A-Z, a-z, and Kannada unicode \u0C80-\u0CFF) and single spaces between words only
   let cleanName = (participantName || '')
-    .replace(/[^a-zA-Z ]/g, '')
+    .replace(/[^a-zA-Z\u0C80-\u0CFF ]/g, '')
     .replace(/^ +/, '')
     .replace(/ {2,}/g, ' ')
     .trim();
@@ -444,13 +444,13 @@ export async function submitInvestigation(
   // Explanation Analysis (up to 30 pts)
   let explanationScore = 0;
   const explLower = explanation.toLowerCase();
-  if (/(poison|toxin|orchid|midnight orchid|bioluminescent|blue pollen|cyanocryptin|tea)/.test(explLower)) {
+  if (/(poison|toxin|orchid|midnight orchid|bioluminescent|blue pollen|cyanocryptin|tea|ವಿಷ|ಆರ್ಕಿಡ್|ಪರಾಗ|ಚಹಾ|ಸೈನೋಕ್ರಿಪ್ಟಿನ್)/i.test(explLower)) {
     explanationScore += 10;
   }
-  if (/(alibi|cctv|cam 3|cam 4|cam3|cam4|corridor|service passage|contradict|11:12|11:18|cloth)/.test(explLower)) {
+  if (/(alibi|cctv|cam 3|cam 4|cam3|cam4|corridor|service passage|contradict|11:12|11:18|cloth|ಆಲಿಬಿ|ಕ್ಯಾಮೆರಾ|ಸಿಸಿಟಿವಿ|ಕಾರಿಡಾರ್|ಹಳದಿ ಕಾರ್ಡಿಗನ್)/i.test(explLower)) {
     explanationScore += 10;
   }
-  if (/(fraud|fund|embezzle|audit|left-hand|left hand|faucet|gloves|smudge|sink|log|terminal)/.test(explLower)) {
+  if (/(fraud|fund|embezzle|audit|left-hand|left hand|faucet|gloves|smudge|sink|log|terminal|ಕೈಗವಸು|ಎಡಗೈ|ವಂಚನೆ|ದುರುಪಯೋಗ|ಲಾಗ್|ಸಿಂಕ್)/i.test(explLower)) {
     explanationScore += 10;
   }
   if (explanationScore > 30) explanationScore = 30;

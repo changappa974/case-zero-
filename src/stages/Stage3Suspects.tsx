@@ -3,9 +3,9 @@ import {
   Users, UserCheck, ShieldCheck, AlertOctagon, Briefcase, FileText, 
   ArrowRight, CheckCircle2, ChevronRight, MessageSquareQuote, Edit3, Bookmark, ShieldAlert 
 } from 'lucide-react';
-import { INITIAL_SUSPECTS } from '../lib/caseData';
 import { Suspect } from '../types';
 import { soundFX } from '../lib/audioService';
+import { useLanguage } from '../lib/i18n';
 
 interface Stage3SuspectsProps {
   suspectNotes: Record<string, string>;
@@ -18,14 +18,18 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
   onSaveSuspectNote,
   onProceed,
 }) => {
-  const [selectedSuspect, setSelectedSuspect] = useState<Suspect>(INITIAL_SUSPECTS[0]);
+  const { t, getTranslatedSuspects } = useLanguage();
+  const suspects = getTranslatedSuspects();
+  const [selectedSuspectId, setSelectedSuspectId] = useState<string>(suspects[0].id);
   const [activeTab, setActiveTab] = useState<'statement' | 'clothing' | 'belongings' | 'motive'>('statement');
-  const [currentNote, setCurrentNote] = useState<string>(suspectNotes[selectedSuspect.id] || '');
+  const [currentNote, setCurrentNote] = useState<string>(suspectNotes[suspects[0].id] || '');
   const [noteSaved, setNoteSaved] = useState(false);
+
+  const selectedSuspect = suspects.find((s) => s.id === selectedSuspectId) || suspects[0];
 
   const handleSelect = (s: Suspect) => {
     soundFX.playCameraSwitch();
-    setSelectedSuspect(s);
+    setSelectedSuspectId(s.id);
     setCurrentNote(suspectNotes[s.id] || '');
     setNoteSaved(false);
   };
@@ -49,15 +53,13 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#cfc7b7] pb-5">
         <div>
           <div className="flex items-center space-x-2 text-amber-900 font-mono text-xs tracking-wider font-bold">
-            <span>STAGE 03 OF 05</span>
-            <span>//</span>
-            <span>PERSONS OF INTEREST</span>
+            <span>{t('stage_3_badge_text', 'STAGE 03 OF 05 // PERSONS OF INTEREST')}</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-black font-display text-[#1c1917] mt-1">
-            EXAMINE THE FOUR SUSPECTS
+            {t('stage_3_heading', 'EXAMINE THE FOUR SUSPECTS')}
           </h2>
           <p className="text-xs sm:text-sm text-stone-700 mt-1 font-sans">
-            Analyze suspect statements, physical clothing against CCTV captures, carried equipment, verified alibis, and hidden motives.
+            {t('stage_3_desc', 'Analyze suspect statements, physical clothing against CCTV captures, carried equipment, verified alibis, and hidden motives.')}
           </p>
         </div>
 
@@ -70,7 +72,7 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
 
       {/* Suspect Selector Cards (4 Columns) */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {INITIAL_SUSPECTS.map((suspect) => {
+        {suspects.map((suspect) => {
           const isSelected = selectedSuspect.id === suspect.id;
           const hasNote = Boolean(suspectNotes[suspect.id]);
 
@@ -158,7 +160,7 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
                   : 'text-stone-800 hover:text-stone-950 hover:bg-[#d6cebf]'
               }`}
             >
-              STATEMENT & ALIBI
+              {t('tab_statement', 'STATEMENT & ALIBI')}
             </button>
             <button
               onClick={() => {
@@ -171,7 +173,7 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
                   : 'text-stone-800 hover:text-stone-950 hover:bg-[#d6cebf]'
               }`}
             >
-              ATTIRE (CCTV MATCH)
+              {t('tab_clothing', 'ATTIRE (CCTV MATCH)')}
             </button>
             <button
               onClick={() => {
@@ -184,7 +186,7 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
                   : 'text-stone-800 hover:text-stone-950 hover:bg-[#d6cebf]'
               }`}
             >
-              BELONGINGS
+              {t('tab_belongings', 'BELONGINGS')}
             </button>
             <button
               onClick={() => {
@@ -197,7 +199,7 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
                   : 'text-stone-800 hover:text-stone-950 hover:bg-[#d6cebf]'
               }`}
             >
-              MOTIVE AUDIT
+              {t('tab_motive', 'MOTIVE AUDIT')}
             </button>
           </div>
         </div>
@@ -211,7 +213,7 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
             {/* Background Narrative */}
             <div className="p-4 rounded-xl bg-[#e6dfd2] border border-[#cfc7b7] space-y-1.5">
               <span className="text-[11px] font-mono text-blue-950 uppercase font-bold">
-                BACKGROUND SUMMARY
+                {t('background_header', 'BACKGROUND SUMMARY')}
               </span>
               <p className="text-xs sm:text-sm text-stone-800 leading-relaxed font-sans font-medium">
                 {selectedSuspect.public_profile.background}
@@ -224,7 +226,7 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
                 <div className="p-4 rounded-xl bg-[#e6dfd2] border border-[#cfc7b7] space-y-2">
                   <div className="flex items-center space-x-2 text-blue-950 font-mono text-xs font-bold">
                     <MessageSquareQuote className="w-4 h-4 text-blue-800" />
-                    <span>OFFICIAL VERBATIM STATEMENT</span>
+                    <span>{t('statement_header', 'OFFICIAL VERBATIM STATEMENT')}</span>
                   </div>
                   <blockquote className="text-sm font-sans italic text-stone-900 border-l-4 border-amber-600 pl-3 py-1 leading-relaxed bg-[#fbf9f5] p-3 rounded-r-lg border-y border-r border-[#cfc7b7]">
                     “{selectedSuspect.public_profile.statement}”
@@ -234,7 +236,7 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
                 <div className="p-4 rounded-xl bg-[#e6dfd2] border border-[#cfc7b7] space-y-2">
                   <div className="flex items-center space-x-2 text-emerald-950 font-mono text-xs font-bold">
                     <ShieldCheck className="w-4 h-4 text-emerald-800" />
-                    <span>FORENSIC ALIBI VERIFICATION</span>
+                    <span>{t('alibi_header', 'FORENSIC ALIBI VERIFICATION')}</span>
                   </div>
                   <p className="text-xs text-stone-800 leading-relaxed font-sans font-medium bg-[#fbf9f5] p-3 rounded-lg border border-[#cfc7b7]">
                     {selectedSuspect.public_profile.alibi}
@@ -247,7 +249,7 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
               <div className="p-4 rounded-xl bg-[#e6dfd2] border border-[#cfc7b7] space-y-3">
                 <div className="flex items-center space-x-2 text-blue-950 font-mono text-xs font-bold">
                   <FileText className="w-4 h-4 text-blue-800" />
-                  <span>VERIFIED APPAREL ON INCIDENT NIGHT</span>
+                  <span>{t('clothing_header', 'VERIFIED APPAREL ON INCIDENT NIGHT')}</span>
                 </div>
                 <p className="text-sm text-stone-800 font-sans leading-relaxed bg-[#fbf9f5] p-3 rounded-lg border border-[#cfc7b7] font-medium">
                   {selectedSuspect.public_profile.clothing}
@@ -263,7 +265,7 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
               <div className="p-4 rounded-xl bg-[#e6dfd2] border border-[#cfc7b7] space-y-3">
                 <div className="flex items-center space-x-2 text-blue-950 font-mono text-xs font-bold">
                   <Briefcase className="w-4 h-4 text-blue-800" />
-                  <span>GEAR & TOOLS CARRIED DURING INCIDENT</span>
+                  <span>{t('belongings_header', 'GEAR & TOOLS CARRIED DURING INCIDENT')}</span>
                 </div>
                 <p className="text-sm text-stone-800 font-sans leading-relaxed bg-[#fbf9f5] p-3 rounded-lg border border-[#cfc7b7] font-medium">
                   {selectedSuspect.public_profile.belongings}
@@ -278,7 +280,7 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
               <div className="p-4 rounded-xl bg-[#e6dfd2] border border-[#cfc7b7] space-y-3">
                 <div className="flex items-center space-x-2 text-red-900 font-mono text-xs font-bold">
                   <AlertOctagon className="w-4 h-4 text-red-700" />
-                  <span>POTENTIAL MOTIVE ASSESSMENT</span>
+                  <span>{t('motive_header', 'POTENTIAL MOTIVE ASSESSMENT')}</span>
                 </div>
                 <p className="text-sm text-stone-800 font-sans leading-relaxed bg-[#fbf9f5] p-3 rounded-lg border border-[#cfc7b7] font-medium">
                   {selectedSuspect.public_profile.possible_motive}
@@ -297,12 +299,12 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
               <div className="flex items-center justify-between text-blue-950 font-mono text-xs">
                 <span className="flex items-center space-x-1.5 font-bold">
                   <Edit3 className="w-3.5 h-3.5 text-blue-800" />
-                  <span>INVESTIGATOR'S LOG</span>
+                  <span>{t('notes_header', "INVESTIGATOR'S LOG")}</span>
                 </span>
                 {noteSaved && (
                   <span className="text-emerald-800 flex items-center space-x-1 font-bold">
                     <CheckCircle2 className="w-3 h-3 text-emerald-700" />
-                    <span>SAVED</span>
+                    <span>{t('note_saved_badge', 'SAVED')}</span>
                   </span>
                 )}
               </div>
@@ -310,7 +312,7 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
               <textarea
                 value={currentNote}
                 onChange={handleNoteChange}
-                placeholder={`Type your investigative observations about ${selectedSuspect.display_name}...`}
+                placeholder={`Type your observations about ${selectedSuspect.display_name}...`}
                 rows={5}
                 className="w-full bg-[#faf7f2] border-2 border-[#cfc7b7] focus:border-blue-800 focus:ring-1 focus:ring-blue-200 rounded-xl p-3 text-xs text-[#1c1917] placeholder-stone-400 font-mono outline-none resize-none shadow-inner"
               />
@@ -319,7 +321,7 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
                 onClick={handleSaveNote}
                 className="w-full py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-mono text-xs font-bold transition shadow-sm"
               >
-                SAVE LOG FOR {selectedSuspect.display_name.toUpperCase()}
+                {t('save_note_btn', 'SAVE LOG')}
               </button>
             </div>
 
@@ -327,7 +329,7 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
             <div className="p-3.5 rounded-xl bg-[#e6dfd2] border border-[#cfc7b7] text-[11px] font-mono text-stone-700 space-y-1.5">
               <span className="text-stone-900 font-bold block">QUICK JUMP:</span>
               <div className="space-y-1">
-                {INITIAL_SUSPECTS.map((s) => (
+                {suspects.map((s) => (
                   <button
                     key={s.id}
                     onClick={() => handleSelect(s)}
@@ -360,7 +362,7 @@ export const Stage3Suspects: React.FC<Stage3SuspectsProps> = ({
           }}
           className="px-6 py-3.5 rounded-xl bg-blue-800 hover:bg-blue-900 text-white font-bold font-mono text-xs tracking-wider flex items-center space-x-2 transition shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
         >
-          <span>PROCEED TO STAGE 04: EVIDENCE BOARD</span>
+          <span>{t('proceed_evidence_btn', 'PROCEED TO STAGE 04: EVIDENCE BOARD')}</span>
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>

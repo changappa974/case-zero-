@@ -11,8 +11,10 @@ import { restoreActiveSession, updateSessionProgress, submitInvestigation, reset
 import { soundFX } from './lib/audioService';
 import { AdminLeaderboard } from './pages/AdminLeaderboard';
 import { RotateCcw, AlertTriangle, ShieldAlert, Maximize2, Lock, EyeOff } from 'lucide-react';
+import { useLanguage } from './lib/i18n';
 
 export const App: React.FC = () => {
+  const { t } = useLanguage();
   const [participant, setParticipant] = useState<Participant | null>(null);
   const [session, setSession] = useState<InvestigationSession | null>(null);
   const [currentStage, setCurrentStage] = useState<InvestigationStage>(0);
@@ -530,13 +532,13 @@ export const App: React.FC = () => {
         <div className="bg-amber-100 border-b border-amber-300 px-4 py-2.5 text-[#1c1917] font-mono text-xs flex items-center justify-between shadow-sm animate-fade-in sticky top-16 z-40">
           <div className="flex items-center space-x-2.5 max-w-7xl mx-auto w-full">
             <span className="px-2 py-0.5 rounded-md bg-amber-200 text-amber-950 font-bold border border-amber-300 text-[10px] uppercase">
-              ATTENTION
+              {t('tab_switch_banner_attention', 'ATTENTION')}
             </span>
             <span className="font-semibold text-stone-900">
-              Stay in the Case Zero window during your investigation.
+              {t('tab_switch_banner_text', 'Stay in the Case Zero window during your investigation.')}
             </span>
             <span className="text-stone-600 text-[11px] hidden sm:inline">
-              (Tab switch detected: #{tabSwitchCount})
+              ({t('tab_switch_detected', 'Tab switch detected: #')}{tabSwitchCount})
             </span>
           </div>
           <button
@@ -618,7 +620,7 @@ export const App: React.FC = () => {
             {/* Top Warning Banner */}
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-red-100 border border-red-300 text-red-900 font-mono text-xs font-bold uppercase tracking-wider">
               <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-ping"></span>
-              <span>SECURITY EXAM LOCKOUT</span>
+              <span>{t('lockout_title', 'SECURITY EXAM LOCKOUT')}</span>
             </div>
 
             {/* Icon */}
@@ -630,22 +632,22 @@ export const App: React.FC = () => {
             <div className="space-y-2">
               <h2 className="text-xl sm:text-2xl font-black font-display text-[#1c1917] tracking-tight">
                 {isWindowBlurred
-                  ? "PAUSED: Window exit detected. Return to Case Zero immediately."
-                  : "⚠️ FULLSCREEN REQUIRED: You cannot leave the Case Zero exam window."}
+                  ? t('window_exit_detected', 'PAUSED: Window exit detected. Return to Case Zero immediately.')
+                  : t('fullscreen_required_msg', '⚠️ FULLSCREEN REQUIRED: You cannot leave the Case Zero exam window.')}
               </h2>
               <p className="text-xs sm:text-sm text-stone-700 font-sans max-w-sm mx-auto leading-relaxed">
-                Case Zero runs under locked kiosk conditions. All tab-switches, window blurs, and fullscreen exits are logged and audited.
+                {t('kiosk_rules_desc', 'Case Zero runs under locked kiosk conditions. All tab-switches, window blurs, and fullscreen exits are logged and audited.')}
               </p>
             </div>
 
             {/* 3-Strike Warning Meter */}
             <div className="p-4 rounded-2xl bg-[#e6dfd2] border border-[#cfc7b7] space-y-2 text-xs font-mono">
               <div className="flex justify-between items-center font-bold">
-                <span className="text-stone-800">INFRACTION AUDIT:</span>
+                <span className="text-stone-800">{t('audit_label', 'INFRACTION AUDIT:')}</span>
                 <span className={`px-2.5 py-0.5 rounded-full ${
                   strikeCount >= 2 ? 'bg-red-200 text-red-950 font-black' : 'bg-amber-200 text-amber-950'
                 }`}>
-                  Strike {strikeCount} of 3
+                  {t('strike_text', 'Strike')} {strikeCount} {t('of_three', 'of 3')}
                 </span>
               </div>
               <div className="w-full bg-[#d6cdbd] h-2.5 rounded-full overflow-hidden">
@@ -658,9 +660,9 @@ export const App: React.FC = () => {
                 />
               </div>
               <p className="text-[11px] text-red-800 font-bold font-sans text-left pt-1">
-                {strikeCount === 1 && "⚠️ Strike 1/3: Stay focused on Case Zero. Do not switch tabs or open external windows."}
-                {strikeCount === 2 && "🚨 Strike 2/3 (FINAL WARNING): One more window exit will immediately disqualify and auto-submit your exam."}
-                {strikeCount >= 3 && "⛔ Strike 3/3: Auto-submitting and tagging score with FLAGGED: EXTERNAL BROWSING DETECTED for judges."}
+                {strikeCount === 1 && t('strike_1_msg', '⚠️ Strike 1/3: Stay focused on Case Zero. Do not switch tabs or open external windows.')}
+                {strikeCount === 2 && t('strike_2_msg', '🚨 Strike 2/3 (FINAL WARNING): One more window exit will immediately disqualify and auto-submit your exam.')}
+                {strikeCount >= 3 && t('strike_3_msg', '⛔ Strike 3/3: Auto-submitting and tagging score with FLAGGED: EXTERNAL BROWSING DETECTED for judges.')}
               </p>
             </div>
 
@@ -670,7 +672,7 @@ export const App: React.FC = () => {
                 onClick={handleResumeFullscreen}
                 className="w-full py-3.5 px-6 rounded-2xl bg-blue-900 hover:bg-blue-950 text-white font-mono font-bold text-xs sm:text-sm uppercase tracking-wider shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5"
               >
-                {isFullscreenLost ? "RETURN TO FULLSCREEN" : "RESUME INVESTIGATION"}
+                {isFullscreenLost ? t('return_fullscreen_btn', 'RETURN TO FULLSCREEN') : t('resume_investigation_btn', 'RESUME INVESTIGATION')}
               </button>
             ) : (
               <div className="text-xs font-mono text-red-700 font-bold animate-pulse">
@@ -691,10 +693,10 @@ export const App: React.FC = () => {
             </div>
             <div>
               <h3 className="font-display font-black text-xl text-[#1c1917]">
-                RESETTING FOR NEXT DETECTIVE...
+                {t('resetting_title', 'RESETTING FOR NEXT DETECTIVE...')}
               </h3>
               <p className="text-xs text-stone-600 font-mono mt-1">
-                Clearing active session caches in 1 second. Ready for the next participant!
+                {t('resetting_desc', 'Clearing active session caches in 1 second. Ready for the next participant!')}
               </p>
             </div>
           </div>
@@ -704,12 +706,12 @@ export const App: React.FC = () => {
       {/* Cinematic Footer */}
       <footer className="border-t border-[#cfc7b7] bg-[#f5f0e6] py-6 text-center text-xs font-mono text-stone-600 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span className="font-bold text-stone-900">CASE ZERO // THE VISUAL MYSTERY CHALLENGE</span>
+          <span className="font-bold text-stone-900">{t('footer_brand', 'CASE ZERO // THE VISUAL MYSTERY CHALLENGE')}</span>
           <span className="text-gray-500">
-            FROSTPEAK CONSERVATORY FORENSIC INCIDENT ARCHIVE
+            {t('footer_archive', 'FROSTPEAK CONSERVATORY FORENSIC INCIDENT ARCHIVE')}
           </span>
           <span className="text-amber-700 font-semibold italic">
-            “Every Detail Tells a Story. Can You Find the Truth?”
+            {t('tagline', '“Every Detail Tells a Story. Can You Find the Truth?”')}
           </span>
         </div>
       </footer>

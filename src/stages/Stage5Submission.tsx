@@ -4,11 +4,11 @@ import {
   Send, Sparkles, User, FileText, CornerDownRight,
   RotateCcw, UserPlus, Clock, Download, Award
 } from 'lucide-react';
-import { INITIAL_SUSPECTS, INITIAL_EVIDENCE } from '../lib/caseData';
 import { Participant, InvestigationSession, SubmissionReceipt } from '../types';
 import { submitInvestigation } from '../lib/supabase';
 import { downloadCertifiedCard } from '../lib/certificateGenerator';
 import { soundFX } from '../lib/audioService';
+import { useLanguage } from '../lib/i18n';
 import confetti from 'canvas-confetti';
 
 interface Stage5SubmissionProps {
@@ -50,6 +50,10 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
   strikeCount = 0,
   isFlagged = false,
 }) => {
+  const { t, getTranslatedSuspects, getTranslatedEvidence, isKannada } = useLanguage();
+  const suspects = getTranslatedSuspects();
+  const evidenceList = getTranslatedEvidence();
+
   // Initialize with drafted values or saved localStorage
   const [selectedSuspectId, setSelectedSuspectId] = useState<string>(() => {
     if (draftSuspectId) return draftSuspectId;
@@ -203,7 +207,7 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
 
   // If already submitted and locked, display the Sealed Receipt screen!
   if (isLocked) {
-    const chosenSuspect = INITIAL_SUSPECTS.find((s) => s.id === selectedSuspectId);
+    const chosenSuspect = suspects.find((s) => s.id === selectedSuspectId);
 
     const startMs = session.started_at ? new Date(session.started_at).getTime() : Date.now();
     const endMs = receipt?.submitted_at ? new Date(receipt.submitted_at).getTime() : Date.now();
@@ -229,10 +233,10 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
 
           <div className="space-y-1">
             <span className="text-xs font-mono uppercase tracking-widest text-emerald-900 font-bold bg-emerald-100 px-3 py-1 rounded-full border border-emerald-300">
-              OFFICIAL VERIFICATION CONFIRMED
+              {t('station_locked_badge', 'OFFICIAL VERIFICATION CONFIRMED')}
             </span>
             <h1 className="text-2xl sm:text-4xl font-black font-display text-[#1c1917] tracking-tight pt-2">
-              INVESTIGATION SUBMITTED SUCCESSFULLY.
+              {t('verdict_title', 'INVESTIGATION SUBMITTED SUCCESSFULLY.')}
             </h1>
             <p className="text-xs sm:text-sm text-stone-700 font-mono">
               Your findings have been permanently encrypted and sealed in the database.
@@ -241,7 +245,7 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
 
           {/* Sealed Confirmation Code Box */}
           <div className="inline-block p-4 rounded-xl bg-[#e6dfd2] border-2 border-[#cfc7b7] font-mono text-center shadow-sm">
-            <span className="text-[11px] text-stone-600 font-bold block mb-1">OFFICIAL CASE REFERENCE CODE</span>
+            <span className="text-[11px] text-stone-600 font-bold block mb-1">{t('confirmation_code_label', 'OFFICIAL CASE REFERENCE CODE')}</span>
             <span className="text-xl sm:text-2xl font-black text-blue-950 tracking-widest">
               {confirmationCode}
             </span>
@@ -268,7 +272,7 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
             <div className="flex items-center space-x-2">
               <Award className="w-5 h-5 text-amber-600" />
               <h2 className="text-lg font-black font-display text-[#1c1917] uppercase tracking-wide">
-                OFFICIAL DETECTIVE CERTIFICATE & CARD
+                {t('credentials_badge', 'OFFICIAL DETECTIVE CERTIFICATE & CARD')}
               </h2>
             </div>
             <span className="text-[11px] font-mono text-stone-600 font-semibold">
@@ -401,7 +405,7 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
               className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold font-mono text-xs uppercase tracking-wider flex items-center justify-center space-x-2.5 shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5"
             >
               <Download className="w-4 h-4 text-stone-950" />
-              <span>DOWNLOAD DETECTIVE CARD (PNG)</span>
+              <span>{t('download_card_btn', 'DOWNLOAD DETECTIVE CARD (PNG)')}</span>
             </button>
           </div>
         </div>
@@ -420,7 +424,7 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-stone-800">
             <div>
-              <span className="text-stone-600 font-semibold block">INVESTIGATING AGENT:</span>
+              <span className="text-stone-600 font-semibold block">{t('agent_label', 'INVESTIGATING AGENT:')}</span>
               <span className="text-[#1c1917] font-bold text-sm">{participant.participant_name}</span>
             </div>
             <div>
@@ -429,12 +433,12 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
             </div>
             {chosenSuspect && (
               <div>
-                <span className="text-stone-600 font-semibold block">ACCUSED MURDERER:</span>
+                <span className="text-stone-600 font-semibold block">{t('accused_suspect_label', 'ACCUSED MURDERER:')}</span>
                 <span className="text-blue-950 font-bold text-sm">{chosenSuspect.display_name}</span>
               </div>
             )}
             <div>
-              <span className="text-stone-600 font-semibold block">EVIDENCE PIECES ATTACHED:</span>
+              <span className="text-stone-600 font-semibold block">{t('confirm_clues_label', 'EVIDENCE PIECES ATTACHED:')}</span>
               <span className="text-[#1c1917] font-bold">{selectedEvidenceCodes.join(', ') || 'ATTACHED'}</span>
             </div>
           </div>
@@ -465,7 +469,7 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
                 className="w-full sm:w-auto px-5 py-3 rounded-xl bg-blue-900 hover:bg-blue-950 text-white font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center space-x-2 transition shadow-md hover:shadow-lg shrink-0 transform hover:-translate-y-0.5"
               >
                 <UserPlus className="w-4 h-4 text-amber-300" />
-                <span>RESET FOR NEXT DETECTIVE</span>
+                <span>{t('reset_terminal_btn', 'RESET FOR NEXT DETECTIVE')}</span>
               </button>
             </div>
           )}
@@ -561,15 +565,13 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#cfc7b7] pb-4">
         <div>
           <div className="flex items-center space-x-2 text-amber-900 font-mono text-xs tracking-wider font-bold">
-            <span>STAGE 05 OF 05</span>
-            <span>//</span>
-            <span>FINAL VERDICT</span>
+            <span>{t('stage_5_badge_text', 'STAGE 05 OF 05 // FINAL VERDICT')}</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-black font-display text-[#1c1917] mt-1">
-            SUBMIT YOUR INVESTIGATION
+            {t('stage_5_heading', 'SUBMIT YOUR INVESTIGATION')}
           </h2>
           <p className="text-xs sm:text-sm text-stone-700 mt-1 font-sans">
-            Answer the three core forensic questions. Once submitted, your answers will be locked and cannot be changed.
+            {t('stage_5_desc', 'Answer the three core forensic questions. Once submitted, your answers will be locked and cannot be changed.')}
           </p>
         </div>
 
@@ -593,14 +595,14 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
           <span className="w-6 h-6 rounded-full bg-blue-100 border border-blue-300 text-blue-950 flex items-center justify-center text-xs font-black">
             1
           </span>
-          <h3 className="text-base text-[#1c1917] font-black">WHO IS THE MURDERER?</h3>
+          <h3 className="text-base text-[#1c1917] font-black">{t('step_1_title', 'WHO IS THE MURDERER?')}</h3>
         </div>
         <p className="text-xs text-stone-700 font-sans">
           Select the individual responsible for the murder of Dr. Arthur Vance at Frostpeak Conservatory.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2">
-          {INITIAL_SUSPECTS.map((s) => {
+          {suspects.map((s) => {
             const isSelected = selectedSuspectId === s.id;
 
             return (
@@ -637,14 +639,14 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
           <span className="w-6 h-6 rounded-full bg-blue-100 border border-blue-300 text-blue-950 flex items-center justify-center text-xs font-black">
             2
           </span>
-          <h3 className="text-base text-[#1c1917] font-black">WHICH PIECES OF EVIDENCE PROVE YOUR CONCLUSION?</h3>
+          <h3 className="text-base text-[#1c1917] font-black">{t('step_2_title', 'WHICH PIECES OF EVIDENCE PROVE YOUR CONCLUSION?')}</h3>
         </div>
         <p className="text-xs text-stone-700 font-sans">
           Select all critical clues that substantiate the murder method, false alibi, and forensic link to the culprit (select at least 2).
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2">
-          {INITIAL_EVIDENCE.map((ev) => {
+          {evidenceList.map((ev) => {
             const isSelected = selectedEvidenceCodes.includes(ev.code);
 
             return (
@@ -685,7 +687,7 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
           <span className="w-6 h-6 rounded-full bg-blue-100 border border-blue-300 text-blue-950 flex items-center justify-center text-xs font-black">
             3
           </span>
-          <h3 className="text-base text-[#1c1917] font-black">HOW WAS THE MURDER COMMITTED & WHAT EVIDENCE PROVES IT?</h3>
+          <h3 className="text-base text-[#1c1917] font-black">{t('step_3_title', 'HOW WAS THE MURDER COMMITTED & WHAT EVIDENCE PROVES IT?')}</h3>
         </div>
         <p className="text-xs text-stone-700 font-sans">
           State your conclusion clearly: Identify who committed the murder, analyze how their claimed alibi is disproved by the timeline and forensic evidence, explain how the crime was executed, and what motive drove the killer.
@@ -698,7 +700,7 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
             onPaste={handlePasteBlocked}
             onDrop={handleDropBlocked}
             rows={6}
-            placeholder="Type your complete investigative conclusion here: State who committed the murder, explain how the crime was executed, why their alibi fails against the physical evidence and CCTV timeline, and what motive drove them..."
+            placeholder={t('explanation_placeholder', 'Type your complete investigative conclusion here: State who committed the murder, explain how the crime was executed, why their alibi fails against the physical evidence and CCTV timeline, and what motive drove them...')}
             className="w-full bg-[#faf7f2] border-2 border-[#cfc7b7] focus:border-blue-800 focus:ring-2 focus:ring-blue-200 rounded-xl p-4 text-xs sm:text-sm text-[#1c1917] placeholder-stone-400 font-mono outline-none shadow-inner font-medium"
           />
 
@@ -737,7 +739,7 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
           className="w-full sm:w-auto px-8 py-4 rounded-xl bg-blue-800 hover:bg-blue-900 text-white font-bold font-mono text-sm tracking-wider flex items-center justify-center space-x-2 transition shadow-md hover:shadow-lg disabled:opacity-50"
         >
           <Send className="w-4 h-4" />
-          <span>FINALIZE & SUBMIT INVESTIGATION</span>
+          <span>{t('finalize_investigation_btn', 'FINALIZE & SUBMIT INVESTIGATION')}</span>
         </button>
       </div>
 
@@ -748,26 +750,26 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
             <div className="flex items-center space-x-3 text-blue-950 border-b border-[#cfc7b7] pb-3">
               <ShieldCheck className="w-6 h-6 text-blue-800" />
               <h3 className="font-display font-bold text-[#1c1917] text-base">
-                CONFIRM FINAL SUBMISSION
+                {t('confirm_modal_title', 'CONFIRM FINAL SUBMISSION')}
               </h3>
             </div>
 
             <p className="text-xs sm:text-sm text-stone-800 font-sans leading-relaxed font-medium">
-              Are you ready to submit your findings? Once submitted, your case file will be permanently sealed in the Supabase database and cannot be modified.
+              {t('confirm_modal_desc', 'Are you ready to submit your findings? Once submitted, your case file will be permanently sealed in the Supabase database and cannot be modified.')}
             </p>
 
             <div className="p-4 rounded-xl bg-[#e6dfd2] border border-[#cfc7b7] text-xs font-mono text-stone-800 space-y-1.5">
               <div>
-                <span className="text-stone-600 font-semibold">AGENT:</span> <strong className="text-[#1c1917] font-bold">{participant.participant_name}</strong>
+                <span className="text-stone-600 font-semibold">{t('agent_label', 'AGENT:')}</span> <strong className="text-[#1c1917] font-bold">{participant.participant_name}</strong>
               </div>
               <div>
-                <span className="text-stone-600 font-semibold">SELECTED SUSPECT:</span>{' '}
+                <span className="text-stone-600 font-semibold">{t('accused_suspect_label', 'SELECTED SUSPECT:')}</span>{' '}
                 <strong className="text-blue-950 font-bold">
-                  {INITIAL_SUSPECTS.find((s) => s.id === selectedSuspectId)?.display_name || 'None Selected'}
+                  {suspects.find((s) => s.id === selectedSuspectId)?.display_name || 'None Selected'}
                 </strong>
               </div>
               <div>
-                <span className="text-stone-600 font-semibold">SUPPORTING CLUES:</span>{' '}
+                <span className="text-stone-600 font-semibold">{t('confirm_clues_label', 'SUPPORTING CLUES:')}</span>{' '}
                 <strong className="text-[#1c1917] font-bold">{selectedEvidenceCodes.length} attached</strong>
               </div>
             </div>
@@ -777,7 +779,7 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
                 onClick={() => setShowConfirmModal(false)}
                 className="px-4 py-2.5 rounded-xl bg-[#e6dfd2] hover:bg-[#ded6c7] text-stone-800 font-mono text-xs font-bold transition"
               >
-                CANCEL / REVIEW
+                {t('cancel_btn', 'CANCEL / REVIEW')}
               </button>
               <button
                 onClick={handleSubmit}
@@ -785,11 +787,11 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
                 className="px-6 py-2.5 rounded-xl bg-blue-800 hover:bg-blue-900 text-white font-bold font-mono text-xs transition flex items-center space-x-2 shadow-sm"
               >
                 {isSubmitting ? (
-                  <span>SEALING FILE...</span>
+                  <span>{t('sealing_btn', 'SEALING FILE...')}</span>
                 ) : (
                   <>
                     <Send className="w-3.5 h-3.5" />
-                    <span>YES, SUBMIT CASE</span>
+                    <span>{t('yes_submit_btn', 'YES, SUBMIT CASE')}</span>
                   </>
                 )}
               </button>
