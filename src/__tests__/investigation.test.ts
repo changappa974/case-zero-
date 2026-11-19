@@ -6,6 +6,7 @@ import {
   fetchLeaderboardEntries,
   resetForNextParticipant,
   checkParticipantHasSubmitted,
+  deleteParticipantSubmission,
   isStationLocked,
   unlockStation,
   STATION_LOCK_KEY
@@ -353,5 +354,64 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
 
     // Candidate 3 (Evelyn, murderer correct) should rank ABOVE Candidate 4 (Frank, murderer wrong) on Murderer
     expect(rank3!.rank).toBeLessThan(rank4!.rank);
+  }, 25000);
+
+  it('allows organizer to delete a participant who errored out on 3 tabs and re-register fresh with the same name', async () => {
+    const studentName = 'Alex Reattempt ' + randomLetters();
+    const evelyn = INITIAL_SUSPECTS.find((s) => s.display_name === 'Dr. Evelyn Hayes')!;
+
+    // 1. Participant registers and errors out on 3 tab switches
+    const { participant, session } = await registerParticipant(studentName);
+    const receipt = await submitInvestigation(
+      session.id,
+      participant.id,
+      evelyn.id,
+      ['EV-01'],
+      'Auto-submitted due to 3 external browsing tab switches',
+      studentName,
+      session.started_at,
+      true, // isAutoSubmit
+      3, // 3 tab switches
+      true, // flagged
+      'FLAGGED: EXTERNAL BROWSING DETECTED',
+      3 // 3 strikes
+    );
+
+    expect(receipt.success).toBe(true);
+
+    // 2. Name is now blocked from registering again
+    const isBlocked = await checkParticipantHasSubmitted(studentName);
+    expect(isBlocked).toBe(true);
+
+    // Attempting to register again with same name fails
+    await expect(registerParticipant(studentName)).rejects.toThrow('already submitted');
+
+    // 3. Organizer deletes the participant from the Admin Leaderboard
+    const leaderboard = await fetchLeaderboardEntries();
+    const entry = leaderboard.find((e) => e.participantName === studentName);
+    expect(entry).toBeDefined();
+
+    const deleteSuccess = await deleteParticipantSubmission(
+      entry!.id,
+      entry!.participantName,
+      entry!.participantId,
+      entry!.sessionId
+    );
+    expect(deleteSuccess).toBe(true);
+
+    // 4. Verify participant is removed from Leaderboard and deduplication check
+    const updatedLeaderboard = await fetchLeaderboardEntries();
+    const deletedEntry = updatedLeaderboard.find((e) => e.participantName === studentName);
+    expect(deletedEntry).toBeUndefined();
+
+    const isBlockedAfterDelete = await checkParticipantHasSubmitted(studentName);
+    expect(isBlockedAfterDelete).toBe(false);
+
+    // 5. Student re-registers fresh with the exact same name!
+    const { participant: reParticipant, session: reSession } = await registerParticipant(studentName);
+    expect(reParticipant).toBeDefined();
+    expect(reParticipant.participant_name).toBe(studentName);
+    expect(reSession.status).toBe('in_progress');
+    expect(isStationLocked()).toBe(false);
   }, 25000);
 });

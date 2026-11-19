@@ -2,9 +2,9 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Trophy, Download, RefreshCw, Search, Eye, CheckCircle2, 
   XCircle, Clock, Users, Lock, ShieldAlert, FileSpreadsheet, 
-  ArrowLeft, Sun, Moon, Copy, Check, Sparkles, AlertTriangle
+  ArrowLeft, Sun, Moon, Copy, Check, Sparkles, AlertTriangle, Trash2
 } from 'lucide-react';
-import { fetchLeaderboardEntries, clearAllSubmissions } from '../lib/supabase';
+import { fetchLeaderboardEntries, clearAllSubmissions, deleteParticipantSubmission } from '../lib/supabase';
 import { LeaderboardEntry } from '../types';
 import { soundFX } from '../lib/audioService';
 import { useLanguage } from '../lib/i18n';
@@ -30,6 +30,9 @@ export const AdminLeaderboard: React.FC<AdminLeaderboardProps> = ({ onExit }) =>
   const [autoRefresh, setAutoRefresh] = useState<boolean>(true);
   const [secondsUntilRefresh, setSecondsUntilRefresh] = useState<number>(5);
   const [selectedEntry, setSelectedEntry] = useState<LeaderboardEntry | null>(null);
+  const [deletingEntry, setDeletingEntry] = useState<LeaderboardEntry | null>(null);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [actionFeedback, setActionFeedback] = useState<string>('');
   const [copiedExplanation, setCopiedExplanation] = useState<boolean>(false);
   const [isDarkProjectorMode, setIsDarkProjectorMode] = useState<boolean>(false);
   const [showClearConfirm, setShowClearConfirm] = useState<boolean>(false);
@@ -65,6 +68,33 @@ export const AdminLeaderboard: React.FC<AdminLeaderboardProps> = ({ onExit }) =>
       console.error('Error loading leaderboard:', e);
     } finally {
       if (!silent) setLoading(false);
+    }
+  };
+
+  // Delete participant & allow retake with same name
+  const handleConfirmDelete = async () => {
+    if (!deletingEntry) return;
+    setIsDeleting(true);
+    soundFX.playAlertBeep();
+    try {
+      await deleteParticipantSubmission(
+        deletingEntry.id,
+        deletingEntry.participantName,
+        deletingEntry.participantId,
+        deletingEntry.sessionId
+      );
+      setActionFeedback(`Deleted "${deletingEntry.participantName}". 3-strike tab locks & submission records cleared — they can now register again with the same name.`);
+      if (selectedEntry?.id === deletingEntry.id) {
+        setSelectedEntry(null);
+      }
+      setDeletingEntry(null);
+      await loadData(true);
+      setTimeout(() => setActionFeedback(''), 8000);
+    } catch (err) {
+      console.error('Error deleting participant:', err);
+      alert('Failed to delete participant record.');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -382,6 +412,22 @@ export const AdminLeaderboard: React.FC<AdminLeaderboardProps> = ({ onExit }) =>
 
       {/* Main Admin Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-8 py-8 space-y-8">
+        
+        {/* Deletion & Retake Feedback Notification Banner */}
+        {actionFeedback && (
+          <div className="p-4 rounded-2xl bg-emerald-100 dark:bg-emerald-950 border-2 border-emerald-400 dark:border-emerald-700 text-emerald-900 dark:text-emerald-200 font-mono text-xs font-bold flex items-center justify-between shadow-md animate-fade-in">
+            <div className="flex items-center space-x-2.5">
+              <CheckCircle2 className="w-5 h-5 text-emerald-700 dark:text-emerald-400 shrink-0" />
+              <span>{actionFeedback}</span>
+            </div>
+            <button
+              onClick={() => setActionFeedback('')}
+              className="text-emerald-800 dark:text-emerald-300 hover:text-emerald-950 font-bold px-2 py-1"
+            >
+              ✕
+            </button>
+          </div>
+        )}
         
         {/* KPI Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -728,13 +774,23 @@ export const AdminLeaderboard: React.FC<AdminLeaderboardProps> = ({ onExit }) =>
 
                         {/* Actions */}
                         <td className="py-3.5 px-4 text-right">
-                          <button
-                            onClick={() => setSelectedEntry(row)}
-                            className="px-3 py-1.5 rounded-lg bg-blue-800 hover:bg-blue-900 text-white font-mono text-[11px] font-bold flex items-center space-x-1.5 ml-auto transition shadow-sm"
-                          >
-                            <Eye className="w-3.5 h-3.5" />
-                            <span>VIEW</span>
-                          </button>
+                          <div className="flex items-center justify-end space-x-1.5">
+                            <button
+                              onClick={() => setSelectedEntry(row)}
+                              className="px-2.5 py-1.5 rounded-lg bg-blue-800 hover:bg-blue-900 text-white font-mono text-[11px] font-bold flex items-center space-x-1 transition shadow-sm"
+                              title="View Official Transcript"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                              <span>VIEW</span>
+                            </button>
+                            <button
+                              onClick={() => setDeletingEntry(row)}
+                              className="p-1.5 rounded-lg bg-red-100 hover:bg-red-200 text-red-700 dark:bg-red-950 dark:hover:bg-red-900 dark:text-red-300 border border-red-300 dark:border-red-800 transition shadow-sm"
+                              title={`Delete participant "${row.participantName}" to allow retake with same name`}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -870,12 +926,93 @@ export const AdminLeaderboard: React.FC<AdminLeaderboardProps> = ({ onExit }) =>
             </div>
 
             {/* Modal Footer */}
-            <div className="pt-2 flex justify-end">
+            <div className="pt-2 flex items-center justify-between border-t border-stone-300 dark:border-slate-800 mt-4">
+              <button
+                onClick={() => setDeletingEntry(selectedEntry)}
+                className="px-4 py-2 rounded-xl bg-red-100 hover:bg-red-200 text-red-700 dark:bg-red-950 dark:hover:bg-red-900 dark:text-red-300 border border-red-300 dark:border-red-800 font-bold text-xs uppercase transition flex items-center space-x-1.5 shadow-sm"
+                title="Delete this submission and allow the student to retake"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>DELETE & ALLOW RETAKE</span>
+              </button>
               <button
                 onClick={() => setSelectedEntry(null)}
                 className="px-5 py-2.5 rounded-xl bg-blue-800 hover:bg-blue-900 text-white font-bold uppercase transition"
               >
                 CLOSE
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deletingEntry && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in font-mono">
+          <div className={`relative w-full max-w-md rounded-3xl border p-6 sm:p-7 shadow-2xl space-y-4 ${
+            isDark ? 'bg-slate-900 border-slate-700 text-slate-100' : 'bg-[#f5f0e6] border-[#cfc7b7] text-[#1c1917]'
+          }`}>
+            <div className="flex items-center space-x-3 text-red-700 dark:text-red-400">
+              <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-950 border border-red-300 dark:border-red-800 flex items-center justify-center shrink-0">
+                <Trash2 className="w-6 h-6 text-red-600 dark:text-red-400" />
+              </div>
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider block text-red-600 dark:text-red-400">
+                  RESET / RETAKE AUTHORIZATION
+                </span>
+                <h3 className="text-lg font-black font-display leading-tight">
+                  Delete Participant?
+                </h3>
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-stone-200/60 dark:bg-slate-800/60 border border-stone-300 dark:border-slate-700 space-y-1.5 text-xs">
+              <p>
+                <strong>Participant:</strong> <span className="font-bold text-blue-800 dark:text-blue-400">{deletingEntry.participantName}</span>
+              </p>
+              <p>
+                <strong>Rank:</strong> #{deletingEntry.rank} • <strong>Score:</strong> {deletingEntry.score} pts
+              </p>
+              {deletingEntry.flagged && (
+                <p className="text-red-600 font-bold flex items-center space-x-1">
+                  <AlertTriangle className="w-3.5 h-3.5" />
+                  <span>3-Strike Browser Lockdown recorded</span>
+                </p>
+              )}
+            </div>
+
+            <p className="text-xs text-stone-600 dark:text-slate-400 leading-relaxed font-sans">
+              Deleting this participant completely clears their submission, resets 3-strike tab locks, and permits the student to <strong>register again fresh with the exact same name</strong>.
+            </p>
+
+            <div className="pt-2 flex items-center justify-end space-x-2">
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={() => setDeletingEntry(null)}
+                className={`px-4 py-2.5 rounded-xl border font-bold text-xs uppercase transition ${
+                  isDark ? 'border-slate-700 hover:bg-slate-800 text-slate-300' : 'border-stone-300 hover:bg-stone-200 text-stone-700'
+                }`}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={handleConfirmDelete}
+                className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase transition shadow-md flex items-center space-x-1.5 disabled:opacity-50"
+              >
+                {isDeleting ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Confirm Delete & Reset</span>
+                  </>
+                )}
               </button>
             </div>
           </div>

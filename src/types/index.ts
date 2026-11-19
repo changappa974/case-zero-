@@ -120,6 +120,8 @@ export interface SubmissionReceipt {
 
 export interface LeaderboardEntry {
   id: string;
+  participantId?: string;
+  sessionId?: string;
   rank: number;
   participantName: string;
   score: number;

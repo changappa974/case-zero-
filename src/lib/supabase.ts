@@ -14,6 +14,8 @@ const SESSION_POINTER_KEY = 'cz_session_pointer';
 const LOCAL_PARTICIPANTS_KEY = 'cz_local_participants';
 const LOCAL_SESSIONS_KEY = 'cz_local_sessions';
 const LOCAL_SUBMISSIONS_KEY = 'cz_local_submissions';
+const LOCAL_DELETED_SUBS_KEY = 'cz_deleted_submissions';
+const LOCAL_DELETED_PARTS_KEY = 'cz_deleted_participants';
 export const STATION_LOCK_KEY = 'cz_completed_lock';
 
 export function isStationLocked(): boolean {
@@ -50,6 +52,12 @@ export function unlockStation(passcode: string): boolean {
 export async function checkParticipantHasSubmitted(participantName: string): Promise<boolean> {
   const cleanName = participantName.trim().toLowerCase();
   if (!cleanName) return false;
+
+  // 0. If organizer has explicitly deleted this participant to permit a retake, unblock them
+  const deletedParts = getLocalStore<string>(LOCAL_DELETED_PARTS_KEY).map((n) => n.trim().toLowerCase());
+  if (deletedParts.includes(cleanName)) {
+    return false;
+  }
 
   // 1. Check local submissions cache
   try {
@@ -159,6 +167,13 @@ export async function registerParticipant(participantName: string): Promise<{ pa
   if (alreadySubmitted) {
     throw new Error('This participant has already submitted their Case Zero investigation. Retakes are not permitted.');
   }
+
+  // Clear name from deleted list if they are starting a fresh approved run
+  try {
+    const deletedParts = getLocalStore<string>(LOCAL_DELETED_PARTS_KEY);
+    const updated = deletedParts.filter((n) => n.trim().toLowerCase() !== cleanName.toLowerCase());
+    setLocalStore(LOCAL_DELETED_PARTS_KEY, updated);
+  } catch (e) {}
 
   const clientToken = 'tok_' + Math.random().toString(36).substring(2, 12) + Date.now().toString(36);
 
@@ -620,7 +635,23 @@ export async function fetchLeaderboardEntries(): Promise<LeaderboardEntry[]> {
     if (!sessionsMap[s.id]) sessionsMap[s.id] = s.started_at;
   });
 
-  const entries: LeaderboardEntry[] = allSubmissions.map((sub) => {
+  const deletedSubs = new Set(getLocalStore<string>(LOCAL_DELETED_SUBS_KEY));
+  const deletedParts = new Set(
+    getLocalStore<string>(LOCAL_DELETED_PARTS_KEY).map((n) => n.trim().toLowerCase())
+  );
+
+  const activeSubmissions = allSubmissions.filter((sub) => {
+    if (deletedSubs.has(sub.id)) return false;
+    const pName = (
+      sub.evaluation_details?.participant_name ||
+      participantsMap[sub.participant_id] ||
+      ''
+    ).trim().toLowerCase();
+    if (pName && deletedParts.has(pName)) return false;
+    return true;
+  });
+
+  const entries: LeaderboardEntry[] = activeSubmissions.map((sub) => {
     const participantName =
       sub.evaluation_details?.participant_name ||
       participantsMap[sub.participant_id] ||
@@ -687,6 +718,8 @@ export async function fetchLeaderboardEntries(): Promise<LeaderboardEntry[]> {
 
     return {
       id: sub.id,
+      participantId: sub.participant_id,
+      sessionId: sub.session_id,
       rank: 0,
       participantName,
       score: finalScore,
@@ -755,6 +788,108 @@ export async function clearAllSubmissions(passcode: string): Promise<boolean> {
   try {
     await supabase.from('case_zero_submissions').delete().neq('id', '00000000-0000-0000-0000-000000000000');
   } catch (e) {}
+  return true;
+}
+
+export async function deleteParticipantSubmission(
+  submissionId: string,
+  participantName: string,
+  participantId?: string,
+  sessionId?: string
+): Promise<boolean> {
+  const cleanName = participantName.trim().toLowerCase();
+
+  // 1. Remove from local storage
+  try {
+    const localSubs = getLocalStore<CaseZeroSubmission>(LOCAL_SUBMISSIONS_KEY);
+    const updatedSubs = localSubs.filter((s) => {
+      if (s.id === submissionId) return false;
+      if (participantId && s.participant_id === participantId) return false;
+      const sName = (s.evaluation_details?.participant_name || '').trim().toLowerCase();
+      if (sName && sName === cleanName) return false;
+      return true;
+    });
+    setLocalStore(LOCAL_SUBMISSIONS_KEY, updatedSubs);
+
+    const localParts = getLocalStore<Participant>(LOCAL_PARTICIPANTS_KEY);
+    const matchingPartIds = localParts
+      .filter((p) => p.id === participantId || p.participant_name.trim().toLowerCase() === cleanName)
+      .map((p) => p.id);
+    const updatedParts = localParts.filter(
+      (p) => p.id !== participantId && p.participant_name.trim().toLowerCase() !== cleanName
+    );
+    setLocalStore(LOCAL_PARTICIPANTS_KEY, updatedParts);
+
+    const localSess = getLocalStore<InvestigationSession>(LOCAL_SESSIONS_KEY);
+    const updatedSess = localSess.filter((sess) => {
+      if (sessionId && sess.id === sessionId) return false;
+      if (participantId && sess.participant_id === participantId) return false;
+      if (matchingPartIds.includes(sess.participant_id)) return false;
+      return true;
+    });
+    setLocalStore(LOCAL_SESSIONS_KEY, updatedSess);
+
+    // Active session pointer cleanup if it belonged to this deleted participant
+    try {
+      const activePointer = sessionStorage.getItem(SESSION_POINTER_KEY);
+      if (activePointer) {
+        const parsed = JSON.parse(activePointer);
+        if (
+          parsed.participantId === participantId ||
+          parsed.sessionId === sessionId ||
+          matchingPartIds.includes(parsed.participantId)
+        ) {
+          sessionStorage.removeItem(SESSION_POINTER_KEY);
+        }
+      }
+    } catch (e) {}
+
+    // Record in deleted tracking sets so they are unblocked for retake
+    const deletedSubs = getLocalStore<string>(LOCAL_DELETED_SUBS_KEY);
+    if (submissionId && !deletedSubs.includes(submissionId)) {
+      deletedSubs.push(submissionId);
+      setLocalStore(LOCAL_DELETED_SUBS_KEY, deletedSubs);
+    }
+
+    const deletedParts = getLocalStore<string>(LOCAL_DELETED_PARTS_KEY);
+    if (cleanName && !deletedParts.map((n) => n.toLowerCase()).includes(cleanName)) {
+      deletedParts.push(cleanName);
+      setLocalStore(LOCAL_DELETED_PARTS_KEY, deletedParts);
+    }
+
+    // Unlock station so this laptop can immediately take another student
+    unlockStation('admin2026');
+  } catch (err) {
+    console.warn('Local storage participant deletion error:', err);
+  }
+
+  // 2. Delete from Supabase
+  try {
+    await supabase.from('case_zero_submissions').delete().eq('id', submissionId);
+
+    if (participantId) {
+      await supabase.from('case_zero_submissions').delete().eq('participant_id', participantId);
+      await supabase.from('investigation_sessions').delete().eq('participant_id', participantId);
+      await supabase.from('participants').delete().eq('id', participantId);
+    }
+
+    if (cleanName) {
+      const { data: pList } = await supabase
+        .from('participants')
+        .select('id, participant_name')
+        .ilike('participant_name', cleanName);
+
+      if (pList && pList.length > 0) {
+        const ids = pList.map((p) => p.id);
+        await supabase.from('case_zero_submissions').delete().in('participant_id', ids);
+        await supabase.from('investigation_sessions').delete().in('participant_id', ids);
+        await supabase.from('participants').delete().in('id', ids);
+      }
+    }
+  } catch (err) {
+    console.warn('Supabase remote participant deletion error:', err);
+  }
+
   return true;
 }
 
