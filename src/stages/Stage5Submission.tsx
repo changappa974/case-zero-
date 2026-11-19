@@ -73,7 +73,7 @@ export const Stage5Submission: React.FC<Stage5SubmissionProps> = ({
         return JSON.parse(raw).selectedEvidenceCodes;
       }
     } catch (e) {}
-    return collectedEvidence.length > 0 ? collectedEvidence : ['EV-01', 'EV-04'];
+    return [];
   });
 
   const [explanation, setExplanation] = useState<string>(() => {
