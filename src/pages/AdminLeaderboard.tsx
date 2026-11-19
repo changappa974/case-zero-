@@ -125,15 +125,19 @@ export const AdminLeaderboard: React.FC<AdminLeaderboardProps> = ({ onExit }) =>
     const headers = [
       'Rank',
       'Participant Name',
-      'Score (out of 100)',
-      'Time Taken',
-      'Time Taken (Seconds)',
+      'Total Score (out of 100)',
+      '1. Accused Murderer',
+      '1. Murderer Correct?',
+      '1. Murderer Score (out of 40)',
+      '2. Evidence Attached',
+      '2. Evidence Score (out of 30)',
+      '3. Text Rationale Score (out of 30)',
+      '4. Time Taken',
+      '4. Time Taken Seconds',
       'Tab Switches',
       'Strikes (Out of 3)',
       'Integrity Status',
-      'Accused Suspect',
-      'Correct Culprit?',
-      'Critical Clues Found',
+      'Critical Clues Count',
       'Confirmation Code',
       'Submitted At',
       'Investigative Deduction Explanation'
@@ -143,13 +147,17 @@ export const AdminLeaderboard: React.FC<AdminLeaderboardProps> = ({ onExit }) =>
       e.rank,
       `"${e.participantName.replace(/"/g, '""')}"`,
       e.score,
+      `"${e.accusedSuspect.replace(/"/g, '""')}"`,
+      e.isCorrectCulprit ? 'YES (Dr. Evelyn Hayes)' : 'NO',
+      e.suspectScore ?? (e.isCorrectCulprit ? 40 : 0),
+      `"${e.evidenceCodes.join('; ')}"`,
+      e.evidenceScore ?? 0,
+      e.explanationScore ?? 0,
       `"${e.timeTakenFormatted}"`,
       e.timeTakenSeconds,
       e.tabSwitches || 0,
       e.strikes || 0,
       e.flagged ? '"FLAGGED: EXTERNAL BROWSING DETECTED"' : '"CLEAN"',
-      `"${e.accusedSuspect.replace(/"/g, '""')}"`,
-      e.isCorrectCulprit ? 'YES (Dr. Evelyn Hayes)' : 'NO',
       e.cluesCount,
       e.confirmationCode || '',
       `"${new Date(e.submittedAt).toLocaleString()}"`,
@@ -540,6 +548,33 @@ export const AdminLeaderboard: React.FC<AdminLeaderboardProps> = ({ onExit }) =>
           </div>
         </div>
 
+        {/* Official Ranking Criteria Indicator */}
+        <div className={`p-4 rounded-2xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs font-mono shadow-sm ${
+          isDark ? 'bg-slate-900 border-slate-800 text-slate-300' : 'bg-[#e6dfd2] border-[#cfc7b7] text-stone-800'
+        }`}>
+          <div className="flex items-center space-x-2 font-bold uppercase tracking-wider text-amber-900 dark:text-amber-400">
+            <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0" />
+            <span>OFFICIAL JURY RANKING ORDER:</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-semibold">
+            <span className="px-2.5 py-1 rounded-lg bg-blue-100 text-blue-950 border border-blue-300 dark:bg-blue-950 dark:text-blue-200">
+              1. Murderer Identification (40 pts)
+            </span>
+            <span className="text-stone-400">➔</span>
+            <span className="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-950 border border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200">
+              2. Critical Evidence (30 pts)
+            </span>
+            <span className="text-stone-400">➔</span>
+            <span className="px-2.5 py-1 rounded-lg bg-purple-100 text-purple-950 border border-purple-300 dark:bg-purple-950 dark:text-purple-200">
+              3. Text Rationale (30 pts)
+            </span>
+            <span className="text-stone-400">➔</span>
+            <span className="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-950 border border-amber-300 dark:bg-amber-950 dark:text-amber-200">
+              4. Time Taken (Speed)
+            </span>
+          </div>
+        </div>
+
         {/* Master Projector Table */}
         <div className={`rounded-2xl border overflow-hidden shadow-lg ${
           isDark ? 'bg-slate-900 border-slate-800' : 'bg-[#f5f0e6] border-[#cfc7b7]'
@@ -552,18 +587,19 @@ export const AdminLeaderboard: React.FC<AdminLeaderboardProps> = ({ onExit }) =>
                 <tr>
                   <th className="py-3.5 px-4 w-16 text-center">RANK</th>
                   <th className="py-3.5 px-4">PARTICIPANT / AGENT</th>
-                  <th className="py-3.5 px-4 text-center">SCORE</th>
-                  <th className="py-3.5 px-4 text-center">TIME TAKEN</th>
-                  <th className="py-3.5 px-4">ACCUSED SUSPECT</th>
-                  <th className="py-3.5 px-4 text-center">CLUES</th>
+                  <th className="py-3.5 px-4 text-center">TOTAL</th>
+                  <th className="py-3.5 px-4">1. MURDERER (40P)</th>
+                  <th className="py-3.5 px-4 text-center">2. EVIDENCE (30P)</th>
+                  <th className="py-3.5 px-4 text-center">3. TEXT (30P)</th>
+                  <th className="py-3.5 px-4 text-center">4. TIME (SPEED)</th>
                   <th className="py-3.5 px-4 text-center">SUBMITTED AT</th>
-                  <th className="py-3.5 px-4 text-right">EXPLANATION</th>
+                  <th className="py-3.5 px-4 text-right">TRANSCRIPT</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-200 dark:divide-slate-800">
                 {filteredEntries.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="py-12 text-center text-stone-500 font-sans">
+                    <td colSpan={9} className="py-12 text-center text-stone-500 font-sans">
                       {loading ? 'Refreshing leaderboard data...' : 'No competitor submissions found yet.'}
                     </td>
                   </tr>
@@ -624,7 +660,7 @@ export const AdminLeaderboard: React.FC<AdminLeaderboardProps> = ({ onExit }) =>
                           </div>
                         </td>
 
-                        {/* Score */}
+                        {/* Total Score */}
                         <td className="py-3.5 px-4 text-center">
                           <span className={`inline-block px-3 py-1 rounded-xl font-black text-sm shadow-sm ${
                             row.score >= 90
@@ -637,28 +673,52 @@ export const AdminLeaderboard: React.FC<AdminLeaderboardProps> = ({ onExit }) =>
                           </span>
                         </td>
 
-                        {/* Time Taken */}
-                        <td className="py-3.5 px-4 text-center font-bold text-stone-700 dark:text-slate-300">
-                          {row.timeTakenFormatted}
-                        </td>
-
-                        {/* Accused Suspect */}
+                        {/* Tier 1: Accused Murderer */}
                         <td className="py-3.5 px-4">
-                          <div className="flex items-center space-x-1.5 font-bold">
+                          <div className="flex items-center space-x-1.5">
                             {row.isCorrectCulprit ? (
                               <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                             ) : (
                               <XCircle className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />
                             )}
-                            <span className={row.isCorrectCulprit ? 'text-emerald-900 dark:text-emerald-300' : 'text-red-900 dark:text-red-300'}>
+                            <span className={`font-bold ${row.isCorrectCulprit ? 'text-emerald-900 dark:text-emerald-300' : 'text-red-900 dark:text-red-300'}`}>
                               {row.accusedSuspect}
+                            </span>
+                            <span className={`ml-auto text-[10px] px-2 py-0.5 rounded-md font-mono font-bold ${
+                              row.isCorrectCulprit 
+                                ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800' 
+                                : 'bg-red-100 text-red-900 dark:bg-red-950 dark:text-red-300 border border-red-300 dark:border-red-800'
+                            }`}>
+                              +{row.suspectScore ?? (row.isCorrectCulprit ? 40 : 0)}
                             </span>
                           </div>
                         </td>
 
-                        {/* Clues */}
-                        <td className="py-3.5 px-4 text-center font-bold">
-                          <span className="text-stone-700 dark:text-slate-300">{row.cluesCount} / 4</span>
+                        {/* Tier 2: Evidence Score */}
+                        <td className="py-3.5 px-4 text-center">
+                          <div className="inline-flex flex-col items-center">
+                            <span className="font-bold text-stone-800 dark:text-slate-200">
+                              {row.matchedEvidenceCount ?? 0}/3 critical
+                            </span>
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950 text-emerald-900 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-bold mt-0.5">
+                              +{row.evidenceScore ?? 0} pts
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* Tier 3: Text Rationale Score */}
+                        <td className="py-3.5 px-4 text-center">
+                          <span className="inline-block text-[11px] font-mono px-2.5 py-1 rounded-lg bg-purple-50 dark:bg-purple-950 text-purple-950 dark:text-purple-300 border border-purple-200 dark:border-purple-800 font-bold">
+                            +{row.explanationScore ?? 0} pts
+                          </span>
+                        </td>
+
+                        {/* Tier 4: Time Taken */}
+                        <td className="py-3.5 px-4 text-center font-bold text-stone-700 dark:text-slate-300">
+                          <div className="inline-flex items-center space-x-1">
+                            <Clock className="w-3.5 h-3.5 text-stone-400 shrink-0" />
+                            <span>{row.timeTakenFormatted}</span>
+                          </div>
                         </td>
 
                         {/* Submitted At */}
@@ -725,31 +785,51 @@ export const AdminLeaderboard: React.FC<AdminLeaderboardProps> = ({ onExit }) =>
               </div>
             )}
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[11px]">
-              <div className="p-3 rounded-xl bg-stone-200/60 dark:bg-slate-800/60 border border-stone-300 dark:border-slate-700">
-                <span className="text-stone-500 block">TOTAL SCORE</span>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 text-[11px]">
+              <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800">
+                <span className="text-stone-500 dark:text-slate-400 block font-bold">TOTAL SCORE</span>
                 <span className="text-lg font-black text-blue-800 dark:text-blue-400">{selectedEntry.score} / 100</span>
               </div>
               <div className="p-3 rounded-xl bg-stone-200/60 dark:bg-slate-800/60 border border-stone-300 dark:border-slate-700">
-                <span className="text-stone-500 block">TIME TAKEN</span>
-                <span className="text-lg font-black">{selectedEntry.timeTakenFormatted}</span>
+                <span className="text-stone-500 dark:text-slate-400 block font-bold">1. MURDERER</span>
+                <div className="flex items-center space-x-1 mt-0.5">
+                  {selectedEntry.isCorrectCulprit ? (
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  ) : (
+                    <XCircle className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                  )}
+                  <span className="font-bold text-xs truncate">
+                    +{selectedEntry.suspectScore ?? (selectedEntry.isCorrectCulprit ? 40 : 0)}/40
+                  </span>
+                </div>
               </div>
               <div className="p-3 rounded-xl bg-stone-200/60 dark:bg-slate-800/60 border border-stone-300 dark:border-slate-700">
-                <span className="text-stone-500 block">TAB SWITCHES</span>
-                <span className={`text-lg font-black ${(selectedEntry.tabSwitches || 0) > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
-                  {selectedEntry.tabSwitches || 0}
+                <span className="text-stone-500 dark:text-slate-400 block font-bold">2. EVIDENCE</span>
+                <span className="text-base font-black text-emerald-700 dark:text-emerald-400">
+                  +{selectedEntry.evidenceScore ?? 0}/30
+                </span>
+                <span className="text-[10px] text-stone-500 block">
+                  {selectedEntry.matchedEvidenceCount ?? 0}/3 clues
                 </span>
               </div>
               <div className="p-3 rounded-xl bg-stone-200/60 dark:bg-slate-800/60 border border-stone-300 dark:border-slate-700">
-                <span className="text-stone-500 block">ACCUSED SUSPECT</span>
-                <div className="flex items-center space-x-1.5 mt-0.5">
-                  {selectedEntry.isCorrectCulprit ? (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  ) : (
-                    <XCircle className="w-4 h-4 text-red-600" />
-                  )}
-                  <span className="font-bold text-sm truncate">{selectedEntry.accusedSuspect}</span>
-                </div>
+                <span className="text-stone-500 dark:text-slate-400 block font-bold">3. TEXT</span>
+                <span className="text-base font-black text-purple-700 dark:text-purple-400">
+                  +{selectedEntry.explanationScore ?? 0}/30
+                </span>
+                <span className="text-[10px] text-stone-500 block">rationale</span>
+              </div>
+              <div className="p-3 rounded-xl bg-stone-200/60 dark:bg-slate-800/60 border border-stone-300 dark:border-slate-700">
+                <span className="text-stone-500 dark:text-slate-400 block font-bold">4. TIME (SPEED)</span>
+                <span className="text-base font-black text-stone-900 dark:text-slate-100">{selectedEntry.timeTakenFormatted}</span>
+                <span className="text-[10px] text-stone-500 block">rank #{selectedEntry.rank}</span>
+              </div>
+              <div className="p-3 rounded-xl bg-stone-200/60 dark:bg-slate-800/60 border border-stone-300 dark:border-slate-700">
+                <span className="text-stone-500 dark:text-slate-400 block font-bold">TAB SWITCHES</span>
+                <span className={`text-base font-black ${(selectedEntry.tabSwitches || 0) > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
+                  {selectedEntry.tabSwitches || 0}
+                </span>
+                <span className="text-[10px] text-stone-500 block">{selectedEntry.strikes || 0}/3 strikes</span>
               </div>
             </div>
 

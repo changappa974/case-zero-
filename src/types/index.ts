@@ -127,6 +127,10 @@ export interface LeaderboardEntry {
   timeTakenFormatted: string;
   accusedSuspect: string;
   isCorrectCulprit: boolean;
+  suspectScore: number;
+  evidenceScore: number;
+  matchedEvidenceCount: number;
+  explanationScore: number;
   cluesCount: number;
   evidenceCodes: string[];
   explanation: string;

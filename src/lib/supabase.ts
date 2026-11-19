@@ -639,8 +639,45 @@ export async function fetchLeaderboardEntries(): Promise<LeaderboardEntry[]> {
 
     const isCorrectCulprit = Boolean(
       sub.selected_suspect_id === '11111111-2222-3333-4444-555555555503' ||
-      (sub.selected_suspect && sub.selected_suspect.toLowerCase().includes('evelyn'))
+      (sub.selected_suspect && sub.selected_suspect.toLowerCase().includes('evelyn')) ||
+      sub.evaluation_details?.suspect_matched
     );
+
+    const suspectScore = sub.evaluation_details?.suspect_score !== undefined
+      ? sub.evaluation_details.suspect_score
+      : (isCorrectCulprit ? 40 : 0);
+
+    // 2. Which pieces of evidence prove your conclusion?
+    // Correct critical evidence: EV-01, EV-03, EV-04, EV-05
+    const selectedEv = sub.selected_evidence || [];
+    const validEvidenceCodes = ['EV-01', 'EV-03', 'EV-04', 'EV-05'];
+    const matchedEvidenceCount = selectedEv.filter((c: string) => validEvidenceCodes.includes(c)).length;
+    let fallbackEvidenceScore = 0;
+    if (selectedEv.includes('EV-01')) fallbackEvidenceScore += 8;
+    if (selectedEv.includes('EV-03')) fallbackEvidenceScore += 8;
+    if (selectedEv.includes('EV-04')) fallbackEvidenceScore += 7;
+    if (selectedEv.includes('EV-05')) fallbackEvidenceScore += 7;
+    const evidenceScore = sub.evaluation_details?.evidence_score !== undefined
+      ? sub.evaluation_details.evidence_score
+      : fallbackEvidenceScore;
+
+    // 3. Based on the text explanation rationale
+    let explanationScore = sub.evaluation_details?.explanation_score;
+    if (explanationScore === undefined) {
+      if (sub.score !== undefined && sub.score !== null) {
+        explanationScore = Math.max(0, Math.min(30, sub.score - suspectScore - evidenceScore));
+      } else {
+        const expl = (sub.incident_explanation || '').trim();
+        let calcExpl = 0;
+        if (expl.length >= 50) calcExpl += 10;
+        if (/(orchid|pollen|cyanide|poison|tea|aconite|blue|ವಿಷ|ಆರ್ಕಿಡ್|ಪರಾಗ|ಚಹಾ)/i.test(expl)) calcExpl += 10;
+        if (/(alibi|cctv|cam 3|cam 4|corridor|service passage|contradict|fraud|fund|left-hand|faucet|gloves|ಆಲಿಬಿ|ಕ್ಯಾಮೆರಾ|ಸಿಸಿಟಿವಿ|ಕೈಗವಸು|ಎಡಗೈ)/i.test(expl)) calcExpl += 10;
+        explanationScore = Math.min(30, calcExpl);
+      }
+    }
+
+    const calculatedTotalScore = suspectScore + evidenceScore + explanationScore;
+    const finalScore = sub.score !== undefined && sub.score !== null ? sub.score : calculatedTotalScore;
 
     const isFlagged = Boolean(
       sub.evaluation_details?.flagged ||
@@ -652,11 +689,15 @@ export async function fetchLeaderboardEntries(): Promise<LeaderboardEntry[]> {
       id: sub.id,
       rank: 0,
       participantName,
-      score: sub.score || 0,
+      score: finalScore,
       timeTakenSeconds: durationSeconds || 9999,
       timeTakenFormatted,
       accusedSuspect: sub.selected_suspect || 'Unknown',
       isCorrectCulprit,
+      suspectScore,
+      evidenceScore,
+      matchedEvidenceCount,
+      explanationScore,
       cluesCount: sub.selected_evidence ? sub.selected_evidence.length : 0,
       evidenceCodes: sub.selected_evidence || [],
       explanation: sub.incident_explanation || '',
@@ -669,10 +710,33 @@ export async function fetchLeaderboardEntries(): Promise<LeaderboardEntry[]> {
     };
   });
 
-  // Sort: High score first; if tied, faster time wins; if tied, earlier submission wins
+  // Strict 4-Tier Leaderboard Ranking:
+  // Tier 1: WHO IS THE MURDERER? (Correct suspect identified ranks first: 40 pts vs 0 pts)
+  // Tier 2: WHICH PIECES OF EVIDENCE PROVE YOUR CONCLUSION? (Higher evidence score ranks next: 30, 20, 10, 0)
+  // Tier 3: BASED ON THE TEXT (Higher text explanation rationale score ranks next: 30, 20, 10, 0)
+  // Tier 4: TIME TAKEN (Faster completion time in seconds ranks next)
   entries.sort((a, b) => {
-    if (b.score !== a.score) return b.score - a.score;
-    if (a.timeTakenSeconds !== b.timeTakenSeconds) return a.timeTakenSeconds - b.timeTakenSeconds;
+    // 1. Who is the murderer?
+    if (b.suspectScore !== a.suspectScore) {
+      return b.suspectScore - a.suspectScore;
+    }
+
+    // 2. Which pieces of evidence prove your conclusion?
+    if (b.evidenceScore !== a.evidenceScore) {
+      return b.evidenceScore - a.evidenceScore;
+    }
+
+    // 3. Based on the text
+    if (b.explanationScore !== a.explanationScore) {
+      return b.explanationScore - a.explanationScore;
+    }
+
+    // 4. Time taken (lower seconds = faster detective = ranks higher)
+    if (a.timeTakenSeconds !== b.timeTakenSeconds) {
+      return a.timeTakenSeconds - b.timeTakenSeconds;
+    }
+
+    // Tiebreaker: earlier submission timestamp
     return new Date(a.submittedAt).getTime() - new Date(b.submittedAt).getTime();
   });
 

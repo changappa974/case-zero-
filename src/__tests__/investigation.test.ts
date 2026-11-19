@@ -277,4 +277,81 @@ describe('CASE ZERO: Murder at Frostpeak Conservatory Workflow & Data Integrity'
     await expect(registerParticipant('12345!@#$%')).rejects.toThrow('Please enter your full name');
     await expect(registerParticipant('   ')).rejects.toThrow('Please enter your full name');
   }, 15000);
+
+  it('ranks leaderboard participants based on: 1. Murderer 2. Evidence 3. Text Rationale 4. Time Taken', async () => {
+    const evelyn = INITIAL_SUSPECTS.find((s) => s.display_name === 'Dr. Evelyn Hayes')!;
+    const chefMarco = INITIAL_SUSPECTS.find((s) => s.display_name === 'Chef Marco')!;
+
+    // Candidate 1: Correct murderer (Evelyn), full evidence (30 pts), full text, 300s
+    const name1 = 'Alpha Detective ' + randomLetters();
+    const { participant: p1, session: s1 } = await registerParticipant(name1);
+    await submitInvestigation(
+      s1.id,
+      p1.id,
+      evelyn.id,
+      ['EV-01', 'EV-03', 'EV-04', 'EV-05'],
+      'Dr. Evelyn poisoned the tea with blue orchid aconite and washed hands at the sink faucet. CCTV corridor alibi contradicted.',
+      name1,
+      new Date(Date.now() - 300000).toISOString()
+    );
+
+    // Candidate 2: Correct murderer (Evelyn), full evidence (30 pts), full text, 600s (tied on 1, 2, 3 but slower than Candidate 1)
+    const name2 = 'Beta Detective ' + randomLetters();
+    const { participant: p2, session: s2 } = await registerParticipant(name2);
+    await submitInvestigation(
+      s2.id,
+      p2.id,
+      evelyn.id,
+      ['EV-01', 'EV-03', 'EV-04', 'EV-05'],
+      'Dr. Evelyn poisoned the tea with blue orchid aconite and washed hands at the sink faucet. CCTV corridor alibi contradicted.',
+      name2,
+      new Date(Date.now() - 600000).toISOString()
+    );
+
+    // Candidate 3: Correct murderer (Evelyn), partial evidence (16 pts), full text, 100s (faster, but lower evidence)
+    const name3 = 'Gamma Detective ' + randomLetters();
+    const { participant: p3, session: s3 } = await registerParticipant(name3);
+    await submitInvestigation(
+      s3.id,
+      p3.id,
+      evelyn.id,
+      ['EV-01', 'EV-03'],
+      'Dr. Evelyn poisoned the tea with blue orchid aconite and washed hands at the sink faucet. CCTV corridor alibi contradicted.',
+      name3,
+      new Date(Date.now() - 100000).toISOString()
+    );
+
+    // Candidate 4: WRONG murderer (Chef Marco), full evidence (30 pts), full text, 50s (very fast, but failed murderer)
+    const name4 = 'Delta Detective ' + randomLetters();
+    const { participant: p4, session: s4 } = await registerParticipant(name4);
+    await submitInvestigation(
+      s4.id,
+      p4.id,
+      chefMarco.id,
+      ['EV-01', 'EV-03', 'EV-04', 'EV-05'],
+      'Chef Marco alibi contradicted by orchid pollen on tea cup.',
+      name4,
+      new Date(Date.now() - 50000).toISOString()
+    );
+
+    const leaderboard = await fetchLeaderboardEntries();
+    const rank1 = leaderboard.find((e) => e.participantName === name1);
+    const rank2 = leaderboard.find((e) => e.participantName === name2);
+    const rank3 = leaderboard.find((e) => e.participantName === name3);
+    const rank4 = leaderboard.find((e) => e.participantName === name4);
+
+    expect(rank1).toBeDefined();
+    expect(rank2).toBeDefined();
+    expect(rank3).toBeDefined();
+    expect(rank4).toBeDefined();
+
+    // Candidate 1 (Evelyn, 3 ev, 30 text, 300s) should rank ABOVE Candidate 2 (Evelyn, 3 ev, 30 text, 600s) on Time Taken
+    expect(rank1!.rank).toBeLessThan(rank2!.rank);
+
+    // Candidate 2 (Evelyn, 3 ev) should rank ABOVE Candidate 3 (Evelyn, 2 ev) on Evidence
+    expect(rank2!.rank).toBeLessThan(rank3!.rank);
+
+    // Candidate 3 (Evelyn, murderer correct) should rank ABOVE Candidate 4 (Frank, murderer wrong) on Murderer
+    expect(rank3!.rank).toBeLessThan(rank4!.rank);
+  }, 25000);
 });
